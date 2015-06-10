@@ -1,0 +1,22 @@
+language: ruby
+sudo: false
+cache: bundler
+bundler_args: --without console
+script:
+  - bundle exec rspec
+  - bundle exec rubocop
+rvm:
+  - 2.0
+  - 2.1
+  - 2.2
+  - rbx-2
+  - jruby
+  - ruby-head
+  - jruby-head
+env:
+  global:
+    - JRUBY_OPTS='--dev -J-Xmx1024M'
+matrix:
+  allow_failures:
+    - rvm: ruby-head
+    - rvm: jruby-head
