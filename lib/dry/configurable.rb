@@ -26,8 +26,12 @@ module Dry
   module Configurable
     # @private
     def self.extended(base)
-      base.instance_variable_set(:@_config_mutex, Mutex.new)
-      base.instance_variable_set(:@_settings_mutex, Mutex.new)
+      attr_reader :_settings
+
+      base.class_eval do
+        @_config_mutex = Mutex.new
+        @_settings = ThreadSafe::Cache.new
+      end
     end
     # Return configuration
     #
@@ -70,11 +74,6 @@ module Dry
     end
 
     private
-
-    # @private
-    def _settings
-      @_settings_mutex.synchronize { @_settings ||= ThreadSafe::Cache.new }
-    end
 
     # @private
     def _config_for(&block)
