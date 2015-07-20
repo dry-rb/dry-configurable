@@ -2,6 +2,8 @@ require 'thread_safe'
 require 'dry/configurable/config'
 require 'dry/configurable/version'
 
+# A collection of micro-libraries, each intended to encapsulate
+# a common task in Ruby
 module Dry
   # A simple configuration mixin
   #
