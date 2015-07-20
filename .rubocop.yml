@@ -10,3 +10,7 @@ Style/Documentation:
 Lint/HandleExceptions:
   Exclude:
     - rakelib/*.rake
+
+Style/FileName:
+  Exclude:
+    - lib/dry-configurable.rb
