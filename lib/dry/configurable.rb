@@ -17,7 +17,7 @@ module Dry
   #     end
   #   end
   #
-  #   App.confiure do |config|
+  #   App.configure do |config|
   #     config.database.dsn = 'jdbc:sqlite:memory'
   #   end
   #
