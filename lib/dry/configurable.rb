@@ -35,6 +35,13 @@ module Dry
         @_settings = ThreadSafe::Cache.new
       end
     end
+
+    # @private
+    def inherited(subclass)
+      subclass.instance_variable_set(:@_config_mutex, @_config_mutex)
+      subclass.instance_variable_set(:@_settings, @_settings)
+    end
+
     # Return configuration
     #
     # @return [Dry::Configurable::Config]
@@ -46,6 +53,7 @@ module Dry
         @_config = Config.new(*_settings.keys).new(*_settings.values) unless _settings.empty?
       end
     end
+
     # Return configuration
     #
     # @yield [Dry::Configuration::Config]
@@ -56,6 +64,7 @@ module Dry
     def configure
       yield(config) if block_given?
     end
+
     # Add a setting to the configuration
     #
     # @param [Mixed] key
