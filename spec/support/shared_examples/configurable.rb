@@ -56,9 +56,7 @@ RSpec.shared_examples 'a configurable class' do
           klass.setting :database do
             setting :dsn, 'sqlite:memory'
           end
-        end
 
-        before do
           klass.configure do |config|
             config.database.dsn = 'jdbc:sqlite:memory'
           end
@@ -66,6 +64,21 @@ RSpec.shared_examples 'a configurable class' do
 
         it 'updates the config value' do
           expect(klass.config.database.dsn).to eq('jdbc:sqlite:memory')
+        end
+      end
+
+      context 'when inherited' do
+        before do
+          klass.setting :dsn
+          klass.configure do |config|
+            config.dsn = 'jdbc:sqlite:memory'
+          end
+        end
+
+        subject!(:subclass) { Class.new(klass) }
+
+        it 'retains its configuration' do
+          expect(subclass.config.dsn).to eq('jdbc:sqlite:memory')
         end
       end
     end
