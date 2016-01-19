@@ -40,7 +40,7 @@ module Dry
     def inherited(subclass)
       subclass.instance_variable_set(:@_config_mutex, @_config_mutex)
       subclass.instance_variable_set(:@_settings, @_settings)
-      subclass.instance_variable_set(:@_config, @_config) if defined?(@_config)
+      subclass.instance_variable_set(:@_config, @_config.clone) if defined?(@_config)
       super
     end
 
