@@ -92,6 +92,16 @@ RSpec.shared_examples 'a configurable class' do
             expect(klass.config.dsn).to eq('jdbc:sqlite:memory')
           end
         end
+
+        context 'when the inherited settings are modified' do
+          before do
+            subclass.setting :db
+          end
+
+          it 'does not modify the original' do
+            expect(klass._settings.keys).to_not include(:db)
+          end
+        end
       end
     end
   end
