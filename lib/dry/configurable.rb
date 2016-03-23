@@ -1,4 +1,4 @@
-require 'thread_safe'
+require 'concurrent'
 require 'dry/configurable/config'
 require 'dry/configurable/version'
 
@@ -32,7 +32,7 @@ module Dry
 
       base.class_eval do
         @_config_mutex = Mutex.new
-        @_settings = ThreadSafe::Cache.new
+        @_settings = Concurrent::Map.new
       end
     end
 
