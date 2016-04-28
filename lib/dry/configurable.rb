@@ -28,8 +28,6 @@ module Dry
   module Configurable
     # @private
     def self.extended(base)
-      attr_reader :_settings
-
       base.class_eval do
         @_config_mutex = Mutex.new
         @_settings = Concurrent::Map.new
@@ -84,6 +82,12 @@ module Dry
     def setting(key, default = nil, &block)
       default = _config_for(&block) if block_given?
       _settings[key] = default
+    end
+
+
+    # @private no, really...
+    def _settings
+      @_settings
     end
 
     private
