@@ -84,7 +84,6 @@ module Dry
       _settings[key] = default
     end
 
-
     # @private no, really...
     def _settings
       @_settings
