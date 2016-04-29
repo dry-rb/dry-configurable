@@ -1,0 +1,23 @@
+engines:
+  rubocop:
+    enabled: true
+    checks:
+      Rubocop/Metrics/LineLength:
+        enabled: true
+        max: 120
+      Rubocop/Style/Documentation:
+        enabled: false
+      Rubocop/Lint/HandleExceptions:
+        enabled: true
+        exclude:
+          - rakelib/*.rake
+      Rubocop/Style/FileName:
+        enabled: true
+        exclude:
+          - lib/dry-configurable.rb
+ratings:
+  paths:
+    - lib/**/*.rb
+  exclude_paths:
+    - spec/**/*
+    - examples/**/*
