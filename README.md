@@ -1,11 +1,16 @@
-# dry-configurable <a href="https://gitter.im/dry-rb/chat" target="_blank">![Join the chat at https://gitter.im/dry-rb/chat](https://badges.gitter.im/Join%20Chat.svg)</a>
+[gitter]: https://gitter.im/dry-rb/chat
+[gem]: https://rubygems.org/gems/dry-configurable
+[travis]: https://travis-ci.org/dry-rb/dry-configurable
+[code_climate]: https://codeclimate.com/github/dry-rb/dry-configurable
+[inch]: http://inch-ci.org/github/dry-rb/dry-configurable
 
-<a href="https://rubygems.org/gems/dry-configurable" target="_blank">![Gem Version](https://badge.fury.io/rb/dry-configurable.svg)</a>
-<a href="https://travis-ci.org/dry-rb/dry-configurable" target="_blank">![Build Status](https://travis-ci.org/dry-rb/dry-configurable.svg?branch=master)</a>
-<a href="https://gemnasium.com/dry-rb/dry-configurable" target="_blank">![Dependency Status](https://gemnasium.com/dry-rb/dry-configurable.svg)</a>
-<a href="https://codeclimate.com/github/dry-rb/dry-configurable" target="_blank">![Code Climate](https://codeclimate.com/github/dry-rb/dry-configurable/badges/gpa.svg)</a>
-<a href="http://inch-ci.org/github/dry-rb/dry-configurable" target="_blank">![Documentation Status](http://inch-ci.org/github/dry-rb/dry-configurable.svg?branch=master&style=flat)</a>
+# dry-configurable [![Join the Gitter chat](https://badges.gitter.im/Join%20Chat.svg)][gitter]
 
+[![Gem Version](https://img.shields.io/gem/v/dry-configurable.svg)][gem]
+[![Build Status](https://img.shields.io/travis/dry-rb/dry-configurable.svg)][travis]
+[![Code Climate](https://img.shields.io/codeclimate/github/dry-rb/dry-configurable.svg)][code_climate]
+[![Test Coverage](https://img.shields.io/codeclimate/coverage/github/dry-rb/dry-configurable.svg)][code_climate]
+[![API Documentation Coverage](http://inch-ci.org/github/dry-rb/dry-configurable.svg)][inch]
 
 ## Synopsis
 
