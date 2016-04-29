@@ -4,7 +4,6 @@ cache: bundler
 bundler_args: --without console
 script:
   - bundle exec rspec
-  - bundle exec rubocop
 rvm:
   - 2.0
   - 2.1
