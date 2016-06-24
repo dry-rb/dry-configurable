@@ -48,9 +48,9 @@ module Dry
     #
     # @api public
     def config
+      return @_config if defined?(@_config)
       @_config_mutex.synchronize do
-        return @_config if defined?(@_config)
-        @_config = Config.new(*_settings.keys).new(*_settings.values) unless _settings.empty?
+        @_config ||= Config.new(*_settings.keys).new(*_settings.values) unless _settings.empty?
       end
     end
 
