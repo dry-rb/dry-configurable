@@ -1,7 +1,7 @@
 module Dry
   module Configurable
     # @private
-    class Config < Struct
+    class Config < ::Struct
     end
   end
 end
