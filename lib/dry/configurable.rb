@@ -29,14 +29,14 @@ module Dry
     # @private
     def self.extended(base)
       base.class_eval do
-        @_config_mutex = Mutex.new
-        @_settings = Concurrent::Map.new
+        @_config_mutex = ::Mutex.new
+        @_settings = ::Concurrent::Map.new
       end
     end
 
     # @private
     def inherited(subclass)
-      subclass.instance_variable_set(:@_config_mutex, Mutex.new)
+      subclass.instance_variable_set(:@_config_mutex, ::Mutex.new)
       subclass.instance_variable_set(:@_settings, @_settings.clone)
       subclass.instance_variable_set(:@_config, @_config.clone) if defined?(@_config)
       super
@@ -50,7 +50,7 @@ module Dry
     def config
       return @_config if defined?(@_config)
       @_config_mutex.synchronize do
-        @_config ||= Config.new(*_settings.keys).new(*_settings.values) unless _settings.empty?
+        @_config ||= ::Dry::Configurable::Config.create(_settings) unless _settings.empty?
       end
     end
 
@@ -93,7 +93,7 @@ module Dry
 
     # @private
     def _config_for(&block)
-      config_klass = Class.new { extend Dry::Configurable }
+      config_klass = ::Class.new { extend ::Dry::Configurable }
       config_klass.instance_eval(&block)
       config_klass.config
     end
