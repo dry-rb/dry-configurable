@@ -1,40 +1,86 @@
 RSpec.shared_examples 'a configurable class' do
   describe Dry::Configurable do
-    describe 'settings' do
-      context 'without default value' do
-        before do
-          klass.setting :dsn
-        end
+    describe '.setting' do
+      context 'without nesting' do
+        context 'without default value' do
+          before do
+            klass.setting :dsn
+          end
 
-        it 'returns nil' do
-          expect(klass.config.dsn).to be(nil)
-        end
-      end
-
-      context 'with default value' do
-        before do
-          klass.setting :dsn, 'sqlite:memory'
-        end
-
-        it 'returns the default value' do
-          expect(klass.config.dsn).to eq('sqlite:memory')
-        end
-      end
-
-      context 'nested configuration' do
-        before do
-          klass.setting :database do
-            setting :dsn, 'sqlite:memory'
+          it 'returns nil' do
+            expect(klass.config.dsn).to be(nil)
           end
         end
 
-        it 'returns the default value' do
-          expect(klass.config.database.dsn).to eq('sqlite:memory')
+        context 'with default value' do
+          before do
+            klass.setting :dsn, 'sqlite:memory'
+          end
+
+          it 'returns the default value' do
+            expect(klass.config.dsn).to eq('sqlite:memory')
+          end
+        end
+
+        context 'with a lazy default value' do
+          before do
+            klass.setting :adapter, 'sqlite'
+            klass.setting :mechanism, 'memory'
+            klass.setting :dsn do |config|
+              "#{config.adapter}:#{config.mechanism}"
+            end
+          end
+
+          it 'returns the lazily evaluated default value' do
+            expect(klass.config.dsn).to eq('sqlite:memory')
+          end
+        end
+      end
+
+      context 'with nesting' do
+        context 'without default value' do
+          before do
+            klass.setting :database do
+              setting :dsn
+            end
+          end
+
+          it 'returns nil' do
+            expect(klass.config.database.dsn).to be(nil)
+          end
+        end
+
+        context 'with default value' do
+          before do
+            klass.setting :database do
+              setting :dsn, 'sqlite:memory'
+            end
+          end
+
+          it 'returns the default value' do
+            expect(klass.config.database.dsn).to eq('sqlite:memory')
+          end
+        end
+
+        context 'with a lazy default value' do
+          before do
+            klass.setting :database do
+              setting :adapter, 'sqlite'
+              setting :mechanism, 'memory'
+              setting :dsn do |config|
+                "#{config.adapter}:#{config.mechanism}"
+              end
+            end
+          end
+
+          it 'returns the lazily evaluated default value' do
+            expect(klass.config.database.dsn).to eq('sqlite:memory')
+          end
         end
       end
     end
 
-    describe 'configuration' do
+    describe '.configure' do
       context 'without nesting' do
         before do
           klass.setting :dsn, 'sqlite:memory'

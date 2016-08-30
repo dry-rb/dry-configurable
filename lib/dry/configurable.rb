@@ -1,5 +1,6 @@
 require 'concurrent'
 require 'dry/configurable/config'
+require 'dry/configurable/config/value/lazy'
 require 'dry/configurable/version'
 
 # A collection of micro-libraries, each intended to encapsulate
@@ -30,7 +31,7 @@ module Dry
     def self.extended(base)
       base.class_eval do
         @_config_mutex = ::Mutex.new
-        @_settings = ::Concurrent::Map.new
+        @_settings = ::Concurrent::Hash.new
       end
     end
 
@@ -50,7 +51,7 @@ module Dry
     def config
       return @_config if defined?(@_config)
       @_config_mutex.synchronize do
-        @_config ||= ::Dry::Configurable::Config.create(_settings) unless _settings.empty?
+        @_config ||= ::Dry::Configurable::Config.new(_settings) unless _settings.empty?
       end
     end
 
@@ -80,8 +81,17 @@ module Dry
     #
     # @api public
     def setting(key, default = nil, &block)
-      default = _config_for(&block) if block_given?
-      _settings[key] = default
+      if block
+        if block.arity.zero?
+          _settings[key] = _config_for(&block)
+        else
+          _settings[key] = ::Dry::Configurable::Config::Value::Lazy.new(
+            block
+          )
+        end
+      else
+        _settings[key] = default
+      end
     end
 
     # @private no, really...
