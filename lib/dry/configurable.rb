@@ -1,5 +1,6 @@
 require 'concurrent'
 require 'dry/configurable/config'
+require 'dry/configurable/config/value'
 require 'dry/configurable/version'
 
 # A collection of micro-libraries, each intended to encapsulate
@@ -30,7 +31,7 @@ module Dry
     def self.extended(base)
       base.class_eval do
         @_config_mutex = ::Mutex.new
-        @_settings = ::Concurrent::Map.new
+        @_settings = ::Concurrent::Array.new
       end
     end
 
@@ -79,9 +80,21 @@ module Dry
     # @return [Dry::Configurable::Config]
     #
     # @api public
-    def setting(key, default = nil, &block)
-      default = _config_for(&block) if block_given?
-      _settings[key] = default
+    def setting(key, value = ::Dry::Configurable::Config::Value::NONE, processor: nil, &block)
+      _settings << ::Dry::Configurable::Config::Value.new(
+        key,
+        block ? _config_for(&block) : value,
+        processor || ::Dry::Configurable::Config::DEFAULT_PROCESSOR
+      )
+    end
+
+    # Return an array of setting names
+    #
+    # @return [Array]
+    #
+    # @api public
+    def settings
+      _settings.map(&:name)
     end
 
     # @private no, really...
