@@ -6,6 +6,11 @@ require 'dry/configurable/version'
 # A collection of micro-libraries, each intended to encapsulate
 # a common task in Ruby
 module Dry
+  # @private
+  SETTING_OPTIONS = {
+    processor: ::Dry::Configurable::Config::DEFAULT_PROCESSOR
+  }.freeze
+
   # A simple configuration mixin
   #
   # @example
@@ -71,7 +76,10 @@ module Dry
     # @param [Mixed] key
     #   The accessor key for the configuration value
     # @param [Mixed] default
-    #   The default config value
+    #   The default config value (optional)
+    # @param [Hash] options
+    # @option options [Symbol] :processor
+    #   An optional proc used to preprocess the config value when set
     #
     # @yield
     #   If a block is given, it will be evaluated in the context of
@@ -80,11 +88,13 @@ module Dry
     # @return [Dry::Configurable::Config]
     #
     # @api public
-    def setting(key, value = ::Dry::Configurable::Config::Value::NONE, processor: nil, &block)
+    def setting(key, *args, &block)
+      value, options = process_setting_args(args)
+
       _settings << ::Dry::Configurable::Config::Value.new(
         key,
         block ? _config_for(&block) : value,
-        processor || ::Dry::Configurable::Config::DEFAULT_PROCESSOR
+        options.fetch(:processor, ::Dry::Configurable::Config::DEFAULT_PROCESSOR)
       )
     end
 
@@ -109,6 +119,32 @@ module Dry
       config_klass = ::Class.new { extend ::Dry::Configurable }
       config_klass.instance_eval(&block)
       config_klass.config
+    end
+
+    # @private
+    def process_setting_args(args)
+      case args.length
+      when 0
+        [::Dry::Configurable::Config::Value::NONE, {}]
+      when 1
+        value = args.first
+
+        if args.first.is_a?(::Hash)
+          options = SETTING_OPTIONS.each_with_object({}) do |tuple, hash|
+            hash[tuple.first] = value.delete(tuple.first) || tuple.last
+          end
+
+          if value.keys.length > 0
+            [value, options]
+          else
+            [::Dry::Configurable::Config::Value::NONE, options]
+          end
+        else
+          [args.first, {}]
+        end
+      else
+        args
+      end
     end
   end
 end

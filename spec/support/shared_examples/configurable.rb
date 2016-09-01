@@ -2,7 +2,7 @@ RSpec.shared_examples 'a configurable class' do
   describe Dry::Configurable do
     describe 'settings' do
       context 'without processor option' do
-        context 'without default value' do
+        context 'with no default value' do
           before do
             klass.setting :dsn
           end
@@ -12,13 +12,41 @@ RSpec.shared_examples 'a configurable class' do
           end
         end
 
-        context 'with default value' do
-          before do
-            klass.setting :dsn, 'sqlite:memory'
+        context 'with a default value' do
+          context 'with a nil default value' do
+            before do
+              klass.setting :dsn, nil
+            end
+
+            it 'returns the default value' do
+              expect(klass.config.dsn).to be(nil)
+            end
           end
 
-          it 'returns the default value' do
-            expect(klass.config.dsn).to eq('sqlite:memory')
+          context 'with a string default value' do
+            before do
+              klass.setting :dsn, 'sqlite:memory'
+            end
+
+            it 'returns the default value' do
+              expect(klass.config.dsn).to eq('sqlite:memory')
+            end
+          end
+
+          context 'with a hash default value' do
+            before do
+              klass.setting :db_config, {
+                user: 'root',
+                password: ''
+              }
+            end
+
+            it 'returns the default value' do
+              expect(klass.config.db_config).to eq(
+                user: 'root',
+                password: ''
+              )
+            end
           end
         end
 
@@ -36,7 +64,7 @@ RSpec.shared_examples 'a configurable class' do
       end
 
       context 'with processor option' do
-        context 'without default value' do
+        context 'with no default value' do
           before do
             klass.setting :dsn, processor: ->(dsn) { "sqlite:#{dsn}" }
           end
@@ -51,7 +79,7 @@ RSpec.shared_examples 'a configurable class' do
             klass.setting :dsn, 'memory', processor: ->(dsn) { "sqlite:#{dsn}" }
           end
 
-          it 'returns the default value' do
+          it 'returns the processed default value' do
             expect(klass.config.dsn).to eq('sqlite:memory')
           end
         end
@@ -63,7 +91,7 @@ RSpec.shared_examples 'a configurable class' do
             end
           end
 
-          it 'returns the default value' do
+          it 'returns the processed default value' do
             expect(klass.config.database.dsn).to eq('sqlite:memory')
           end
         end
@@ -99,7 +127,7 @@ RSpec.shared_examples 'a configurable class' do
             end
           end
 
-          it 'updates the config value' do
+          it 'updates and processes the config value' do
             expect(klass.config.dsn).to eq('jdbc:sqlite:memory')
           end
         end
@@ -133,7 +161,7 @@ RSpec.shared_examples 'a configurable class' do
             end
           end
 
-          it 'updates the config value' do
+          it 'updates and processes the config value' do
             expect(klass.config.database.dsn).to eq('jdbc:sqlite:memory')
           end
         end
