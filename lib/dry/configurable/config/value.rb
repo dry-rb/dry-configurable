@@ -4,7 +4,7 @@ module Dry
       # @private
       class Value
         # @private
-        NONE = Object.new.freeze
+        NONE = ::Object.new.freeze
 
         attr_reader :name, :processor
 
