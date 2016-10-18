@@ -23,8 +23,12 @@ class App
     # Can pass a default value
     setting :dsn, 'sqlite:memory'
   end
+  
   # Defaults to nil if no default value is given
   setting :adapter
+  
+  # Pre-process values
+  setting :path, 'test', processor: ->(value) { Pathname(value) }
 end
 
 App.configure do |config|
@@ -33,7 +37,12 @@ end
 
 App.config.database.dsn
 # => 'jdbc:sqlite:memory'
-App.config.adapter # => nil
+
+App.config.adapter
+# => nil
+
+App.config.path
+# => #<Pathname:test>
 ```
 
 ## License
