@@ -28,7 +28,7 @@ class App
   setting :adapter
   
   # Pre-process values
-  setting :path, 'test', processor: ->(value) { Pathname(value) }
+  setting(:path, 'test') { |value| Pathname(value) }
 end
 
 App.configure do |config|
