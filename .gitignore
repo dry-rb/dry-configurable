@@ -6,3 +6,4 @@ bin/
 tmp/
 .idea/
 Gemfile.lock
+spec/examples.txt
