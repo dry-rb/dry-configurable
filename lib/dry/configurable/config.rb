@@ -17,6 +17,14 @@ module Dry
           end
         end
 
+        klass.__send__(:define_method, '[]') do |name|
+          __send__(name)
+        end
+
+        klass.__send__(:define_method, '[]=') do |name, value|
+          __send__("#{name}=", value)
+        end
+
         klass.new(settings)
       end
 
