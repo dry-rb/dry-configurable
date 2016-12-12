@@ -17,14 +17,6 @@ module Dry
           end
         end
 
-        klass.__send__(:define_method, '[]') do |name|
-          __send__(name)
-        end
-
-        klass.__send__(:define_method, '[]=') do |name, value|
-          __send__("#{name}=", value)
-        end
-
         klass.new(settings)
       end
 
@@ -64,6 +56,14 @@ module Dry
         end
       end
       alias to_hash to_h
+
+      def [](name)
+        public_send(name)
+      end
+
+      def []=(name, value)
+        public_send("#{name}=", value)
+      end
     end
   end
 end

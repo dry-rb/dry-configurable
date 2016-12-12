@@ -29,22 +29,6 @@ RSpec.describe Dry::Configurable::Config do
         .from(nil)
         .to('h4xz0rz')
     end
-
-    it 'allows access to settings in the subclass through a hash interface' do
-      expect(config[:db]).to eq('sqlite:memory')
-      expect(config[:user]).to eq('root')
-      expect(config[:pass]).to be(nil)
-
-      expect { config[:db] = 'ineedm0ar' }.to change(config, :db)
-        .from('sqlite:memory')
-        .to('ineedm0ar:memory')
-      expect { config[:user] = 'whoami' }.to change(config, :user)
-        .from('root')
-        .to('whoami')
-      expect { config[:pass] = 'h4xz0rz' }.to change(config, :pass)
-        .from(nil)
-        .to('h4xz0rz')
-    end
   end
 
   describe '#clone' do
@@ -142,6 +126,28 @@ RSpec.describe Dry::Configurable::Config do
           }
         )
       end
+    end
+  end
+
+  describe '#[]' do
+    it 'returns given setting' do
+      expect(config[:db]).to eq('sqlite:memory')
+      expect(config[:user]).to eq('root')
+      expect(config[:pass]).to be(nil)
+    end
+  end
+
+  describe '#[]=' do
+    it 'sets given setting' do
+      expect { config[:db] = 'ineedm0ar' }.to change(config, :db)
+        .from('sqlite:memory')
+        .to('ineedm0ar:memory')
+      expect { config[:user] = 'whoami' }.to change(config, :user)
+        .from('root')
+        .to('whoami')
+      expect { config[:pass] = 'h4xz0rz' }.to change(config, :pass)
+        .from(nil)
+        .to('h4xz0rz')
     end
   end
 end
