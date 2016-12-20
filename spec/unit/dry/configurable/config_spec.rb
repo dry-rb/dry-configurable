@@ -135,6 +135,12 @@ RSpec.describe Dry::Configurable::Config do
       expect(config[:user]).to eq('root')
       expect(config[:pass]).to be(nil)
     end
+
+    it 'raises an ArgumentError when setting does not exist' do
+      expect { config[:unknown] }.to raise_error(
+        ArgumentError, '+unknown+ is not a setting name'
+      )
+    end
   end
 
   describe '#[]=' do
@@ -148,6 +154,12 @@ RSpec.describe Dry::Configurable::Config do
       expect { config[:pass] = 'h4xz0rz' }.to change(config, :pass)
         .from(nil)
         .to('h4xz0rz')
+    end
+
+    it 'raises an ArgumentError when setting does not exist' do
+      expect { config[:unknown] = 'unknown' }.to raise_error(
+        ArgumentError, '+unknown+ is not a setting name'
+      )
     end
   end
 end
