@@ -128,4 +128,48 @@ RSpec.describe Dry::Configurable::Config do
       end
     end
   end
+
+  describe '#[]' do
+    it 'returns given setting' do
+      expect(config[:db]).to eq('sqlite:memory')
+      expect(config[:user]).to eq('root')
+      expect(config[:pass]).to be(nil)
+    end
+
+    it 'raises an ArgumentError when setting does not exist' do
+      expect { config[:unknown] }.to raise_error(
+        ArgumentError, '+unknown+ is not a setting name'
+      )
+    end
+
+    it 'accepts setting name as a string' do
+      expect(config['user']).to eq('root')
+    end
+  end
+
+  describe '#[]=' do
+    it 'sets given setting' do
+      expect { config[:db] = 'ineedm0ar' }.to change(config, :db)
+        .from('sqlite:memory')
+        .to('ineedm0ar:memory')
+      expect { config[:user] = 'whoami' }.to change(config, :user)
+        .from('root')
+        .to('whoami')
+      expect { config[:pass] = 'h4xz0rz' }.to change(config, :pass)
+        .from(nil)
+        .to('h4xz0rz')
+    end
+
+    it 'raises an ArgumentError when setting does not exist' do
+      expect { config[:unknown] = 'unknown' }.to raise_error(
+        ArgumentError, '+unknown+ is not a setting name'
+      )
+    end
+
+    it 'accepts setting name as a string' do
+      expect { config['user'] = 'whoami' }.to change(config, :user)
+        .from('root')
+        .to('whoami')
+    end
+  end
 end

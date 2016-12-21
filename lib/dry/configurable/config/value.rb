@@ -9,7 +9,7 @@ module Dry
         attr_reader :name, :processor
 
         def initialize(name, value, processor)
-          @name, @value, @processor = name, value, processor
+          @name, @value, @processor = name.to_sym, value, processor
         end
 
         def value

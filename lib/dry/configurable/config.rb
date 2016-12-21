@@ -56,6 +56,26 @@ module Dry
         end
       end
       alias to_hash to_h
+
+      def [](name)
+        raise_unknown_setting_error(name) unless setting?(name)
+        public_send(name)
+      end
+
+      def []=(name, value)
+        raise_unknown_setting_error(name) unless setting?(name)
+        public_send("#{name}=", value)
+      end
+
+      private
+
+      def raise_unknown_setting_error(name)
+        raise ArgumentError, "+#{name}+ is not a setting name"
+      end
+
+      def setting?(name)
+        @config.key?(name.to_sym)
+      end
     end
   end
 end

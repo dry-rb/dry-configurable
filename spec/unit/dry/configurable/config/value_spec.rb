@@ -5,6 +5,14 @@ RSpec.describe Dry::Configurable::Config::Value do
   let(:value) { 'test' }
   let(:processor) { ->(v) { v }}
 
+  describe '#initialize' do
+    it 'coerces string name to symbol' do
+      config = klass.new('db', value, processor)
+
+      expect(config.name).to eq(:db)
+    end
+  end
+
   describe '#name' do
     subject! { config.name }
 
