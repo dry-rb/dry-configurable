@@ -74,7 +74,7 @@ module Dry
       end
 
       def setting?(name)
-        @config.key?(name)
+        @config.key?(name.to_sym)
       end
     end
   end

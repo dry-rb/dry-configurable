@@ -141,6 +141,10 @@ RSpec.describe Dry::Configurable::Config do
         ArgumentError, '+unknown+ is not a setting name'
       )
     end
+
+    it 'accepts setting name as a string' do
+      expect(config['user']).to eq('root')
+    end
   end
 
   describe '#[]=' do
@@ -160,6 +164,12 @@ RSpec.describe Dry::Configurable::Config do
       expect { config[:unknown] = 'unknown' }.to raise_error(
         ArgumentError, '+unknown+ is not a setting name'
       )
+    end
+
+    it 'accepts setting name as a string' do
+      expect { config['user'] = 'whoami' }.to change(config, :user)
+        .from('root')
+        .to('whoami')
     end
   end
 end
