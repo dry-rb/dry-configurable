@@ -36,6 +36,10 @@ App.config.database.dsn
 App.config.adapter # => nil
 ```
 
+## Links
+
+* [Documentation](http://dry-rb.org/gems/dry-configurable)
+
 ## License
 
 See `LICENSE` file.
