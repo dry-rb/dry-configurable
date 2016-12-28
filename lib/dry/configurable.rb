@@ -50,9 +50,16 @@ module Dry
     # @api public
     def config
       return @_config if defined?(@_config)
-      @_config_mutex.synchronize do
-        @_config ||= ::Dry::Configurable::Config.create(_settings) unless _settings.empty?
-      end
+      create_config
+    end
+
+    # Resets configuration to default values
+    #
+    # @return [Dry::Configurable::Config]
+    #
+    # @api public
+    def reset_configuration
+      create_config
     end
 
     # Return configuration
@@ -117,6 +124,13 @@ module Dry
       config_klass = ::Class.new { extend ::Dry::Configurable }
       config_klass.instance_eval(&block)
       config_klass.config
+    end
+
+    # @private
+    def create_config
+      @_config_mutex.synchronize do
+        @_config = ::Dry::Configurable::Config.create(_settings) unless _settings.empty?
+      end
     end
   end
 end

@@ -242,5 +242,21 @@ RSpec.shared_examples 'a configurable class' do
         end
       end
     end
+
+    describe 'reset_configuration' do
+      before do
+        klass.setting :dsn, nil
+
+        klass.configure do |config|
+          config.dsn = 'sqlite:memory'
+        end
+
+        klass.reset_configuration
+      end
+
+      it 'resets configuration to default values' do
+        expect(klass.config.dsn).to be_nil
+      end
+    end
   end
 end
