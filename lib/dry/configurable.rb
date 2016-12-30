@@ -53,15 +53,6 @@ module Dry
       create_config
     end
 
-    # Resets configuration to default values
-    #
-    # @return [Dry::Configurable::Config]
-    #
-    # @api public
-    def reset_config
-      create_config
-    end
-
     # Return configuration
     #
     # @yield [Dry::Configuration::Config]
