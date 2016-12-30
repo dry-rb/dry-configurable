@@ -58,7 +58,7 @@ module Dry
     # @return [Dry::Configurable::Config]
     #
     # @api public
-    def reset_configuration
+    def reset_config
       create_config
     end
 

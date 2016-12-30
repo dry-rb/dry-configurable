@@ -243,7 +243,7 @@ RSpec.shared_examples 'a configurable class' do
       end
     end
 
-    describe 'reset_configuration' do
+    describe 'reset_config' do
       before do
         klass.setting :dsn, nil
 
@@ -251,7 +251,7 @@ RSpec.shared_examples 'a configurable class' do
           config.dsn = 'sqlite:memory'
         end
 
-        klass.reset_configuration
+        klass.reset_config
       end
 
       it 'resets configuration to default values' do
