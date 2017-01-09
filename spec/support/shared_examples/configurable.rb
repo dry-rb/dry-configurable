@@ -242,5 +242,25 @@ RSpec.shared_examples 'a configurable class' do
         end
       end
     end
+
+    context 'Test Interface' do
+      before { klass.enable_test_interface }
+
+      describe 'reset_config' do
+        before do
+          klass.setting :dsn, nil
+
+          klass.configure do |config|
+            config.dsn = 'sqlite:memory'
+          end
+
+          klass.reset_config
+        end
+
+        it 'resets configuration to default values' do
+          expect(klass.config.dsn).to be_nil
+        end
+      end
+    end
   end
 end
