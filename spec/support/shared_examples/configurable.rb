@@ -1,5 +1,21 @@
 RSpec.shared_examples 'a configurable class' do
   describe Dry::Configurable do
+    describe '.setting' do
+      context 'when subject is not already configured' do
+        before do
+          klass.setting :dsn
+          klass.configure { |config| config.dsn = 'mysql:fail' }
+        end
+
+        it do
+          expect { klass.setting(:fail) }.to raise_error(
+            ::Dry::Configurable::AlreadyConfiguredError,
+            'Cannot add setting `fail`, Test::Configurable is already configured'
+          )
+        end
+      end
+    end
+
     describe 'settings' do
       context 'without processor option' do
         context 'without default value' do
@@ -178,8 +194,8 @@ RSpec.shared_examples 'a configurable class' do
 
           subject!(:subclass) { Class.new(klass) }
 
-          it 'retains its configuration' do
-            expect(subclass.config.dsn).to eq('jdbc:sqlite:memory')
+          it 'does not retain parent class configuration' do
+            expect(subclass.config.dsn).to be_nil
           end
 
           context 'when the inherited config is modified' do
@@ -206,8 +222,8 @@ RSpec.shared_examples 'a configurable class' do
 
           subject!(:subclass) { Class.new(klass) }
 
-          it 'retains its configuration' do
-            expect(subclass.config.dsn).to eq('jdbc:sqlite:memory')
+          it 'does not retain parent class configuration' do
+            expect(subclass.config.dsn).to be_nil
           end
 
           context 'when the inherited config is modified' do
@@ -225,6 +241,8 @@ RSpec.shared_examples 'a configurable class' do
         end
 
         context 'when the inherited settings are modified' do
+          let(:subclass) { Class.new(klass) }
+
           before do
             klass.setting :dsn
             klass.configure do |config|
@@ -233,8 +251,6 @@ RSpec.shared_examples 'a configurable class' do
 
             subclass.setting :db
           end
-
-          subject!(:subclass) { Class.new(klass) }
 
           it 'does not modify the original' do
             expect(klass.settings).to_not include(:db)

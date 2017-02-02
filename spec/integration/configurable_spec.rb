@@ -3,6 +3,10 @@ RSpec.describe Dry::Configurable do
     let(:klass) do
       Class.new do
         extend Dry::Configurable
+
+        def self.to_s
+          'Test::Configurable'
+        end
       end
     end
 
@@ -13,6 +17,10 @@ RSpec.describe Dry::Configurable do
     let(:base_klass) do
       Class.new do
         extend Dry::Configurable
+
+        def self.to_s
+          'Test::Configurable'
+        end
       end
     end
 
