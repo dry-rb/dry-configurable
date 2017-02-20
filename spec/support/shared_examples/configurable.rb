@@ -249,9 +249,13 @@ RSpec.shared_examples 'a configurable class' do
       describe 'reset_config' do
         before do
           klass.setting :dsn, nil
+          klass.setting :pool do
+            setting :size, nil
+          end
 
           klass.configure do |config|
             config.dsn = 'sqlite:memory'
+            config.pool.size = 5
           end
 
           klass.reset_config
@@ -259,6 +263,7 @@ RSpec.shared_examples 'a configurable class' do
 
         it 'resets configuration to default values' do
           expect(klass.config.dsn).to be_nil
+          expect(klass.config.pool.size).to be_nil
         end
       end
     end
