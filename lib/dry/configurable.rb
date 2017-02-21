@@ -113,9 +113,7 @@ module Dry
 
     # @private
     def _config_for(&block)
-      config_klass = ::Class.new { extend ::Dry::Configurable }
-      config_klass.instance_eval(&block)
-      create_nested_config(config_klass)
+      ::Dry::Configurable::NestedConfig.new(&block)
     end
 
     # @private
@@ -134,11 +132,6 @@ module Dry
     # @private
     def nested_configs
       _settings.select { |setting| setting.value.kind_of?(::Dry::Configurable::NestedConfig) }.map(&:value)
-    end
-
-    # @private
-    def create_nested_config(klass)
-      ::Dry::Configurable::NestedConfig.new(klass)
     end
   end
 end

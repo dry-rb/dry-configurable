@@ -2,7 +2,9 @@ module Dry
   module Configurable
     # @private
     class NestedConfig
-      def initialize(klass)
+      def initialize(&block)
+        klass = ::Class.new { extend ::Dry::Configurable }
+        klass.instance_eval(&block)
         @klass = klass
       end
 
