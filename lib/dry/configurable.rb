@@ -2,6 +2,7 @@ require 'concurrent'
 require 'dry/configurable/config'
 require 'dry/configurable/nested_config'
 require 'dry/configurable/config/value'
+require 'dry/configurable/error'
 require 'dry/configurable/version'
 
 # A collection of micro-libraries, each intended to encapsulate
@@ -40,7 +41,6 @@ module Dry
     def inherited(subclass)
       subclass.instance_variable_set(:@_config_mutex, ::Mutex.new)
       subclass.instance_variable_set(:@_settings, @_settings.clone)
-      subclass.instance_variable_set(:@_config, @_config.clone) if defined?(@_config)
       super
     end
 
@@ -80,6 +80,11 @@ module Dry
     #
     # @api public
     def setting(key, value = ::Dry::Configurable::Config::Value::NONE, &block)
+      raise(
+        AlreadyConfiguredError,
+        "Cannot add setting `#{key}`, #{self} is already configured"
+      ) if defined?(@_config)
+
       if block
         if block.parameters.empty?
           value = _config_for(&block)
