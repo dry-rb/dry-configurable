@@ -1,5 +1,6 @@
 require 'concurrent'
 require 'dry/configurable/config'
+require 'dry/configurable/nested_config'
 require 'dry/configurable/config/value'
 require 'dry/configurable/version'
 
@@ -112,16 +113,25 @@ module Dry
 
     # @private
     def _config_for(&block)
-      config_klass = ::Class.new { extend ::Dry::Configurable }
-      config_klass.instance_eval(&block)
-      config_klass.config
+      ::Dry::Configurable::NestedConfig.new(&block)
     end
 
     # @private
     def create_config
       @_config_mutex.synchronize do
+        create_config_for_nested_configurations
         @_config = ::Dry::Configurable::Config.create(_settings) unless _settings.empty?
       end
+    end
+
+    # @private
+    def create_config_for_nested_configurations
+      nested_configs.map {  |nested_config| nested_config.create_config }
+    end
+
+    # @private
+    def nested_configs
+      _settings.select { |setting| setting.value.kind_of?(::Dry::Configurable::NestedConfig) }.map(&:value)
     end
   end
 end
