@@ -224,20 +224,20 @@ RSpec.shared_examples 'a configurable class' do
           end
         end
 
-        context 'when the inherited settings are modified' do
+        context 'when the inherited settings are modified ' do
           before do
             klass.setting :dsn
             klass.configure do |config|
               config.dsn = 'jdbc:sqlite:memory'
             end
-
-            subclass.setting :db
           end
 
           subject!(:subclass) { Class.new(klass) }
 
-          it 'does not modify the original' do
-            expect(klass.settings).to_not include(:db)
+          it 'raise an Exception' do
+            expect{ subclass.setting :db }.to raise_error(
+              Dry::Configurable::AlreadyDefinedConfig
+            )
           end
         end
       end
@@ -265,6 +265,19 @@ RSpec.shared_examples 'a configurable class' do
           expect(klass.config.dsn).to be_nil
           expect(klass.config.pool.size).to be_nil
         end
+      end
+    end
+
+    context 'Try to set new value after config has been created' do
+      before do
+        klass.setting :dsn, 'sqlite:memory'
+        klass.config
+      end
+
+      it 'raise an exception' do
+        expect{ klass.setting :pool, 5 }.to raise_error(
+          Dry::Configurable::AlreadyDefinedConfig
+        )
       end
     end
   end
