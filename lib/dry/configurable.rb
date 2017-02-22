@@ -1,5 +1,6 @@
 require 'concurrent'
 require 'dry/configurable/config'
+require 'dry/configurable/error'
 require 'dry/configurable/nested_config'
 require 'dry/configurable/config/value'
 require 'dry/configurable/version'
@@ -80,6 +81,7 @@ module Dry
     #
     # @api public
     def setting(key, value = ::Dry::Configurable::Config::Value::NONE, &block)
+      raise_already_defined_config(key) if defined?(@_config)
       if block
         if block.parameters.empty?
           value = _config_for(&block)
@@ -132,6 +134,12 @@ module Dry
     # @private
     def nested_configs
       _settings.select { |setting| setting.value.kind_of?(::Dry::Configurable::NestedConfig) }.map(&:value)
+    end
+
+    # @private
+    def raise_already_defined_config(key)
+      raise AlreadyDefinedConfig,
+        "Cannot add setting +#{key}+, #{self} is already configured"
     end
   end
 end
