@@ -139,7 +139,7 @@ module Dry
     # @private
     def raise_already_defined_config(key)
       raise AlreadyDefinedConfig,
-        "Cannot add setting `#{key}`, #{self} is already configured"
+        "Cannot add setting +#{key}+, #{self} is already configured"
     end
   end
 end
