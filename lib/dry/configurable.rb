@@ -34,6 +34,7 @@ module Dry
       base.class_eval do
         @_config_mutex = ::Mutex.new
         @_settings = ::Concurrent::Array.new
+        @_reader_attributes = ::Concurrent::Array.new
       end
     end
 
@@ -41,6 +42,7 @@ module Dry
     def inherited(subclass)
       subclass.instance_variable_set(:@_config_mutex, ::Mutex.new)
       subclass.instance_variable_set(:@_settings, @_settings.clone)
+      subclass.instance_variable_set(:@_reader_attributes, @_reader_attributes.clone)
       subclass.instance_variable_set(:@_config, @_config.clone) if defined?(@_config)
       super
     end
@@ -80,7 +82,7 @@ module Dry
     # @return [Dry::Configurable::Config]
     #
     # @api public
-    def setting(key, value = ::Dry::Configurable::Config::Value::NONE, &block)
+    def setting(key, value = ::Dry::Configurable::Config::Value::NONE, options = {}, &block)
       raise_already_defined_config(key) if defined?(@_config)
       if block
         if block.parameters.empty?
@@ -95,6 +97,7 @@ module Dry
         value,
         processor || ::Dry::Configurable::Config::DEFAULT_PROCESSOR
       )
+      store_reader_options(key, options)
     end
 
     # Return an array of setting names
@@ -109,6 +112,10 @@ module Dry
     # @private no, really...
     def _settings
       @_settings
+    end
+
+    def _reader_attributes
+      @_reader_attributes
     end
 
     private
@@ -140,6 +147,23 @@ module Dry
     def raise_already_defined_config(key)
       raise AlreadyDefinedConfig,
         "Cannot add setting +#{key}+, #{self} is already configured"
+    end
+
+    # @private
+    def store_reader_options(key, options)
+      if options.fetch(:reader, false)
+        _reader_attributes << key
+      end
+    end
+
+    # @private
+    def method_missing(method, *args, &block)
+      _reader_attributes.include?(method) ? config.public_send(method, *args, &block) : super
+    end
+
+    # @private
+    def respond_to_missing?(method, _include_private = false)
+      _reader_attributes.include?(method) || super
     end
   end
 end

@@ -48,6 +48,80 @@ RSpec.shared_examples 'a configurable class' do
               )
             end
           end
+
+          context 'reader option' do
+            context 'without passing option' do
+              before do
+                klass.setting :dsn, nil
+              end
+
+              before do
+                klass.configure do |config|
+                  config.dsn = 'jdbc:sqlite:memory'
+                end
+              end
+
+              it 'will not create a getter method' do
+                expect(klass.respond_to?(:dsn)).to be_falsey
+              end
+            end
+
+            context 'with hash as value ' do
+              before do
+                klass.setting :dsn, {foo: 'bar'}, reader: true
+              end
+
+              it 'will create a getter method' do
+                expect(klass.dsn).to eq({foo: 'bar'})
+                expect(klass.respond_to?(:dsn)).to be_truthy
+              end
+            end
+
+            context 'with option set to true' do
+              before do
+                klass.setting :dsn, 'testing', reader: true
+              end
+
+              it 'will create a getter method' do
+                expect(klass.dsn).to eq 'testing'
+                expect(klass.respond_to?(:dsn)).to be_truthy
+              end
+            end
+
+            context 'with nested configuration' do
+              before do
+                klass.setting :dsn, nil, reader: true do
+                  setting :pool, 5
+                end
+              end
+
+              it 'will create a nested getter method' do
+                expect(klass.dsn.pool).to eq 5
+              end
+            end
+
+            context 'with processor' do
+              context 'with default value' do
+                before do
+                  klass.setting(:dsn, 'memory', reader: true) { |dsn| "sqlite:#{dsn}" }
+                end
+
+                it 'returns the default value' do
+                  expect(klass.dsn).to eq('sqlite:memory')
+                end
+              end
+
+              context 'without default value' do
+                before do
+                  klass.setting(:dsn, nil, reader: true) { |dsn| "sqlite:#{dsn}" }
+                end
+
+                xit 'returns the default value' do
+                  expect(klass.dsn).to eq(nil)
+                end
+              end
+            end
+          end
         end
 
         context 'nested configuration' do

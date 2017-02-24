@@ -25,6 +25,12 @@ class App
   end
   # Defaults to nil if no default value is given
   setting :adapter
+  # Passing the reader option as true will create reader method for the class
+  setting :pool, 5 , reader: true
+  # Passing the reader attributes works with nested configuration
+  setting :uploader, nil, reader: true do
+    setting :bucket, 'dev'
+  end
 end
 
 App.configure do |config|
@@ -34,6 +40,8 @@ end
 App.config.database.dsn
 # => 'jdbc:sqlite:memory'
 App.config.adapter # => nil
+App.pool # => 5
+App.uploader.bucket # => 'dev'
 ```
 
 ## Links
