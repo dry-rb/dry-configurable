@@ -29,6 +29,7 @@ module Dry
   #
   # @api public
   module Configurable
+    VALID_OPTIONS = %i(reader)
     # @private
     def self.extended(base)
       base.class_eval do
@@ -82,8 +83,9 @@ module Dry
     # @return [Dry::Configurable::Config]
     #
     # @api public
-    def setting(key, value = ::Dry::Configurable::Config::Value::NONE, options = {}, &block)
+    def setting(key, *args, &block)
       raise_already_defined_config(key) if defined?(@_config)
+      value, options = parse_args(args)
       if block
         if block.parameters.empty?
           value = _config_for(&block)
@@ -94,10 +96,10 @@ module Dry
 
       _settings << ::Dry::Configurable::Config::Value.new(
         key,
-        value,
+        value || ::Dry::Configurable::Config::Value::NONE,
         processor || ::Dry::Configurable::Config::DEFAULT_PROCESSOR
       )
-      store_reader_options(key, options)
+      store_reader_options(key, options) if options.any?
     end
 
     # Return an array of setting names
@@ -147,6 +149,29 @@ module Dry
     def raise_already_defined_config(key)
       raise AlreadyDefinedConfig,
         "Cannot add setting +#{key}+, #{self} is already configured"
+    end
+
+    def parse_args(args)
+      if args && args.size > 1
+        [args.first, check_options(args.last)]
+      else
+        check_for_value_or_options(args.first)
+      end
+    end
+
+    def check_options(opts)
+      return {} if opts.empty?
+      opts.select { |k, _| VALID_OPTIONS.include?(k) }
+    end
+
+    def check_for_value_or_options(data)
+      case data
+      when Hash
+        [nil, check_options(data)] if data.any?{ |k, _| VALID_OPTIONS.include?(k) }
+        [data, {}]
+      else
+        [data, {}]
+      end
     end
 
     # @private

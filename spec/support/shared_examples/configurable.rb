@@ -116,7 +116,7 @@ RSpec.shared_examples 'a configurable class' do
                   klass.setting(:dsn, nil, reader: true) { |dsn| "sqlite:#{dsn}" }
                 end
 
-                xit 'returns the default value' do
+                it 'returns the default value' do
                   expect(klass.dsn).to eq(nil)
                 end
               end
