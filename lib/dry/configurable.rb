@@ -2,6 +2,7 @@ require 'concurrent'
 require 'dry/configurable/config'
 require 'dry/configurable/error'
 require 'dry/configurable/nested_config'
+require 'dry/configurable/argument_parser'
 require 'dry/configurable/config/value'
 require 'dry/configurable/version'
 
@@ -29,7 +30,6 @@ module Dry
   #
   # @api public
   module Configurable
-    VALID_OPTIONS = %i(reader)
     # @private
     def self.extended(base)
       base.class_eval do
@@ -85,7 +85,7 @@ module Dry
     # @api public
     def setting(key, *args, &block)
       raise_already_defined_config(key) if defined?(@_config)
-      value, options = parse_args(args)
+      value, options = ArgumentParser.call(args)
       if block
         if block.parameters.empty?
           value = _config_for(&block)
@@ -149,29 +149,6 @@ module Dry
     def raise_already_defined_config(key)
       raise AlreadyDefinedConfig,
         "Cannot add setting +#{key}+, #{self} is already configured"
-    end
-
-    def parse_args(args)
-      if args && args.size > 1
-        [args.first, check_options(args.last)]
-      else
-        check_for_value_or_options(args.first)
-      end
-    end
-
-    def check_options(opts)
-      return {} if opts.empty?
-      opts.select { |k, _| VALID_OPTIONS.include?(k) }
-    end
-
-    def check_for_value_or_options(data)
-      case data
-      when Hash
-        [nil, check_options(data)] if data.any?{ |k, _| VALID_OPTIONS.include?(k) }
-        [data, {}]
-      else
-        [data, {}]
-      end
     end
 
     # @private
