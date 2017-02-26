@@ -8,7 +8,7 @@ module Dry
         @klass = klass
       end
 
-        # @private no, really...
+      # @private no, really...
       def create_config
         if @klass.instance_variables.include?(:@_config)
           @klass.__send__(:create_config)

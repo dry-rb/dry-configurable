@@ -1,11 +1,12 @@
 RSpec.describe Dry::Configurable::ArgumentParser do
   let(:klass) { Dry::Configurable::ArgumentParser }
+
   context 'with no args' do
     let(:parsed) { klass.new([]) }
 
     it 'return default values' do
       expect(parsed.value).to eq nil
-      expect(parsed.options).to eq ({ })
+      expect(parsed.options).to eq({})
     end
   end
 
@@ -20,7 +21,7 @@ RSpec.describe Dry::Configurable::ArgumentParser do
 
       it 'returns correct value and options' do
         expect(parsed.value).to eq 'dry-rb'
-        expect(parsed.options).to eq ({ reader: true })
+        expect(parsed.options).to eq(reader: true)
       end
     end
 
@@ -32,33 +33,33 @@ RSpec.describe Dry::Configurable::ArgumentParser do
 
       it 'returns correct values and empty options' do
         expect(parsed.value).to eq 'dry-rb'
-        expect(parsed.options).to eq ({ })
+        expect(parsed.options).to eq({})
       end
     end
 
     context 'values as hash' do
       let(:value) do
-        { db: 'dry-rb'  }
+        { db: 'dry-rb' }
       end
       let(:options) do
         { reader: true }
       end
 
       it 'returns correct values and empty options' do
-        expect(parsed.value).to eq ({ db: 'dry-rb'  })
-        expect(parsed.options).to eq ({ reader: true })
+        expect(parsed.value).to eq(db: 'dry-rb')
+        expect(parsed.options).to eq(reader: true)
       end
     end
 
     context 'values as array' do
-      let(:value) { [1,2,3] }
+      let(:value) { [1, 2, 3] }
       let(:options) do
         { reader: true }
       end
 
       it 'returns correct values and empty options' do
-        expect(parsed.value).to eq ([1,2,3])
-        expect(parsed.options).to eq ({ reader: true })
+        expect(parsed.value).to eq([1, 2, 3])
+        expect(parsed.options).to eq(reader: true)
       end
     end
   end
@@ -70,7 +71,7 @@ RSpec.describe Dry::Configurable::ArgumentParser do
 
       it 'returns correct value and options' do
         expect(parsed.value).to eq 'dry-rb'
-        expect(parsed.options).to eq ({ })
+        expect(parsed.options).to eq({})
       end
     end
 
@@ -80,8 +81,8 @@ RSpec.describe Dry::Configurable::ArgumentParser do
       end
 
       it 'returns correct value and options' do
-        expect(parsed.value).to eq ({ writer: true })
-        expect(parsed.options).to eq ({})
+        expect(parsed.value).to eq(writer: true)
+        expect(parsed.options).to eq({})
       end
     end
 
@@ -92,7 +93,7 @@ RSpec.describe Dry::Configurable::ArgumentParser do
 
       it 'returns correct value and options' do
         expect(parsed.value).to eq nil
-        expect(parsed.options).to eq ({ reader: true })
+        expect(parsed.options).to eq(reader: true)
       end
     end
   end
@@ -106,7 +107,7 @@ RSpec.describe Dry::Configurable::ArgumentParser do
 
       it 'returns correct value and options' do
         expect(parsed.value).to eq nil
-        expect(parsed.options).to eq ({ reader: true })
+        expect(parsed.options).to eq(reader: true)
       end
     end
   end

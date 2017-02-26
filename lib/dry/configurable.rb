@@ -137,25 +137,23 @@ module Dry
 
     # @private
     def create_config_for_nested_configurations
-      nested_configs.map {  |nested_config| nested_config.create_config }
+      nested_configs.map(&:create_config)
     end
 
     # @private
     def nested_configs
-      _settings.select { |setting| setting.value.kind_of?(::Dry::Configurable::NestedConfig) }.map(&:value)
+      _settings.select { |setting| setting.value.is_a?(::Dry::Configurable::NestedConfig) }.map(&:value)
     end
 
     # @private
     def raise_already_defined_config(key)
       raise AlreadyDefinedConfig,
-        "Cannot add setting +#{key}+, #{self} is already configured"
+            "Cannot add setting +#{key}+, #{self} is already configured"
     end
 
     # @private
     def store_reader_options(key, options)
-      if options.fetch(:reader, false)
-        _reader_attributes << key
-      end
+      _reader_attributes << key if options.fetch(:reader, false)
     end
 
     # @private

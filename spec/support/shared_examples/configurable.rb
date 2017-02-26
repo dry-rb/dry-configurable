@@ -69,11 +69,11 @@ RSpec.shared_examples 'a configurable class' do
 
           context 'with hash as value ' do
             before do
-              klass.setting :dsn, {foo: 'bar'}, reader: true
+              klass.setting :dsn, { foo: 'bar' }, reader: true
             end
 
             it 'will create a getter method' do
-              expect(klass.dsn).to eq({foo: 'bar'})
+              expect(klass.dsn).to eq(foo: 'bar')
               expect(klass.respond_to?(:dsn)).to be_truthy
             end
           end
@@ -192,7 +192,7 @@ RSpec.shared_examples 'a configurable class' do
 
         context 'with processor' do
           before do
-            klass.setting(:dsn, 'sqlite') { |dsn| "#{dsn}:memory"}
+            klass.setting(:dsn, 'sqlite') { |dsn| "#{dsn}:memory" }
           end
 
           before do
@@ -227,7 +227,7 @@ RSpec.shared_examples 'a configurable class' do
         context 'with processor' do
           before do
             klass.setting :database do
-              setting(:dsn, 'sqlite') { |dsn| "#{dsn}:memory"}
+              setting(:dsn, 'sqlite') { |dsn| "#{dsn}:memory" }
             end
 
             klass.configure do |config|
@@ -348,7 +348,7 @@ RSpec.shared_examples 'a configurable class' do
       end
 
       it 'raise an exception' do
-        expect{ klass.setting :pool, 5 }.to raise_error(
+        expect { klass.setting :pool, 5 }.to raise_error(
           Dry::Configurable::AlreadyDefinedConfig
         )
       end

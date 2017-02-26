@@ -3,7 +3,7 @@ RSpec.describe Dry::Configurable::Config::Value do
   let(:config) { klass.new(name, value, processor) }
   let(:name) { :db }
   let(:value) { 'test' }
-  let(:processor) { ->(v) { v }}
+  let(:processor) { ->(v) { v } }
 
   describe '#initialize' do
     it 'coerces string name to symbol' do

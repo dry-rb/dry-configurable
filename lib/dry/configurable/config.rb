@@ -48,10 +48,10 @@ module Dry
         @config.each_with_object({}) do |tuple, hash|
           key, value = tuple
 
-          if value.kind_of?(::Dry::Configurable::Config)
+          if value.is_a?(::Dry::Configurable::Config)
             hash[key] = value.to_h
           else
-            hash[key] = value 
+            hash[key] = value
           end
         end
       end

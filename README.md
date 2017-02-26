@@ -26,9 +26,9 @@ class App
   # Defaults to nil if no default value is given
   setting :adapter
   # Passing the reader option as true will create reader method for the class
-  setting :pool, 5 ,reader: true
+  setting :pool, 5, reader: true
   # Passing the reader attributes works with nested configuration
-  setting :uploader ,reader: true do
+  setting :uploader, reader: true do
     setting :bucket, 'dev'
   end
 end

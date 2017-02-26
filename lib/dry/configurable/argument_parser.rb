@@ -16,15 +16,14 @@ module Dry
   #
   #   Dry::Configurable::ArgumentParser.call(['db:sqlite', { reader: true })
   #    # => [ 'db:sqlite', { reader: true } ]
-
   module Configurable
     # @private
     class ArgumentParser
-      VALID_OPTIONS = %i(reader)
+      VALID_OPTIONS = %i(reader).freeze
 
       def self.call(data)
         parsed = new(data)
-        [ parsed.value, parsed.options ]
+        [parsed.value, parsed.options]
       end
 
       def initialize(data)
@@ -85,7 +84,7 @@ module Dry
 
       # @private
       def hash_include_options_key(hash)
-        hash.any?{ |k, _| VALID_OPTIONS.include?(k) }
+        hash.any? { |k, _| VALID_OPTIONS.include?(k) }
       end
     end
   end
