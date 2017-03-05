@@ -16,11 +16,7 @@ module Dry
         end
 
         def value
-          if none?
-            nil
-          else
-            @value
-          end
+          none? ? nil : @value
         end
 
         def none?
