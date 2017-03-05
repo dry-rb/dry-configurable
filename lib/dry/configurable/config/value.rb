@@ -6,16 +6,21 @@ module Dry
         # @private
         NONE = ::Object.new.freeze
 
-        attr_reader :name, :processor
+        attr_reader :name, :processor, :preprocessor
 
-        def initialize(name, value, processor)
+        def initialize(name, value, processor, preprocessor = nil)
           @name = name.to_sym
           @value = value
           @processor = processor
+          @preprocessor = preprocessor
         end
 
         def value
-          none? ? nil : @value
+          if none?
+            nil
+          else
+            @value
+          end
         end
 
         def none?

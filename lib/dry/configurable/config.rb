@@ -14,7 +14,8 @@ module Dry
 
           klass.__send__(:define_method, "#{setting.name}=") do |value|
             raise_frozen_config if frozen?
-            @config[setting.name] = setting.processor.call(value)
+            v = setting.preprocessor ? setting.preprocessor.(value) : value
+            @config[setting.name] = setting.processor.call(v)
           end
         end
 
@@ -26,7 +27,8 @@ module Dry
 
         settings.each do |setting|
           if setting.none?
-            @config[setting.name] = nil
+            v = setting.preprocessor ? setting.preprocessor.() : nil
+            @config[setting.name] = v
           else
             public_send("#{setting.name}=", setting.value)
           end

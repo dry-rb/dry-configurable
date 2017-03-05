@@ -6,6 +6,11 @@ if ENV['COVERAGE'] == 'true' && RUBY_ENGINE == 'ruby' && RUBY_VERSION == '2.3.1'
   end
 end
 
+module Types
+  String = ->(default = 'test') { default }
+  StringCoercible = ->(default = '') { default.to_s }
+end
+
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|

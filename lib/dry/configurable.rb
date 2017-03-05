@@ -105,11 +105,15 @@ module Dry
         end
       end
 
+      value, preprocessor = extract_preprocessor(value)
+
       _settings << ::Dry::Configurable::Config::Value.new(
         key,
         !value.nil? ? value : ::Dry::Configurable::Config::Value::NONE,
-        processor || ::Dry::Configurable::Config::DEFAULT_PROCESSOR
+        processor || ::Dry::Configurable::Config::DEFAULT_PROCESSOR,
+        preprocessor
       )
+
       store_reader_options(key, options) if options.any?
     end
 
@@ -132,6 +136,10 @@ module Dry
     end
 
     private
+
+    def extract_preprocessor(value)
+      value.respond_to?(:call) ? [nil, value] : [value, nil]
+    end
 
     # @private
     def _config_for(&block)
