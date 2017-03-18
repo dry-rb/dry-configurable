@@ -96,7 +96,7 @@ module Dry
 
       _settings << ::Dry::Configurable::Config::Value.new(
         key,
-        value || ::Dry::Configurable::Config::Value::NONE,
+        !value.nil? ? value : ::Dry::Configurable::Config::Value::NONE,
         processor || ::Dry::Configurable::Config::DEFAULT_PROCESSOR
       )
       store_reader_options(key, options) if options.any?
