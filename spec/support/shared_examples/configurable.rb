@@ -23,6 +23,16 @@ RSpec.shared_examples 'a configurable class' do
             end
           end
 
+          context 'with a false default value' do
+            before do
+              klass.setting :dsn, false
+            end
+
+            it 'returns the default value' do
+              expect(klass.config.dsn).to be(false)
+            end
+          end
+
           context 'with a string default value' do
             before do
               klass.setting :dsn, 'sqlite:memory'
