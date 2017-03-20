@@ -13,6 +13,7 @@ module Dry
           end
 
           klass.__send__(:define_method, "#{setting.name}=") do |value|
+            raise_frozen_config if frozen?
             @config[setting.name] = setting.processor.call(value)
           end
         end
@@ -44,6 +45,11 @@ module Dry
         clone
       end
 
+      def finalize!
+        @config.freeze
+        freeze
+      end
+
       def to_h
         @config.each_with_object({}) do |tuple, hash|
           key, value = tuple
@@ -69,6 +75,10 @@ module Dry
       end
 
       private
+
+      def raise_frozen_config
+        raise FrozenConfig, 'Cannot modify frozen config'
+      end
 
       def raise_unknown_setting_error(name)
         raise ArgumentError, "+#{name}+ is not a setting name"

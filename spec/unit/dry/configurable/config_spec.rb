@@ -53,6 +53,15 @@ RSpec.describe Dry::Configurable::Config do
     end
   end
 
+  describe '#finalize!' do
+    subject!(:dup) { config.finalize! }
+
+    it 'freezes itself and the config' do
+      expect { config.user = 'whoami' }
+        .to raise_error(Dry::Configurable::FrozenConfig, 'Cannot modify frozen config')
+    end
+  end
+
   describe '#to_h' do
     subject! { config.to_h }
 
