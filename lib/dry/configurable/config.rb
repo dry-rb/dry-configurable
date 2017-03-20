@@ -48,7 +48,8 @@ module Dry
         @config.each_with_object({}) do |tuple, hash|
           key, value = tuple
 
-          if value.is_a?(::Dry::Configurable::Config)
+          case value
+          when ::Dry::Configurable::Config, ::Dry::Configurable::NestedConfig
             hash[key] = value.to_h
           else
             hash[key] = value
