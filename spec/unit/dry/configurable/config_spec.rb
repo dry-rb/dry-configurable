@@ -68,7 +68,9 @@ RSpec.describe Dry::Configurable::Config do
 
     context 'with nesting' do
       let(:nested_setting) do
-        klass.create([value_class.new(:bar, 'baz', ->(v) { v })])
+        ::Dry::Configurable::NestedConfig.new do
+          setting(:bar, 'baz') { |v| v }
+        end.tap(&:create_config)
       end
       let(:settings) do
         [
