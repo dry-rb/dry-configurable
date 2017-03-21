@@ -251,6 +251,30 @@ RSpec.shared_examples 'a configurable class' do
         end
       end
 
+      context 'when finalized' do
+        before do
+          klass.setting :dsn
+          klass.configure do |config|
+            config.dsn = 'jdbc:sqlite'
+          end
+          klass.finalize!
+        end
+
+        it 'disallows modification' do
+          expect do
+            klass.configure do |config|
+              config.dsn = 'jdbc:sqlite'
+            end
+          end.to raise_error(Dry::Configurable::FrozenConfig, 'Cannot modify frozen config')
+        end
+
+        it 'disallows direct modification on config' do
+          expect do
+            klass.config.dsn = 'jdbc:sqlite:memory'
+          end.to raise_error(Dry::Configurable::FrozenConfig, 'Cannot modify frozen config')
+        end
+      end
+
       context 'when inherited' do
         context 'without processor' do
           before do

@@ -66,7 +66,18 @@ module Dry
     #
     # @api public
     def configure
+      raise_frozen_config if frozen?
       yield(config) if block_given?
+    end
+
+    # Finalize and freeze configuration
+    #
+    # @return [Dry::Configurable::Config]
+    #
+    # @api public
+    def finalize!
+      freeze
+      config.finalize!
     end
 
     # Add a setting to the configuration
@@ -149,6 +160,11 @@ module Dry
     def raise_already_defined_config(key)
       raise AlreadyDefinedConfig,
             "Cannot add setting +#{key}+, #{self} is already configured"
+    end
+
+    # @private
+    def raise_frozen_config
+      raise FrozenConfig, 'Cannot modify frozen config'
     end
 
     # @private
