@@ -1,5 +1,9 @@
 ## Unreleased
 
+[Compare v0.7.0...HEAD](https://github.com/dry-rb/dry-configurable/compare/v0.7.0...HEAD)
+
+## 0.7.0
+
 ## Added
 
 * Introduce `Configurable.finalize!` which freezes config and its dependencies ([qcam](https://github.com/qcam))
@@ -10,4 +14,4 @@
 * Convert nested configs to nested hashes with `Config#to_h` ([saverio-kantox](https://github.com/saverio-kantox))
 * Disallow modification on frozen config ([qcam](https://github.com/qcam))
 
-[Compare v0.6.2...HEAD](https://github.com/dry-rb/dry-configurable/compare/v0.6.2...HEAD)
+[Compare v0.6.2...v0.7.0](https://github.com/dry-rb/dry-configurable/compare/v0.6.2...v0.7.0)
