@@ -9,12 +9,12 @@ module Dry
   # as options.
   #
   # @example
-  #   p = Dry::Configurable::ArgumentParser.new(['db:sqlite', { reader: true })
+  #   p = Dry::Configurable::ArgumentParser.new(['db:sqlite', { reader: true }])
   #
   #   p.value # => 'db:sqlite'
   #   p.options # => { reader: true }
   #
-  #   Dry::Configurable::ArgumentParser.call(['db:sqlite', { reader: true })
+  #   Dry::Configurable::ArgumentParser.call(['db:sqlite', { reader: true }])
   #    # => [ 'db:sqlite', { reader: true } ]
   module Configurable
     # @private
