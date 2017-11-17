@@ -76,8 +76,8 @@ module Dry
     #
     # @api public
     def finalize!
-      freeze
       config.finalize!
+      freeze
     end
 
     # Add a setting to the configuration
