@@ -47,6 +47,10 @@ module Dry
 
       def finalize!
         @config.freeze
+        @config.each_value do |value|
+          next unless nested_config?(value)
+          value.finalize!
+        end
         freeze
       end
 
@@ -54,12 +58,7 @@ module Dry
         @config.each_with_object({}) do |tuple, hash|
           key, value = tuple
 
-          case value
-          when ::Dry::Configurable::Config, ::Dry::Configurable::NestedConfig
-            hash[key] = value.to_h
-          else
-            hash[key] = value
-          end
+          hash[key] = nested_config?(value) ? value.to_h : value
         end
       end
       alias to_hash to_h
@@ -75,6 +74,11 @@ module Dry
       end
 
       private
+
+      def nested_config?(value)
+        value.is_a?(::Dry::Configurable::Config) ||
+          value.is_a?(::Dry::Configurable::NestedConfig)
+      end
 
       def raise_frozen_config
         raise FrozenConfig, 'Cannot modify frozen config'

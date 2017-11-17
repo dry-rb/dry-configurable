@@ -56,8 +56,34 @@ RSpec.describe Dry::Configurable::Config do
   describe '#finalize!' do
     subject! { config.finalize! }
 
-    it 'freezes itself and the config' do
-      expect { config.user = 'whoami' }
+    let(:nested_setting) do
+      ::Dry::Configurable::NestedConfig.new do
+        setting(:bar, 'baz')
+      end.tap(&:create_config)
+    end
+
+    let(:deeply_nested_setting) do
+      ::Dry::Configurable::NestedConfig.new do
+        setting(:foo, ::Dry::Configurable::NestedConfig.new do
+          setting(:bar, 'baz')
+        end.tap(&:create_config))
+      end.tap(&:create_config)
+    end
+
+    let(:settings) do
+      [
+        value_class.new(:db, 'sqlite', ->(v) { v }),
+        value_class.new(:nested, nested_setting, ->(v) { v }),
+        value_class.new(:deeply_nested, deeply_nested_setting, ->(v) { v })
+      ]
+    end
+
+    it 'recursively freezes itself and the config' do
+      expect { config.db = 'whoami' }
+        .to raise_error(Dry::Configurable::FrozenConfig, 'Cannot modify frozen config')
+      expect { config.nested.bar = 'oops' }
+        .to raise_error(Dry::Configurable::FrozenConfig, 'Cannot modify frozen config')
+      expect { config.deeply_nested.foo.bar = 'oops' }
         .to raise_error(Dry::Configurable::FrozenConfig, 'Cannot modify frozen config')
     end
   end
