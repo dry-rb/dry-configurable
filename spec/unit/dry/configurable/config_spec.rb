@@ -54,7 +54,7 @@ RSpec.describe Dry::Configurable::Config do
   end
 
   describe '#finalize!' do
-    subject!(:dup) { config.finalize! }
+    subject! { config.finalize! }
 
     it 'freezes itself and the config' do
       expect { config.user = 'whoami' }

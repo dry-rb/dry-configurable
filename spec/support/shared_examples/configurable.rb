@@ -254,6 +254,15 @@ RSpec.shared_examples 'a configurable class' do
       context 'when finalized' do
         before do
           klass.setting :dsn
+          klass.setting :foo, 'bar'
+          klass.setting :nested do
+            setting :foo, 'bar'
+          end
+          klass.setting :deeply_nested do
+            setting :foo do
+              setting :bar, 'baz'
+            end
+          end
           klass.configure do |config|
             config.dsn = 'jdbc:sqlite'
           end
@@ -271,6 +280,54 @@ RSpec.shared_examples 'a configurable class' do
         it 'disallows direct modification on config' do
           expect do
             klass.config.dsn = 'jdbc:sqlite:memory'
+          end.to raise_error(Dry::Configurable::FrozenConfig, 'Cannot modify frozen config')
+        end
+
+        it 'disallows modification of default settings' do
+          expect do
+            klass.configure do |config|
+              config.foo = 'oops'
+            end
+          end.to raise_error(Dry::Configurable::FrozenConfig, 'Cannot modify frozen config')
+        end
+
+        it 'disallows direct modification of default settings' do
+          expect do
+            klass.config.foo = 'oops'
+          end.to raise_error(Dry::Configurable::FrozenConfig, 'Cannot modify frozen config')
+        end
+
+        it 'disallows modification of default nested settings' do
+          expect do
+            klass.configure do |config|
+              config.nested.configure do |nested_config|
+                nested_config.foo = 'oops'
+              end
+            end
+          end.to raise_error(Dry::Configurable::FrozenConfig, 'Cannot modify frozen config')
+        end
+
+        it 'disallows direct modification of default nested settings' do
+          expect do
+            klass.config.nested.foo = 'oops'
+          end.to raise_error(Dry::Configurable::FrozenConfig, 'Cannot modify frozen config')
+        end
+
+        it 'disallows modification of default deeply nested settings' do
+          expect do
+            klass.configure do |config|
+              config.deeply_nested.configure do |cc|
+                cc.foo.configure do |c|
+                  c.bar = 'oops'
+                end
+              end
+            end
+          end.to raise_error(Dry::Configurable::FrozenConfig, 'Cannot modify frozen config')
+        end
+
+        it 'disallows direct modification of default deeply nested settings' do
+          expect do
+            klass.config.deeply_nested.foo.bar = 'oops'
           end.to raise_error(Dry::Configurable::FrozenConfig, 'Cannot modify frozen config')
         end
       end
