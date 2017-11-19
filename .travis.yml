@@ -2,28 +2,20 @@ language: ruby
 dist: trusty
 sudo: required
 cache: bundler
-bundler_args: --without console
+bundler_args: --without benchmarks tools
 script:
   - bundle exec rake spec
 after_success:
   - '[ -d coverage ] && bundle exec codeclimate-test-reporter'
 rvm:
-  - 2.0
-  - 2.1
-  - 2.2
-  - 2.3.1
-  - rbx-3
-  - jruby-9.1.5.0
-  - ruby-head
-  - jruby-head
+  - 2.2.7
+  - 2.3.4
+  - 2.4.1
+  - jruby-9.1.10.0
 env:
   global:
     - JRUBY_OPTS='--dev -J-Xmx1024M'
     - COVERAGE='true'
-matrix:
-  allow_failures:
-    - rvm: ruby-head
-    - rvm: jruby-head
 notifications:
   email: false
   webhooks:
