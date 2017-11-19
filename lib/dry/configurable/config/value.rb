@@ -19,6 +19,15 @@ module Dry
           none? ? nil : @value
         end
 
+        def process(value)
+          value = preprocessor ? preprocessor.(value) : value
+          processor.(value)
+        end
+
+        def preprocess
+          preprocessor ? preprocessor.() : nil
+        end
+
         def none?
           @value.equal?(::Dry::Configurable::Config::Value::NONE)
         end

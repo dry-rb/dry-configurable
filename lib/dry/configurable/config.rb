@@ -5,34 +5,34 @@ module Dry
       DEFAULT_PROCESSOR = ->(v) { v }.freeze
 
       def self.create(settings)
-        klass = ::Class.new(self)
+        mod = settings_mod(settings)
 
-        settings.each do |setting|
-          klass.__send__(:define_method, setting.name) do
-            @config[setting.name]
-          end
-
-          klass.__send__(:define_method, "#{setting.name}=") do |value|
-            raise_frozen_config if frozen?
-            v = setting.preprocessor ? setting.preprocessor.(value) : value
-            @config[setting.name] = setting.processor.call(v)
-          end
+        klass = ::Class.new(self) do
+          include mod
         end
 
         klass.new(settings)
       end
 
+      def self.settings_mod(settings)
+        Module.new do
+          settings.each do |setting|
+            define_method(setting.name) do
+              @config[setting.name]
+            end
+
+            define_method("#{setting.name}=") do |value|
+              raise_frozen_config if frozen?
+              @config[setting.name] = setting.process(value)
+            end
+          end
+        end
+      end
+
       def initialize(settings)
         @config = ::Concurrent::Hash.new
 
-        settings.each do |setting|
-          if setting.none?
-            v = setting.preprocessor ? setting.preprocessor.() : nil
-            @config[setting.name] = v
-          else
-            public_send("#{setting.name}=", setting.value)
-          end
-        end
+        initialize_values(settings)
       end
 
       def dup
@@ -77,6 +77,16 @@ module Dry
       end
 
       private
+
+      def initialize_values(settings)
+        settings.each do |setting|
+          if setting.none?
+            @config[setting.name] = setting.preprocess
+          else
+            public_send("#{setting.name}=", setting.value)
+          end
+        end
+      end
 
       def raise_frozen_config
         raise FrozenConfig, 'Cannot modify frozen config'
