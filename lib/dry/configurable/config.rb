@@ -3,6 +3,7 @@ module Dry
     # @private
     class Config
       DEFAULT_PROCESSOR = ->(v) { v }.freeze
+      DEFAULT_PREPROCESSOR = proc { |v| v }.freeze
 
       def self.create(settings)
         mod = settings_mod(settings)
@@ -81,7 +82,7 @@ module Dry
       def initialize_values(settings)
         settings.each do |setting|
           if setting.none?
-            @config[setting.name] = setting.preprocess
+            @config[setting.name] = setting.preprocessor.()
           else
             public_send("#{setting.name}=", setting.value)
           end

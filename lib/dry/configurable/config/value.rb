@@ -6,9 +6,10 @@ module Dry
         # @private
         NONE = ::Object.new.freeze
 
+
         attr_reader :name, :processor, :preprocessor
 
-        def initialize(name, value, processor, preprocessor = nil)
+        def initialize(name, value, processor, preprocessor)
           @name = name.to_sym
           @value = value
           @processor = processor
@@ -20,12 +21,8 @@ module Dry
         end
 
         def process(value)
-          value = preprocessor ? preprocessor.(value) : value
+          value = preprocessor.(value)
           processor.(value)
-        end
-
-        def preprocess
-          preprocessor ? preprocessor.() : nil
         end
 
         def none?

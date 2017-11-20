@@ -1,13 +1,14 @@
 RSpec.describe Dry::Configurable::Config::Value do
   let(:klass) { Dry::Configurable::Config::Value }
-  let(:config) { klass.new(name, value, processor) }
+  let(:config) { klass.new(name, value, processor, preprocessor) }
   let(:name) { :db }
   let(:value) { 'test' }
   let(:processor) { ->(v) { v } }
+  let(:preprocessor) { Dry::Configurable::Config::DEFAULT_PREPROCESSOR }
 
   describe '#initialize' do
     it 'coerces string name to symbol' do
-      config = klass.new('db', value, processor)
+      config = klass.new('db', value, processor, preprocessor)
 
       expect(config.name).to eq(:db)
     end
