@@ -25,7 +25,8 @@ module Dry
   #
   # @api public
   module ConfigurableV2
-    class NotConfigured < StandardError; end
+    NotConfigured  = Class.new(StandardError)
+    AlreadyDefinedConfig = Class.new(StandardError)
 
     class ProxySettings
       attr_reader :schema
@@ -81,6 +82,7 @@ module Dry
     end
 
     def setting(name, type = nil, &block)
+      raise_already_defined_config(name) if defined?(@config)
       if block
         if block.parameters.any?
           @processors[name] = block
@@ -111,6 +113,12 @@ module Dry
       raise NotConfigured,
         "You need to use #configure method to setup values for your configuration, there are some values missing\n" +
         "#{e.message}"
+    end
+
+    # @private
+    def raise_already_defined_config(key)
+      raise AlreadyDefinedConfig,
+            "Cannot add setting +#{name}+, #{self} is already configured"
     end
   end
 end

@@ -97,7 +97,7 @@ RSpec.describe Dry::ConfigurableV2 do
       end
     end
 
-    context 'processor example' do
+    context 'processors' do
       let(:klass) do
         Class.new do
           extend Dry::ConfigurableV2
@@ -112,6 +112,20 @@ RSpec.describe Dry::ConfigurableV2 do
         end
 
         expect(klass.config.database_url).to eq 'hello::jdbc:sqlite:memory'
+      end
+    end
+
+    context 'try to set new value after config has been created' do
+      before do
+        klass.configure do
+          config :database_url, 'localhost'
+        end
+      end
+
+      it 'raise an exception' do
+        expect { klass.setting :pool, 5 }.to raise_error(
+          Dry::ConfigurableV2::AlreadyDefinedConfig
+        )
       end
     end
   end
