@@ -73,6 +73,28 @@ RSpec.describe Dry::ConfigurableV2 do
 
         expect(klass.config.preview.testing).to eq 'tested'
       end
+
+      context 'allow to set up processor for nested config' do
+        let(:klass) do
+          Class.new do
+            extend Dry::ConfigurableV2
+
+            setting :preview do
+              setting(:testing, Test::Types::String) { |value| "foo::#{value}" }
+            end
+          end
+        end
+
+        it 'allow to set values for nested configuration' do
+          klass.configure do
+            config :preview do
+              config :testing, 'tested'
+            end
+          end
+
+          expect(klass.config.preview.testing).to eq 'foo::tested'
+        end
+      end
     end
 
     context 'processor example' do

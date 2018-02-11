@@ -1,5 +1,4 @@
 require 'dry-struct'
-require 'dry/core/class_builder'
 # A collection of micro-libraries, each intended to encapsulate
 # a common task in Ruby
 
@@ -53,12 +52,16 @@ module Dry
     end
 
     class StructBuilder
-      def initialize(name, &block)
+      def initialize(processors, name, &block)
+        @processors = processors
         @name = name
         instance_eval(&block)
       end
 
-      def setting(name, type)
+      def setting(name, type, &block)
+        if block && block.parameters.any?
+          @processors[name] = block
+        end
         struct_class.attribute(name, type)
       end
 
@@ -86,7 +89,7 @@ module Dry
     end
 
     def build_struct(name, &block)
-      StructBuilder.new(name, &block).struct_class
+      StructBuilder.new(@processors, name, &block).struct_class
     end
 
     def configure(&block)
