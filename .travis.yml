@@ -8,8 +8,6 @@ script:
 after_success:
   - '[ -d coverage ] && bundle exec codeclimate-test-reporter'
 rvm:
-  - 2.0
-  - 2.1
   - 2.2
   - 2.3.1
   - rbx-3
