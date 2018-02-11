@@ -2,6 +2,14 @@ require 'dry-struct'
 # A collection of micro-libraries, each intended to encapsulate
 # a common task in Ruby
 module Dry
+  class Struct
+    class << self
+      alias_method :setting, :attribute
+    end
+  end
+end
+
+module Dry
   # A simple configuration mixin
   #
   # @example
@@ -34,9 +42,14 @@ module Dry
         instance_eval(&block)
       end
 
-      def config(key, value)
+      def config(key, value = nil, &block)
         if @settings.attribute?(key)
-          @schema[key] = @processors.key?(key) ? @processors[key].call(value) : value
+          value = if block
+                    self.class.new(@settings.schema[key], @processors, &block).schema
+                  else
+                    @processors.key?(key) ? @processors[key].call(value) : value
+                  end
+          @schema[key] = value
         end
       end
 
@@ -52,9 +65,13 @@ module Dry
       end
     end
 
-    def setting(name, type, &block)
-      @settings.attribute(name, type)
-      @processors[name] = block if block
+    def setting(name, type = nil, &block)
+      if block && block.parameters.any?
+        @processors[name] = block
+        @settings.attribute(name, type)
+      else
+        @settings.attribute(name, type, &block)
+      end
     end
 
     def configure(&block)

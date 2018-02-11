@@ -49,6 +49,32 @@ RSpec.describe Dry::ConfigurableV2 do
       end
     end
 
+    context 'nested configuration' do
+      let(:klass) do
+        Class.new do
+          extend Dry::ConfigurableV2
+
+          setting :database_url, Test::Types::String
+
+          setting :preview do
+            setting :testing, Test::Types::String
+          end
+        end
+      end
+
+      it 'allow to set values for nested configuration' do
+        klass.configure do
+          config :preview do
+            config :testing, 'tested'
+          end
+
+          config :database_url, 'localhost'
+        end
+
+        expect(klass.config.preview.testing).to eq 'tested'
+      end
+    end
+
     context 'processor example' do
       let(:klass) do
         Class.new do
