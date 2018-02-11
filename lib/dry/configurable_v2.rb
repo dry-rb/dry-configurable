@@ -28,6 +28,8 @@ module Dry
     class NotConfigured < StandardError; end
 
     class ProxySettings
+      attr_reader :schema
+
       def initialize(settings, processors, &block)
         @settings = settings
         @processors = processors
@@ -36,31 +38,29 @@ module Dry
       end
 
       def config(key, value = nil, &block)
-        if @settings.attribute?(key)
+        if settings.attribute?(key)
           value = if block
-                    self.class.new(@settings.schema[key], @processors, &block).schema
+                    self.class.new(settings.schema[key], processors, &block).schema
                   else
-                    @processors.key?(key) ? @processors[key].call(value) : value
+                    processors.key?(key) ? processors[key].call(value) : value
                   end
-          @schema[key] = value
+          schema[key] = value
         end
       end
 
-      def schema
-        @schema
-      end
+      private
+      attr_reader :processors, :settings
     end
 
     class StructBuilder
-      def initialize(processors, name, &block)
+      def initialize(processors, &block)
         @processors = processors
-        @name = name
         instance_eval(&block)
       end
 
       def setting(name, type, &block)
         if block && block.parameters.any?
-          @processors[name] = block
+          processors[name] = block
         end
         struct_class.attribute(name, type)
       end
@@ -68,6 +68,9 @@ module Dry
       def struct_class
         @struct_class ||= Class.new(Dry::Struct)
       end
+
+      private
+      attr_reader :processors
     end
 
     def self.extended(base)
@@ -82,14 +85,14 @@ module Dry
         if block.parameters.any?
           @processors[name] = block
         else
-          type = build_struct(name, &block)
+          type = build_struct(&block)
         end
       end
       @settings.attribute(name, type)
     end
 
-    def build_struct(name, &block)
-      StructBuilder.new(@processors, name, &block).struct_class
+    def build_struct(&block)
+      StructBuilder.new(@processors, &block).struct_class
     end
 
     def configure(&block)
