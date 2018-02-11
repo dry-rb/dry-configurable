@@ -1,13 +1,7 @@
 require 'dry-struct'
+require 'dry/core/class_builder'
 # A collection of micro-libraries, each intended to encapsulate
 # a common task in Ruby
-module Dry
-  class Struct
-    class << self
-      alias_method :setting, :attribute
-    end
-  end
-end
 
 module Dry
   # A simple configuration mixin
@@ -58,6 +52,21 @@ module Dry
       end
     end
 
+    class StructBuilder
+      def initialize(name, &block)
+        @name = name
+        instance_eval(&block)
+      end
+
+      def setting(name, type)
+        struct_class.attribute(name, type)
+      end
+
+      def struct_class
+        @struct_class ||= Class.new(Dry::Struct)
+      end
+    end
+
     def self.extended(base)
       base.class_eval do
         @settings = Class.new(Dry::Struct)
@@ -66,12 +75,18 @@ module Dry
     end
 
     def setting(name, type = nil, &block)
-      if block && block.parameters.any?
-        @processors[name] = block
-        @settings.attribute(name, type)
-      else
-        @settings.attribute(name, type, &block)
+      if block
+        if block.parameters.any?
+          @processors[name] = block
+        else
+          type = build_struct(name, &block)
+        end
       end
+      @settings.attribute(name, type)
+    end
+
+    def build_struct(name, &block)
+      StructBuilder.new(name, &block).struct_class
     end
 
     def configure(&block)
