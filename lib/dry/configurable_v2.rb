@@ -92,7 +92,7 @@ module Dry
       if defined?(@config)
         @config
       else
-        @settings.new
+        @settings.new(build_default_keys(@settings))
       end
     rescue Dry::Struct::Error => e
       raise NotConfiguredError,
@@ -104,6 +104,18 @@ module Dry
     def raise_already_defined_config(key)
       raise AlreadyDefinedConfigError,
             "Cannot add setting +#{name}+, #{self} is already configured"
+    end
+
+    # @private
+    def build_default_keys(settings, start = {})
+      settings.attribute_names.each do |key|
+        type = settings.schema[key]
+        start[key] = {} unless type.default?
+        if type.respond_to?(:schema)
+          build_default_keys(type, start[key])
+        end
+      end
+      start
     end
   end
 end
