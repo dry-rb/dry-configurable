@@ -75,6 +75,32 @@ RSpec.describe Dry::ConfigurableV2 do
       end
     end
 
+    context 'big nested configuration' do
+      let(:klass) do
+        Class.new do
+          extend Dry::ConfigurableV2
+
+          setting :preview do
+            setting :testing do
+              setting :allowed, Test::Types::Bool
+            end
+          end
+        end
+      end
+
+      it 'allow to set values for nested configuration' do
+        klass.configure do
+          config :preview do
+            config :testing do
+              config :allowed, true
+            end
+          end
+        end
+
+        expect(klass.config.preview.testing.allowed).to eq true
+      end
+    end
+
     context 'try to set new value after config has been created' do
       before do
         klass.configure do

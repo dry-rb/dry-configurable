@@ -49,16 +49,18 @@ module Dry
     end
 
     class StructBuilder
+      attr_reader :struct_class
+
       def initialize(&block)
+        @struct_class = Class.new(Dry::Struct)
         instance_eval(&block)
       end
 
-      def setting(name, type, &block)
+      def setting(name, type = nil, &block)
+        if block
+          type = self.class.new(&block).struct_class
+        end
         struct_class.attribute(name, type)
-      end
-
-      def struct_class
-        @struct_class ||= Class.new(Dry::Struct)
       end
     end
 
