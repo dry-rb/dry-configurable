@@ -13,7 +13,7 @@ RSpec.describe Dry::ConfigurableV2 do
       it 'raises NotConfigured' do
         expect {
           klass.config
-        }.to raise_error(Dry::ConfigurableV2::NotConfigured)
+        }.to raise_error(Dry::ConfigurableV2::NotConfiguredError)
       end
 
       context 'all setting has defaults' do
@@ -84,7 +84,7 @@ RSpec.describe Dry::ConfigurableV2 do
 
       it 'raise an exception' do
         expect { klass.setting :pool, 5 }.to raise_error(
-          Dry::ConfigurableV2::AlreadyDefinedConfig
+          Dry::ConfigurableV2::AlreadyDefinedConfigError
         )
       end
     end

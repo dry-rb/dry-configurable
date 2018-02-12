@@ -25,8 +25,8 @@ module Dry
   #
   # @api public
   module ConfigurableV2
-    NotConfigured  = Class.new(StandardError)
-    AlreadyDefinedConfig = Class.new(StandardError)
+    NotConfiguredError  = Class.new(StandardError)
+    AlreadyDefinedConfigError = Class.new(StandardError)
 
     class ProxySettings
       attr_reader :schema
@@ -93,14 +93,14 @@ module Dry
         @settings.new
       end
     rescue Dry::Struct::Error => e
-      raise NotConfigured,
+      raise NotConfiguredError,
         "You need to use #configure method to setup values for your configuration, there are some values missing\n" +
         "#{e.message}"
     end
 
     # @private
     def raise_already_defined_config(key)
-      raise AlreadyDefinedConfig,
+      raise AlreadyDefinedConfigError,
             "Cannot add setting +#{name}+, #{self} is already configured"
     end
   end
