@@ -31,74 +31,57 @@ module Dry
     class ProxySettings
       attr_reader :schema
 
-      def initialize(settings, processors, &block)
+      def initialize(settings, &block)
         @settings = settings
-        @processors = processors
         @schema = {}
         instance_eval(&block)
       end
 
       def config(key, value = nil, &block)
         if settings.attribute?(key)
-          value = if block
-                    self.class.new(settings.schema[key], processors, &block).schema
-                  else
-                    processors.key?(key) ? processors[key].call(value) : value
-                  end
+          value = block ? self.class.new(settings.schema[key], &block).schema : value
           schema[key] = value
         end
       end
 
       private
-      attr_reader :processors, :settings
+      attr_reader :settings
     end
 
     class StructBuilder
-      def initialize(processors, &block)
-        @processors = processors
+      def initialize(&block)
         instance_eval(&block)
       end
 
       def setting(name, type, &block)
-        if block && block.parameters.any?
-          processors[name] = block
-        end
         struct_class.attribute(name, type)
       end
 
       def struct_class
         @struct_class ||= Class.new(Dry::Struct)
       end
-
-      private
-      attr_reader :processors
     end
 
     def self.extended(base)
       base.class_eval do
         @settings = Class.new(Dry::Struct)
-        @processors = ::Concurrent::Hash.new
       end
     end
 
     def setting(name, type = nil, &block)
       raise_already_defined_config(name) if defined?(@config)
       if block
-        if block.parameters.any?
-          @processors[name] = block
-        else
-          type = build_struct(&block)
-        end
+        type = build_struct(&block)
       end
       @settings.attribute(name, type)
     end
 
     def build_struct(&block)
-      StructBuilder.new(@processors, &block).struct_class
+      StructBuilder.new(&block).struct_class
     end
 
     def configure(&block)
-      settings_values = ProxySettings.new(@settings, @processors, &block).schema
+      settings_values = ProxySettings.new(@settings, &block).schema
       @config = @settings.new(settings_values)
       self
     end

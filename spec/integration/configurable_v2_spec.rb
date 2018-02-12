@@ -73,46 +73,6 @@ RSpec.describe Dry::ConfigurableV2 do
 
         expect(klass.config.preview.testing).to eq 'tested'
       end
-
-      context 'allow to set up processor for nested config' do
-        let(:klass) do
-          Class.new do
-            extend Dry::ConfigurableV2
-
-            setting :preview do
-              setting(:testing, Test::Types::String) { |value| "foo::#{value}" }
-            end
-          end
-        end
-
-        it 'allow to set values for nested configuration' do
-          klass.configure do
-            config :preview do
-              config :testing, 'tested'
-            end
-          end
-
-          expect(klass.config.preview.testing).to eq 'foo::tested'
-        end
-      end
-    end
-
-    context 'processors' do
-      let(:klass) do
-        Class.new do
-          extend Dry::ConfigurableV2
-
-          setting(:database_url, Test::Types::String) { |value| "hello::#{value}" }
-        end
-      end
-
-      it 'allow to set values using processors' do
-        klass.configure do
-          config :database_url, 'jdbc:sqlite:memory'
-        end
-
-        expect(klass.config.database_url).to eq 'hello::jdbc:sqlite:memory'
-      end
     end
 
     context 'try to set new value after config has been created' do
