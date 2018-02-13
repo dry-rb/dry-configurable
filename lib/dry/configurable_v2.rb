@@ -67,6 +67,7 @@ module Dry
     def self.extended(base)
       base.class_eval do
         @settings = Class.new(Dry::Struct)
+        @reader_options = []
       end
     end
 
@@ -76,6 +77,7 @@ module Dry
         type = build_struct(&block)
       end
       @settings.attribute(name, type)
+      store_reader_key(name) if reader_options?(@settings)
     end
 
     def build_struct(&block)
@@ -116,6 +118,34 @@ module Dry
         end
       end
       start
+    end
+
+    # @private
+    def method_missing(method, *args, &block)
+      @reader_options.include?(method) ? config.public_send(method, *args, &block) : super
+    end
+
+    # @private
+    def store_reader_key(key)
+      @reader_options << key
+    end
+
+    # @private
+    def reader_options?(settings)
+      types = extract_types(settings)
+      types.any? { |type| type.meta[:reader] }
+    end
+
+    # @private
+    def extract_types(settings)
+      settings.attribute_names.each_with_object([]) do |key, acc|
+        type = settings.schema[key]
+        if type.respond_to?(:schema)
+          acc << extract_types(type)
+        else
+          acc << type
+        end
+      end.flatten
     end
   end
 end
