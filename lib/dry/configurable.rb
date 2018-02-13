@@ -1,13 +1,6 @@
-require 'concurrent'
-require 'dry/configurable/config'
-require 'dry/configurable/error'
-require 'dry/configurable/nested_config'
-require 'dry/configurable/argument_parser'
-require 'dry/configurable/config/value'
-require 'dry/configurable/version'
+require 'dry-struct'
+require 'dry/configurable/proxy_settings'
 
-# A collection of micro-libraries, each intended to encapsulate
-# a common task in Ruby
 module Dry
   # A simple configuration mixin
   #
@@ -16,170 +9,121 @@ module Dry
   #   class App
   #     extend Dry::Configurable
   #
-  #     setting :database do
-  #       setting :dsn, 'sqlite:memory'
+  #     setting :database_url, Types::String.constrained(filled: true)
+  #     setting :path, Types::Strict::String do |value|
+  #       Pathname(value)
   #     end
   #   end
   #
-  #   App.configure do |config|
-  #     config.database.dsn = 'jdbc:sqlite:memory'
+  #   App.configure do
+  #     config :database_url, 'jdbc:sqlite:memory'
   #   end
   #
-  #   App.config.database.dsn
+  #   App.config.database_url
   #     # => "jdbc:sqlite:memory'"
   #
   # @api public
   module Configurable
-    # @private
-    def self.extended(base)
-      base.class_eval do
-        @_config_mutex = ::Mutex.new
-        @_settings = ::Concurrent::Array.new
-        @_reader_attributes = ::Concurrent::Array.new
-      end
-    end
+    NotConfiguredError  = Class.new(StandardError)
+    AlreadyDefinedConfigError = Class.new(StandardError)
 
-    # @private
-    def inherited(subclass)
-      subclass.instance_variable_set(:@_config_mutex, ::Mutex.new)
-      subclass.instance_variable_set(:@_settings, @_settings.clone)
-      subclass.instance_variable_set(:@_reader_attributes, @_reader_attributes.clone)
-      subclass.instance_variable_set(:@_config, @_config.clone) if defined?(@_config)
-      super
-    end
+    class Config < Dry::Struct
+      class << self
+        private :attribute
 
-    # Return configuration
-    #
-    # @return [Dry::Configurable::Config]
-    #
-    # @api public
-    def config
-      return @_config if defined?(@_config)
-      create_config
-    end
-
-    # Return configuration
-    #
-    # @yield [Dry::Configuration::Config]
-    #
-    # @return [Dry::Configurable::Config]
-    #
-    # @api public
-    def configure
-      raise_frozen_config if frozen?
-      yield(config) if block_given?
-    end
-
-    # Finalize and freeze configuration
-    #
-    # @return [Dry::Configurable::Config]
-    #
-    # @api public
-    def finalize!
-      freeze
-      config.finalize!
-    end
-
-    # Add a setting to the configuration
-    #
-    # @param [Mixed] key
-    #   The accessor key for the configuration value
-    # @param [Mixed] default
-    #   The default config value
-    #
-    # @yield
-    #   If a block is given, it will be evaluated in the context of
-    #   and new configuration class, and bound as the default value
-    #
-    # @return [Dry::Configurable::Config]
-    #
-    # @api public
-    def setting(key, *args, &block)
-      raise_already_defined_config(key) if defined?(@_config)
-      value, options = ArgumentParser.call(args)
-      if block
-        if block.parameters.empty?
-          value = _config_for(&block)
-        else
-          processor = block
+        def setting(name, type = nil, &block)
+          if block
+            attribute(name, Class.new(Config), &block)
+          else
+            attribute(name, type)
+          end
         end
       end
-
-      _settings << ::Dry::Configurable::Config::Value.new(
-        key,
-        !value.nil? ? value : ::Dry::Configurable::Config::Value::NONE,
-        processor || ::Dry::Configurable::Config::DEFAULT_PROCESSOR
-      )
-      store_reader_options(key, options) if options.any?
     end
 
-    # Return an array of setting names
-    #
-    # @return [Array]
-    #
-    # @api public
-    def settings
-      _settings.map(&:name)
+    def setting(name, type = nil, &block)
+      raise_already_defined_config(name) if defined?(@config)
+      raise(
+        'You can only pass a type or a block'
+      ) if type && block
+
+      struct_class.setting(name, type, &block)
+      store_reader_key(name) if reader_options?
     end
 
-    # @private no, really...
-    def _settings
-      @_settings
+    def configure(&block)
+      settings_values = ProxySettings.new(struct_class, &block).schema
+      @config = struct_class.new(settings_values)
     end
 
-    def _reader_attributes
-      @_reader_attributes
+    def config
+      if defined?(@config)
+        @config
+      else
+        struct_class.new(build_default_keys(struct_class))
+      end
+    rescue Dry::Struct::Error => e
+      raise NotConfiguredError,
+        "You need to use #configure method to setup values for your configuration, there are some values missing\n" +
+        "#{e.message}"
     end
 
     private
 
     # @private
-    def _config_for(&block)
-      ::Dry::Configurable::NestedConfig.new(&block)
-    end
-
-    # @private
-    def create_config
-      @_config_mutex.synchronize do
-        create_config_for_nested_configurations
-        @_config = ::Dry::Configurable::Config.create(_settings) unless _settings.empty?
-      end
-    end
-
-    # @private
-    def create_config_for_nested_configurations
-      nested_configs.map(&:create_config)
-    end
-
-    # @private
-    def nested_configs
-      _settings.select { |setting| setting.value.is_a?(::Dry::Configurable::NestedConfig) }.map(&:value)
-    end
-
-    # @private
     def raise_already_defined_config(key)
-      raise AlreadyDefinedConfig,
-            "Cannot add setting +#{key}+, #{self} is already configured"
+      raise AlreadyDefinedConfigError,
+            "Cannot add setting +#{name}+, #{self} is already configured"
     end
 
     # @private
-    def raise_frozen_config
-      raise FrozenConfig, 'Cannot modify frozen config'
-    end
-
-    # @private
-    def store_reader_options(key, options)
-      _reader_attributes << key if options.fetch(:reader, false)
+    def build_default_keys(settings, start = {})
+      settings.attribute_names.each do |key|
+        type = settings.schema[key]
+        start[key] = {} unless type.default?
+        if type.respond_to?(:schema)
+          build_default_keys(type, start[key])
+        end
+      end
+      start
     end
 
     # @private
     def method_missing(method, *args, &block)
-      _reader_attributes.include?(method) ? config.public_send(method, *args, &block) : super
+      reader_options.include?(method) ? config.public_send(method, *args, &block) : super
     end
 
     # @private
-    def respond_to_missing?(method, _include_private = false)
-      _reader_attributes.include?(method) || super
+    def struct_class
+      @struct_class ||= Class.new(Config)
+    end
+
+    # @private
+    def store_reader_key(key)
+      reader_options << key
+    end
+
+    # @private
+    def reader_options?
+      types = extract_types(struct_class)
+      types.any? { |type| type.meta[:reader] }
+    end
+
+    # @private
+    def extract_types(struct_class)
+      struct_class.attribute_names.each_with_object([]) do |key, acc|
+        type = struct_class.schema[key]
+        if type.respond_to?(:schema)
+          acc << extract_types(type)
+        else
+          acc << type
+        end
+      end.flatten
+    end
+
+    # @private
+    def reader_options
+      @reader_options ||= []
     end
   end
 end
