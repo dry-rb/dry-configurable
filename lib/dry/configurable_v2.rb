@@ -48,59 +48,48 @@ module Dry
       attr_reader :settings
     end
 
-    class StructBuilder
-      attr_reader :struct_class
+    class Config < Dry::Struct
+      class << self
+        private :attribute
 
-      def initialize(&block)
-        @struct_class = Class.new(Dry::Struct)
-        instance_eval(&block)
-      end
-
-      def setting(name, type = nil, &block)
-        if block
-          type = self.class.new(&block).struct_class
+        def setting(name, type = nil, &block)
+          if block
+            attribute(name, Class.new(Config), &block)
+          else
+            attribute(name, type)
+          end
         end
-        struct_class.attribute(name, type)
-      end
-    end
-
-    def self.extended(base)
-      base.class_eval do
-        @settings = Class.new(Dry::Struct)
-        @reader_options = []
       end
     end
 
     def setting(name, type = nil, &block)
       raise_already_defined_config(name) if defined?(@config)
-      if block
-        type = build_struct(&block)
-      end
-      @settings.attribute(name, type)
-      store_reader_key(name) if reader_options?(@settings)
-    end
+      raise(
+        'You can only pass a type or a block'
+      ) if type && block
 
-    def build_struct(&block)
-      StructBuilder.new(&block).struct_class
+      struct_class.setting(name, type, &block)
+      store_reader_key(name) if reader_options?
     end
 
     def configure(&block)
-      settings_values = ProxySettings.new(@settings, &block).schema
-      @config = @settings.new(settings_values)
-      self
+      settings_values = ProxySettings.new(struct_class, &block).schema
+      @config = struct_class.new(settings_values)
     end
 
     def config
       if defined?(@config)
         @config
       else
-        @settings.new(build_default_keys(@settings))
+        struct_class.new(build_default_keys(struct_class))
       end
     rescue Dry::Struct::Error => e
       raise NotConfiguredError,
         "You need to use #configure method to setup values for your configuration, there are some values missing\n" +
         "#{e.message}"
     end
+
+    private
 
     # @private
     def raise_already_defined_config(key)
@@ -122,30 +111,40 @@ module Dry
 
     # @private
     def method_missing(method, *args, &block)
-      @reader_options.include?(method) ? config.public_send(method, *args, &block) : super
+      reader_options.include?(method) ? config.public_send(method, *args, &block) : super
+    end
+
+    # @private
+    def struct_class
+      @struct_class ||= Class.new(Config)
     end
 
     # @private
     def store_reader_key(key)
-      @reader_options << key
+      reader_options << key
     end
 
     # @private
-    def reader_options?(settings)
-      types = extract_types(settings)
+    def reader_options?
+      types = extract_types(struct_class)
       types.any? { |type| type.meta[:reader] }
     end
 
     # @private
-    def extract_types(settings)
-      settings.attribute_names.each_with_object([]) do |key, acc|
-        type = settings.schema[key]
+    def extract_types(struct_class)
+      struct_class.attribute_names.each_with_object([]) do |key, acc|
+        type = struct_class.schema[key]
         if type.respond_to?(:schema)
           acc << extract_types(type)
         else
           acc << type
         end
       end.flatten
+    end
+
+    # @private
+    def reader_options
+      @reader_options ||= []
     end
   end
 end
