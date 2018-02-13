@@ -1,8 +1,8 @@
-RSpec.describe Dry::ConfigurableV2 do
+RSpec.describe Dry::Configurable do
   context 'reader option' do
     let(:klass) do
       Class.new do
-        extend Dry::ConfigurableV2
+        extend Dry::Configurable
 
         setting :database_url, Test::Types::String.meta(reader: true)
       end
@@ -22,7 +22,7 @@ RSpec.describe Dry::ConfigurableV2 do
   context 'reader option nested configuration' do
     let(:klass) do
       Class.new do
-        extend Dry::ConfigurableV2
+        extend Dry::Configurable
 
         setting :database do
           setting :url, Test::Types::String.meta(reader: true)

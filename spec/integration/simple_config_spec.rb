@@ -1,7 +1,7 @@
-RSpec.describe Dry::ConfigurableV2 do
+RSpec.describe Dry::Configurable do
   let(:klass) do
     Class.new do
-      extend Dry::ConfigurableV2
+      extend Dry::Configurable
 
       setting :database_url, Test::Types::Strict::String
       setting :path, Test::Types::String.default('test')

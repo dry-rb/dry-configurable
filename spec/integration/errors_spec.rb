@@ -1,7 +1,7 @@
-RSpec.describe Dry::ConfigurableV2 do
+RSpec.describe Dry::Configurable do
   let(:klass) do
     Class.new do
-      extend Dry::ConfigurableV2
+      extend Dry::Configurable
 
       setting :database_url, Test::Types::Strict::String
       setting :path, Test::Types::String.default('test')
@@ -12,7 +12,7 @@ RSpec.describe Dry::ConfigurableV2 do
     it 'raises NotConfigured' do
       expect {
         klass.config
-      }.to raise_error(Dry::ConfigurableV2::NotConfiguredError)
+      }.to raise_error(Dry::Configurable::NotConfiguredError)
     end
   end
 
@@ -25,7 +25,7 @@ RSpec.describe Dry::ConfigurableV2 do
 
     it 'raise an exception' do
       expect { klass.setting :pool, 5 }.to raise_error(
-        Dry::ConfigurableV2::AlreadyDefinedConfigError
+        Dry::Configurable::AlreadyDefinedConfigError
       )
     end
   end

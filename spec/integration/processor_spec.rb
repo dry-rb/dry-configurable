@@ -1,8 +1,8 @@
-RSpec.describe Dry::ConfigurableV2 do
+RSpec.describe Dry::Configurable do
   context 'Use of processors' do
     let(:klass) do
       Class.new do
-        extend Dry::ConfigurableV2
+        extend Dry::Configurable
 
         setting :database_url, Test::Types::String.constructor { |value| "foo::#{value}" }
       end
@@ -22,7 +22,7 @@ RSpec.describe Dry::ConfigurableV2 do
   context 'Use of processors with default values' do
     let(:klass) do
       Class.new do
-        extend Dry::ConfigurableV2
+        extend Dry::Configurable
 
         setting :wait_time, Test::Types::Strict::Integer.constructor(&:to_i).default { 3 }
       end
@@ -44,7 +44,7 @@ RSpec.describe Dry::ConfigurableV2 do
   context 'Use of processors with nested configuration' do
     let(:klass) do
       Class.new do
-        extend Dry::ConfigurableV2
+        extend Dry::Configurable
 
         setting :database do
           setting :url, Test::Types::String.constructor { |value| "foo::#{value}" }
@@ -68,7 +68,7 @@ RSpec.describe Dry::ConfigurableV2 do
   context 'Use of processors with nested configuration and default values' do
     let(:klass) do
       Class.new do
-        extend Dry::ConfigurableV2
+        extend Dry::Configurable
 
         setting :wait do
           setting :time, Test::Types::Strict::Integer.constructor(&:to_i).default { 3 }

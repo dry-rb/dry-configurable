@@ -1,8 +1,8 @@
-RSpec.describe Dry::ConfigurableV2 do
+RSpec.describe Dry::Configurable do
   context 'nested configuration' do
     let(:klass) do
       Class.new do
-        extend Dry::ConfigurableV2
+        extend Dry::Configurable
 
         setting :database_url, Test::Types::String
 
@@ -28,7 +28,7 @@ RSpec.describe Dry::ConfigurableV2 do
   context 'big nested configuration' do
     let(:klass) do
       Class.new do
-        extend Dry::ConfigurableV2
+        extend Dry::Configurable
 
         setting :preview do
           setting :testing do

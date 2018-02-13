@@ -1,8 +1,8 @@
-RSpec.describe Dry::ConfigurableV2 do
+RSpec.describe Dry::Configurable do
   context 'all setting has defaults' do
     let(:klass) do
       Class.new do
-        extend Dry::ConfigurableV2
+        extend Dry::Configurable
 
         setting :database_url, Test::Types::String.default('localhost')
         setting :path, Test::Types::String.default('test')
@@ -18,7 +18,7 @@ RSpec.describe Dry::ConfigurableV2 do
   context 'all nested settings has default values' do
     let(:klass) do
       Class.new do
-        extend Dry::ConfigurableV2
+        extend Dry::Configurable
 
         setting :database do
           setting :url, Test::Types::String.default('localhost')

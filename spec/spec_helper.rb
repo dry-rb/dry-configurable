@@ -93,8 +93,6 @@ module Test
 end
 
 require 'dry/configurable'
-require 'dry/configurable_v2'
-require 'dry/configurable/test_interface'
 
 Dir[Pathname(__FILE__).dirname.join('support/**/*.rb').to_s].each do |file|
   require file
