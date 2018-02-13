@@ -1,5 +1,6 @@
 require 'dry-struct'
 require 'dry/configurable/proxy_settings'
+require 'dry/configurable/default_values'
 
 module Dry
   # A simple configuration mixin
@@ -60,7 +61,8 @@ module Dry
       if defined?(@config)
         @config
       else
-        struct_class.new(build_default_keys(struct_class))
+        default_chema = DefaultValues.call(struct_class)
+        @config = struct_class.new(default_chema)
       end
     rescue Dry::Struct::Error => e
       raise NotConfiguredError,
@@ -74,18 +76,6 @@ module Dry
     def raise_already_defined_config(key)
       raise AlreadyDefinedConfigError,
             "Cannot add setting +#{name}+, #{self} is already configured"
-    end
-
-    # @private
-    def build_default_keys(settings, start = {})
-      settings.attribute_names.each do |key|
-        type = settings.schema[key]
-        start[key] = {} unless type.default?
-        if type.respond_to?(:schema)
-          build_default_keys(type, start[key])
-        end
-      end
-      start
     end
 
     # @private
