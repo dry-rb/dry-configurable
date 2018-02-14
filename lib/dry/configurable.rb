@@ -44,12 +44,8 @@ module Dry
 
     def setting(name, type = nil, &block)
       raise_already_defined_config(name) if defined?(@config)
-      raise(
-        'You can only pass a type or a block'
-      ) if type && block
-
       struct_class.setting(name, type, &block)
-      store_reader_key(name) if reader_options?
+      define_reader_method(name, type) if type
     end
 
     def configure
@@ -80,6 +76,18 @@ module Dry
 
     private
 
+    def define_reader_method(name, type)
+      singleton_class.class_eval do
+        define_method(name) do
+          config.public_send(name)
+        end
+      end if reader_option?(type)
+    end
+
+    def reader_option?(type)
+      type.meta.fetch(:reader) { false }
+    end
+
     # @private
     def raise_already_defined_config(key)
       raise AlreadyDefinedConfigError,
@@ -109,41 +117,8 @@ module Dry
     end
 
     # @private
-    def method_missing(method, *args, &block)
-      reader_options.include?(method) ? config.public_send(method, *args, &block) : super
-    end
-
-    # @private
     def struct_class
       @struct_class ||= Class.new(Config)
-    end
-
-    # @private
-    def store_reader_key(key)
-      reader_options << key
-    end
-
-    # @private
-    def reader_options?
-      types = extract_types(struct_class)
-      types.any? { |type| type.meta[:reader] }
-    end
-
-    # @private
-    def extract_types(struct_class)
-      struct_class.attribute_names.each_with_object([]) do |key, acc|
-        type = struct_class.schema[key]
-        if type.respond_to?(:schema)
-          acc << extract_types(type)
-        else
-          acc << type
-        end
-      end.flatten
-    end
-
-    # @private
-    def reader_options
-      @reader_options ||= []
     end
   end
 end

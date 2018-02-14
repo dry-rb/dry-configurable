@@ -265,8 +265,8 @@
         Class.new do
           extend Dry::Configurable
 
-          setting :database do
-            setting :url, Test::Types::String.meta(reader: true)
+          setting :database, Test::Types::Hash.meta(reader: true) do
+            setting :url, Test::Types::String
           end
         end
       end
