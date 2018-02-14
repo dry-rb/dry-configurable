@@ -3,7 +3,24 @@ module Dry
 
     # @private
     class NullConfig
-      def initialize
+      def self.from(struct_class)
+        keys = extract_keys(struct_class, [])
+        new(keys)
+      end
+
+      def self.extract_keys(struct_class, keys)
+        struct_class.attribute_names.each do |key|
+          type = struct_class.schema[key]
+          keys << key
+          if type.respond_to?(:schema)
+            extract_keys(type, keys)
+          end
+        end
+        keys
+      end
+
+      def initialize(keys)
+        @keys = keys
         @schema = {}
       end
 
@@ -18,23 +35,26 @@ module Dry
         end
       end
 
-      EQUAL_END = /=$/
+      EQUAL = "=".freeze
 
       def method_missing(method_name, *args, &block)
         to_return = self
-        if method_name.to_s.match(EQUAL_END)
-          key = method_name.to_s.gsub(EQUAL_END, '').to_sym
+        key = method_name.to_s
+        index = key.rindex(EQUAL)
+        key = index ? key[0, index].to_sym : method_name
+        super unless keys.include?(key)
+        if index
           schema[key] = args.first
         else
-          null_config = self.class.new
-          schema[method_name] = null_config
+          null_config = self.class.new(keys)
+          schema[key] = null_config
           to_return = null_config
         end
         to_return
       end
 
       private
-      attr_reader :schema
+      attr_reader :schema, :keys
     end
   end
 end

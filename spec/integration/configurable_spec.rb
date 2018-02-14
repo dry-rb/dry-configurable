@@ -312,5 +312,17 @@
         )
       end
     end
+
+    context 'try to configure an invalid setting' do
+      it 'raise NoMethodError' do
+        expect do
+          klass.configure do |config|
+            config.hello_world = 'localhost'
+          end
+        end.to raise_error(
+          NoMethodError
+        )
+      end
+    end
   end
 end

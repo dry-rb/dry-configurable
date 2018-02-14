@@ -54,7 +54,7 @@ module Dry
     end
 
     def null_config
-      @null_config ||= NullConfig.new
+      @null_config ||= NullConfig.from(struct_class)
     end
 
     def config
