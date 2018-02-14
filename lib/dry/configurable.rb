@@ -1,5 +1,5 @@
 require 'dry-struct'
-require 'dry/configurable/proxy_settings'
+require 'dry/configurable/null_config'
 
 module Dry
   # A simple configuration mixin
@@ -51,9 +51,13 @@ module Dry
       store_reader_key(name) if reader_options?
     end
 
-    def configure(&block)
-      settings_values = ProxySettings.new(struct_class, &block).schema
-      @config = struct_class.new(settings_values)
+    def configure
+      yield(null_config)
+      finalize! unless finalized?
+    end
+
+    def null_config
+      @null_config ||= NullConfig.new
     end
 
     def config
@@ -74,6 +78,17 @@ module Dry
     def raise_already_defined_config(key)
       raise AlreadyDefinedConfigError,
             "Cannot add setting +#{name}+, #{self} is already configured"
+    end
+
+    # @private
+    def finalize!
+      @config = struct_class.new(null_config.to_config)
+      @finalized = true
+    end
+
+    # @private
+    def finalized?
+      @finalized == true
     end
 
     # @private

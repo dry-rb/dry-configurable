@@ -1,4 +1,4 @@
-RSpec.describe Dry::Configurable do
+  RSpec.describe Dry::Configurable do
   context 'when extended' do
     let(:klass) do
       Class.new do
@@ -55,8 +55,8 @@ RSpec.describe Dry::Configurable do
 
     context 'basic example' do
       before do
-        klass.configure do
-          config :database_url, 'jdbc:sqlite:memory'
+        klass.configure do |config|
+          config.database_url = 'jdbc:sqlite:memory'
         end
       end
 
@@ -83,12 +83,10 @@ RSpec.describe Dry::Configurable do
       end
 
       it 'allow to set values for nested configuration' do
-        klass.configure do
-          config :preview do
-            config :testing, 'tested'
-          end
+        klass.configure do |config|
+          config.preview.testing = 'tested'
 
-          config :database_url, 'localhost'
+          config.database_url = 'localhost'
         end
 
         expect(klass.config.preview.testing).to eq 'tested'
@@ -109,12 +107,8 @@ RSpec.describe Dry::Configurable do
       end
 
       it 'allow to set values for nested configuration' do
-        klass.configure do
-          config :preview do
-            config :testing do
-              config :allowed, true
-            end
-          end
+        klass.configure do |config|
+          config.preview.testing.allowed = true
         end
 
         expect(klass.config.preview.testing.allowed).to eq true
@@ -131,8 +125,8 @@ RSpec.describe Dry::Configurable do
       end
 
       before do
-        klass.configure do
-          config :database_url, 'localhost'
+        klass.configure do |config|
+          config.database_url = 'localhost'
         end
       end
 
@@ -155,8 +149,8 @@ RSpec.describe Dry::Configurable do
       end
 
       it 'will use value provided' do
-        klass.configure do
-          config :wait_time, '34'
+        klass.configure do |config|
+          config.wait_time = '34'
         end
 
         expect(klass.config.wait_time).to eq 34
@@ -175,10 +169,8 @@ RSpec.describe Dry::Configurable do
       end
 
       before do
-        klass.configure do
-          config :database do
-            config :url, 'localhost'
-          end
+        klass.configure do |config|
+          config.database.url = 'localhost'
         end
       end
 
@@ -203,10 +195,8 @@ RSpec.describe Dry::Configurable do
       end
 
       it 'will use value provided' do
-        klass.configure do
-          config :wait do
-            config :time, '34'
-          end
+        klass.configure do |config|
+          config.wait.time = '34'
         end
 
         expect(klass.config.wait.time).to eq 34
@@ -223,8 +213,8 @@ RSpec.describe Dry::Configurable do
       end
 
       before do
-        klass.configure do
-          config :database_url,'localhost'
+        klass.configure do |config|
+          config.database_url = 'localhost'
         end
       end
 
@@ -245,10 +235,8 @@ RSpec.describe Dry::Configurable do
       end
 
       before do
-        klass.configure do
-          config :database do
-            config :url,'localhost'
-          end
+        klass.configure do |config|
+          config.database.url = 'localhost'
         end
       end
 
@@ -259,8 +247,8 @@ RSpec.describe Dry::Configurable do
 
     context 'try to set new value after config has been created' do
       before do
-        klass.configure do
-          config :database_url, 'localhost'
+        klass.configure do |config|
+          config.database_url = 'localhost'
         end
       end
 
