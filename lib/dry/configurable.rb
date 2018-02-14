@@ -26,6 +26,7 @@ module Dry
   module Configurable
     NotConfiguredError  = Class.new(StandardError)
     AlreadyDefinedConfigError = Class.new(StandardError)
+    FrozenConfigError = Class.new(StandardError)
 
     class Config < Dry::Struct
       class << self
@@ -52,6 +53,7 @@ module Dry
     end
 
     def configure
+      raise_frozen_config if finalized?
       yield(null_config)
     end
 
@@ -85,9 +87,8 @@ module Dry
     end
 
     # @private
-    def finalize!
-      @config = struct_class.new(null_config.to_config)
-      @finalized = true
+    def raise_frozen_config
+      raise FrozenConfigError, 'Cannot modify frozen config'
     end
 
     # @private

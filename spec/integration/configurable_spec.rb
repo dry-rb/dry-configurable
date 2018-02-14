@@ -297,5 +297,20 @@
         )
       end
     end
+
+    context 'try call configure after been finalize!' do
+      before do
+        klass.configure do |config|
+          config.database_url = 'localhost'
+        end
+        klass.finalize!
+      end
+
+      it 'raise an exception' do
+        expect { klass.configure }.to raise_error(
+          Dry::Configurable::FrozenConfigError
+        )
+      end
+    end
   end
 end
