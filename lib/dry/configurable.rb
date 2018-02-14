@@ -53,7 +53,6 @@ module Dry
 
     def configure
       yield(null_config)
-      finalize! unless finalized?
     end
 
     def null_config
@@ -72,6 +71,11 @@ module Dry
         "#{e.message}"
     end
 
+    def finalize!
+      @config = struct_class.new(null_config.to_config)
+      @finalized = true
+    end
+
     private
 
     # @private
@@ -88,7 +92,7 @@ module Dry
 
     # @private
     def finalized?
-      @finalized == true
+      @finalized
     end
 
     # @private

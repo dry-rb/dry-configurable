@@ -58,6 +58,7 @@
         klass.configure do |config|
           config.database_url = 'jdbc:sqlite:memory'
         end
+        klass.finalize!
       end
 
       it 'allow to set values' do
@@ -88,6 +89,7 @@
 
           config.database_url = 'localhost'
         end
+        klass.finalize!
 
         expect(klass.config.preview.testing).to eq 'tested'
       end
@@ -110,6 +112,7 @@
         klass.configure do |config|
           config.preview.testing.allowed = true
         end
+        klass.finalize!
 
         expect(klass.config.preview.testing.allowed).to eq true
       end
@@ -128,6 +131,7 @@
         klass.configure do |config|
           config.database_url = 'localhost'
         end
+        klass.finalize!
       end
 
       it 'use types constructor to generate config value' do
@@ -152,8 +156,38 @@
         klass.configure do |config|
           config.wait_time = '34'
         end
+        klass.finalize!
 
         expect(klass.config.wait_time).to eq 34
+      end
+    end
+
+    context 'Call multiple times configure before #finalize!' do
+      let(:klass) do
+        Class.new do
+          extend Dry::Configurable
+
+          setting :database, Test::Types::String
+          setting :name, Test::Types::String
+        end
+      end
+
+      before do
+        klass.configure do |config|
+          config.database = 'localhost'
+          config.name = 'dry'
+        end
+
+        klass.configure do |config|
+          config.database = 'localhost_2'
+        end
+
+        klass.finalize!
+      end
+
+      it 'returns the correct value' do
+        expect(klass.config.database).to eq 'localhost_2'
+        expect(klass.config.name).to eq 'dry'
       end
     end
 
@@ -172,6 +206,7 @@
         klass.configure do |config|
           config.database.url = 'localhost'
         end
+        klass.finalize!
       end
 
       it 'use types constructor to generate config value' do
@@ -198,6 +233,7 @@
         klass.configure do |config|
           config.wait.time = '34'
         end
+        klass.finalize!
 
         expect(klass.config.wait.time).to eq 34
       end
@@ -216,6 +252,7 @@
         klass.configure do |config|
           config.database_url = 'localhost'
         end
+        klass.finalize!
       end
 
       it 'allows to access the configuration value directly' do
@@ -238,6 +275,7 @@
         klass.configure do |config|
           config.database.url = 'localhost'
         end
+        klass.finalize!
       end
 
       it 'allows to access the configuration value directly' do
@@ -250,6 +288,7 @@
         klass.configure do |config|
           config.database_url = 'localhost'
         end
+        klass.finalize!
       end
 
       it 'raise an exception' do
