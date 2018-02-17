@@ -42,6 +42,13 @@ module Dry
       end
     end
 
+    def self.extended(klass)
+      klass.class_eval do
+        @finalized = false
+        @configured = false
+      end
+    end
+
     def setting(name, type = nil, &block)
       raise_already_defined_config(name) if defined?(@config)
       struct_class.setting(name, type, &block)
