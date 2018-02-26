@@ -2,7 +2,7 @@ module Dry
   module Configurable
 
     # @private
-    class NullConfig < Dry::Struct
+    class NullConfig < Config
       transform_types do |type|
         if type.is_a?(Class) && type <= Dry::Struct || type.default?
           type
@@ -14,14 +14,8 @@ module Dry
       end
 
       class << self
-        private :attribute
-
         def setting(name, type = nil, &block)
-          if block
-            attribute(name, Class.new(NullConfig), &block)
-          else
-            attribute(name, type)
-          end
+          super
 
           define_method("#{name}=") do |value|
             @attributes = @attributes.merge(name => value)

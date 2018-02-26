@@ -1,4 +1,5 @@
 require 'dry-struct'
+require 'dry/configurable/config'
 require 'dry/configurable/null_config'
 
 module Dry
@@ -27,20 +28,6 @@ module Dry
     NotConfiguredError  = Class.new(StandardError)
     AlreadyDefinedConfigError = Class.new(StandardError)
     FrozenConfigError = Class.new(StandardError)
-
-    class Config < Dry::Struct
-      class << self
-        private :attribute
-
-        def setting(name, type = nil, &block)
-          if block
-            attribute(name, Class.new(Config), &block)
-          else
-            attribute(name, type)
-          end
-        end
-      end
-    end
 
     def self.extended(klass)
       klass.class_eval do
