@@ -45,30 +45,33 @@ module Dry
     def self.extended(klass)
       klass.class_eval do
         @finalized = false
-        @configured = false
       end
     end
 
     def setting(name, type = nil, &block)
       raise_already_defined_config(name) if defined?(@config)
-      struct_class.setting(name, type, &block)
+      set_setting(name, type, &block)
       define_reader_method(name, type) if type
     end
 
     def configure
       raise_frozen_config if finalized?
-      yield(null_config)
+      yield(null_config_instance)
     end
 
     def null_config
-      @null_config ||= NullConfig.from(struct_class)
+      @null_config ||= Class.new(NullConfig)
+    end
+
+    def null_config_instance
+      @null_config_instance ||= null_config.new
     end
 
     def config
       if defined?(@config)
         @config
       else
-        struct_class.new(build_default_keys(struct_class))
+        struct_class.new
       end
     rescue Dry::Struct::Error => e
       raise NotConfiguredError,
@@ -77,7 +80,7 @@ module Dry
     end
 
     def finalize!
-      @config = struct_class.new(null_config.to_config)
+      @config = struct_class.new(null_config_instance.attributes)
       @finalized = true
     end
 
@@ -112,20 +115,13 @@ module Dry
     end
 
     # @private
-    def build_default_keys(settings, start = {})
-      settings.attribute_names.each do |key|
-        type = settings.schema[key]
-        start[key] = {} unless type.default?
-        if type.respond_to?(:schema)
-          build_default_keys(type, start[key])
-        end
-      end
-      start
-    end
-
-    # @private
     def struct_class
       @struct_class ||= Class.new(Config)
+    end
+
+    def set_setting(name, type, &block)
+      struct_class.setting(name, type, &block)
+      null_config.setting(name, type, &block)
     end
   end
 end
