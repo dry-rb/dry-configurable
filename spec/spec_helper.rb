@@ -84,6 +84,14 @@ RSpec.configure do |config|
   Kernel.srand config.seed
 end
 
+require 'dry-types'
+
+module Test
+  module Types
+    include Dry::Types.module
+  end
+end
+
 require 'dry/configurable'
 require 'dry/configurable/test_interface'
 
