@@ -1,4 +1,5 @@
 require 'dry-struct'
+require 'dry/configurable/helpers'
 require 'dry/configurable/error'
 require 'dry/configurable/config'
 require 'dry/configurable/null_config'
@@ -28,6 +29,7 @@ module Dry
   module Configurable
     def self.extended(klass)
       klass.class_eval do
+        extend Helpers
         @configured = false
       end
     end
@@ -41,11 +43,10 @@ module Dry
       super
     end
 
-
-    def setting(name, type = nil, &block)
+    def setting(name, type_or_value = nil, &block)
       raise_already_defined_config(name) if defined?(@config)
-      set_setting(name, type, &block)
-      define_reader_method(name, type) if type
+      set_setting(name, type_or_value, &block)
+      define_reader_method(name, type_or_value) if type?(type_or_value)
     end
 
     def configure
