@@ -31,11 +31,13 @@ module Dry
       klass.class_eval do
         extend Helpers
         @configured = false
+        @config_mutex = ::Mutex.new
       end
     end
 
     def inherited(subclass)
       subclass.instance_variable_set(:@configured, @configured)
+      subclass.instance_variable_set(:@config_mutex, ::Mutex.new)
       subclass.instance_variable_set(:@null_config, @null_config.clone) if defined?(@null_config)
       subclass.instance_variable_set(:@null_config_instance, @null_config_instance.clone) if defined?(@null_config_instance)
       subclass.instance_variable_set(:@struct_class, @struct_class.clone) if defined?(@struct_class)
@@ -106,7 +108,9 @@ module Dry
 
     # @private
     def create_config
-      @config = @configured ? struct_class.new(null_config_instance.attributes) : struct_class.new
+      @config_mutex.synchronize do
+        @config = @configured ? struct_class.new(null_config_instance.attributes) : struct_class.new
+      end
     end
 
     # @private
