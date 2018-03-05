@@ -54,7 +54,7 @@ module Dry
     def configure
       raise_frozen_config if frozen?
       yield(null_config_instance)
-      @configured = true
+      set_configured!
     end
 
     def null_config
@@ -108,7 +108,7 @@ module Dry
 
     # @private
     def create_config
-      @config_mutex.synchronize do
+      thread_safe do
         @config = @configured ? struct_class.new(null_config_instance.attributes) : struct_class.new
       end
     end
@@ -118,9 +118,22 @@ module Dry
       @struct_class ||= Class.new(Config)
     end
 
+    # @private
     def set_setting(name, type, &block)
       struct_class.setting(name, type, &block)
       null_config.setting(name, type, &block)
+    end
+
+    # @private
+    def set_configured!
+      thread_safe { @configured = true }
+    end
+
+    # @private
+    def thread_safe
+      @config_mutex.synchronize do
+        yield
+      end
     end
   end
 end
