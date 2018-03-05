@@ -1,4 +1,5 @@
 require 'dry-types'
+require 'dry/core/deprecations'
 
 module Dry
   module Configurable
@@ -18,7 +19,7 @@ module Dry
             type = if type?(type_or_value)
               type_or_value
             else
-              warn deprecation_warning
+              Dry::Core::Deprecations.warn(deprecation_warning, tag: :'dry-configurable')
               ANY.default(type_or_value)
             end
             attribute(name, type)
