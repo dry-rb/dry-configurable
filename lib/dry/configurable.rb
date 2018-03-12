@@ -53,8 +53,10 @@ module Dry
 
     def configure
       raise_frozen_config if frozen?
-      yield(null_config_instance)
-      set_configured!
+      thread_safe do
+        yield(null_config_instance)
+        @configured = true
+      end
     end
 
     def null_config
@@ -69,7 +71,9 @@ module Dry
       if defined?(@config)
         @config
       else
-        create_config
+        thread_safe do
+          @config ||= @configured ? struct_class.new(null_config_instance.attributes) : struct_class.new
+        end
       end
     rescue Dry::Struct::Error => e
       raise NotConfiguredError,
@@ -107,13 +111,6 @@ module Dry
     end
 
     # @private
-    def create_config
-      thread_safe do
-        @config = @configured ? struct_class.new(null_config_instance.attributes) : struct_class.new
-      end
-    end
-
-    # @private
     def struct_class
       @struct_class ||= Class.new(Config)
     end
@@ -125,15 +122,8 @@ module Dry
     end
 
     # @private
-    def set_configured!
-      thread_safe { @configured = true }
-    end
-
-    # @private
     def thread_safe
-      @config_mutex.synchronize do
-        yield
-      end
+      @config_mutex.synchronize { yield }
     end
   end
 end
