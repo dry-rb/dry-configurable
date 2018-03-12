@@ -272,12 +272,6 @@ RSpec.shared_examples 'a configurable class' do
               end
             end.to raise_error(Dry::Configurable::FrozenConfigError, 'Cannot modify frozen config')
           end
-
-          it 'disallows direct modification on config' do
-            expect do
-              klass.config.dsn = 'jdbc:sqlite:memory'
-            end.to raise_error(FrozenError)
-          end
         end
 
         context 'when inherited' do
