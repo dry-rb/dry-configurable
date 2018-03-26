@@ -179,11 +179,55 @@ RSpec.shared_examples 'a configurable class' do
             expect(klass.config.database.dsn).to eq('sqlite:memory')
           end
         end
+
+        context 'Dry::Types' do
+          before do
+            klass.setting :db, Types::String, reader: true
+          end
+
+          it 'returns default' do
+            expect(klass.db).to eq 'test'
+          end
+        end
       end
     end
 
     describe 'configuration' do
       context 'without nesting' do
+        context 'Dry::Types' do
+          context 'without processor' do
+            before do
+              klass.setting :db, Types::StringCoercible, reader: true
+            end
+
+            before do
+              klass.configure do |config|
+                config.db = 1
+              end
+            end
+
+            it 'updates the config value' do
+              expect(klass.db).to eq '1'
+            end
+          end
+
+          context 'with processor' do
+            before do
+              klass.setting(:dsn, Types::StringCoercible ) { |dsn| dsn + "tested" }
+            end
+
+            before do
+              klass.configure do |config|
+                config.dsn = 1
+              end
+            end
+
+            it 'updates the config value' do
+              expect(klass.config.dsn).to eq('1tested')
+            end
+          end
+        end
+
         context 'without processor' do
           before do
             klass.setting :dsn, 'sqlite:memory'
@@ -218,6 +262,35 @@ RSpec.shared_examples 'a configurable class' do
       end
 
       context 'with nesting' do
+        context 'with Dry::Types' do
+          context 'without processor' do
+            before do
+              klass.setting :database do
+                setting :dsn, Types::String
+              end
+            end
+
+            it 'updates the config value' do
+              expect(klass.config.database.dsn).to eq('test')
+            end
+          end
+
+          context 'with processor' do
+            before do
+              klass.setting :database do
+                setting(:dsn, Types::StringCoercible) { |dsn| dsn + "tested" }
+              end
+
+              klass.configure do |config|
+                config.database.dsn = :hello
+              end
+            end
+
+            it 'updates the config value' do
+              expect(klass.config.database.dsn).to eq('hellotested')
+            end
+          end
+        end
         context 'without processor' do
           before do
             klass.setting :database do

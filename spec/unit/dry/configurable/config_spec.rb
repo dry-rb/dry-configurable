@@ -1,15 +1,16 @@
 RSpec.describe Dry::Configurable::Config do
   let(:klass) { Dry::Configurable::Config }
   let(:config) { klass.create(settings) }
+  let(:default_preprocessor) { klass::DEFAULT_PREPROCESSOR }
   let(:settings) do
     [
-      value_class.new(:db, 'sqlite', ->(v) { "#{v}:memory" }),
-      value_class.new(:user, 'root', ->(v) { v }),
-      value_class.new(:pass, none, ->(v) { v })
+      value_class.new(:db, 'sqlite', ->(v) { "#{v}:memory" }, default_preprocessor),
+      value_class.new(:user, 'root', ->(v) { v }, default_preprocessor),
+      value_class.new(:pass, none, ->(v) { v }, default_preprocessor)
     ]
   end
   let(:value_class) { Dry::Configurable::Config::Value }
-  let(:none) { value_class::NONE }
+  let(:none) { value_class::NONE  }
 
   describe '.create' do
     it 'creates a config subclass from the given settings' do
@@ -83,10 +84,10 @@ RSpec.describe Dry::Configurable::Config do
       end
       let(:settings) do
         [
-          value_class.new(:db, 'sqlite', ->(v) { "#{v}:memory" }),
-          value_class.new(:user, 'root', ->(v) { v }),
-          value_class.new(:pass, none, ->(v) { v }),
-          value_class.new(:foo, nested_setting, ->(v) { v })
+          value_class.new(:db, 'sqlite', ->(v) { "#{v}:memory" }, default_preprocessor),
+          value_class.new(:user, 'root', ->(v) { v }, default_preprocessor),
+          value_class.new(:pass, none, ->(v) { v }, default_preprocessor),
+          value_class.new(:foo, nested_setting, ->(v) { v }, default_preprocessor)
         ]
       end
       it 'returns a config hash' do
@@ -117,14 +118,14 @@ RSpec.describe Dry::Configurable::Config do
 
     context 'with nesting' do
       let(:nested_setting) do
-        klass.create([value_class.new(:bar, 'baz', ->(v) { v })])
+        klass.create([value_class.new(:bar, 'baz', ->(v) { v }, default_preprocessor)])
       end
       let(:settings) do
         [
-          value_class.new(:db, 'sqlite', ->(v) { "#{v}:memory" }),
-          value_class.new(:user, 'root', ->(v) { v }),
-          value_class.new(:pass, none, ->(v) { v }),
-          value_class.new(:foo, nested_setting, ->(v) { v })
+          value_class.new(:db, 'sqlite', ->(v) { "#{v}:memory" }, default_preprocessor),
+          value_class.new(:user, 'root', ->(v) { v }, default_preprocessor),
+          value_class.new(:pass, none, ->(v) { v }, default_preprocessor),
+          value_class.new(:foo, nested_setting, ->(v) { v }, default_preprocessor)
         ]
       end
       it 'returns a config hash' do
