@@ -25,7 +25,7 @@ RSpec.shared_examples 'a configurable class' do
 
           context 'with a string default value' do
             before do
-              klass.setting :dsn,  Test::Types::String.default('sqlite:memory')
+              klass.setting :dsn, Test::Types::String.default('sqlite:memory')
             end
 
             it 'returns the default value' do

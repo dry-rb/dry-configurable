@@ -19,7 +19,7 @@ module Dry
   module Configurable
     # @private
     class ArgumentParser
-      VALID_OPTIONS = %i(reader).freeze
+      VALID_OPTIONS = %i[reader].freeze
 
       def self.call(data)
         parsed = new(data)

@@ -14,14 +14,14 @@ module Dry
 
         def setting(name, type_or_value = nil, &block)
           if block
-            attribute(name, Class.new(self.superclass), &block)
+            attribute(name, Class.new(superclass), &block)
           else
             type = if type?(type_or_value)
-              type_or_value
-            else
-              Dry::Core::Deprecations.warn(deprecation_warning, tag: :'dry-configurable')
-              ANY.default(type_or_value)
-            end
+                     type_or_value
+                   else
+                     Dry::Core::Deprecations.warn(deprecation_warning, tag: :'dry-configurable')
+                     ANY.default(type_or_value)
+                   end
             attribute(name, type)
           end
         end

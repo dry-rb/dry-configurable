@@ -1,6 +1,5 @@
 module Dry
   module Configurable
-
     # @private
     class NullConfig < Config
       transform_types do |type|

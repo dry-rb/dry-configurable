@@ -37,7 +37,7 @@ RSpec.shared_examples 'a configurable class old api' do
 
         context 'with a string default value' do
           before do
-            klass.setting :dsn,  'sqlite:memory'
+            klass.setting :dsn, 'sqlite:memory'
           end
 
           it 'returns the default value' do
@@ -47,7 +47,7 @@ RSpec.shared_examples 'a configurable class old api' do
 
         context 'with a hash default value' do
           before do
-            klass.setting :db_config, {user: 'root', password: ''}
+            klass.setting :db_config, user: 'root', password: ''
           end
 
           it 'returns the default value' do

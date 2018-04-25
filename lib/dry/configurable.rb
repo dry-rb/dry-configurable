@@ -77,8 +77,8 @@ module Dry
       end
     rescue Dry::Struct::Error => e
       raise NotConfiguredError,
-        "You need to use #configure method to setup values for your configuration, there are some values missing\n" +
-        "#{e.message}"
+            "You need to use #configure method to setup values for your configuration, there are some values missing\n" \
+            "#{e.message}"
     end
 
     def finalize!
@@ -88,11 +88,12 @@ module Dry
     private
 
     def define_reader_method(name, type)
+      return unless reader_option?(type)
       singleton_class.class_eval do
         define_method(name) do
           config.public_send(name)
         end
-      end if reader_option?(type)
+      end
     end
 
     def reader_option?(type)
@@ -100,7 +101,7 @@ module Dry
     end
 
     # @private
-    def raise_already_defined_config(key)
+    def raise_already_defined_config(name)
       raise AlreadyDefinedConfigError,
             "Cannot add setting +#{name}+, #{self} is already configured"
     end
