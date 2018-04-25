@@ -7,6 +7,7 @@ RSpec.describe Dry::Configurable do
     end
 
     it_behaves_like 'a configurable class'
+    it_behaves_like 'a configurable class old api'
   end
 
   context 'when extended then inherited' do
@@ -21,5 +22,6 @@ RSpec.describe Dry::Configurable do
     end
 
     it_behaves_like 'a configurable class'
+    it_behaves_like 'a configurable class old api'
   end
 end

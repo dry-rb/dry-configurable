@@ -3,7 +3,8 @@
 module Dry
   module Configurable
     Error = Class.new(::StandardError)
-    AlreadyDefinedConfig = ::Class.new(Error)
-    FrozenConfig = ::Class.new(Error)
+    AlreadyDefinedConfigError = ::Class.new(Error)
+    FrozenConfigError = ::Class.new(Error)
+    NotConfiguredError = ::Class.new(Error)
   end
 end

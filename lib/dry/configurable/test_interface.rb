@@ -8,7 +8,7 @@ module Dry
       #
       # @api public
       def reset_config
-        create_config
+        @configured = false
       end
     end
 
