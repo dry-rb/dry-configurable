@@ -349,32 +349,6 @@ RSpec.shared_examples 'a configurable class' do
         end
       end
 
-      context 'Test Interface' do
-        before { klass.enable_test_interface }
-
-        describe 'reset_config' do
-          before do
-            klass.setting :dsn, Test::Types::String
-            klass.setting :pool do
-              setting :size, Test::Types::Integer
-            end
-
-            klass.configure do |config|
-              config.dsn = 'sqlite:memory'
-              config.pool.size = 5
-            end
-
-            # klass.reset_config
-          end
-
-          it 'resets configuration to default values' do
-            skip
-            expect(klass.config.dsn).to be_nil
-            expect(klass.config.pool.size).to be_nil
-          end
-        end
-      end
-
       context 'Try to set new value after config has been created' do
         before do
           klass.setting :dsn, Test::Types::String.default('sqlite:memory')
