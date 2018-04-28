@@ -43,6 +43,30 @@ App.pool # => 5
 App.uploader.bucket # => 'dev'
 ```
 
+### How to reset the config to its original state on testing environment
+
+spec_helper.rb
+
+```ruby
+require "dry/configurable/test_interface"
+
+# this is your module/class that extend Dry::Configurable
+module AwesomeModule
+  # add this code
+  extend Dry::Configurable::TestInterface
+end
+```
+
+on spec file
+
+```ruby
+before(:all) { AwesomeModule.reset_config }
+
+# or 
+before(:each) { AwesomeModule.reset_config }
+
+```
+
 ## Links
 
 * [Documentation](http://dry-rb.org/gems/dry-configurable)
