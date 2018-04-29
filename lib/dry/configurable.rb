@@ -82,6 +82,7 @@ module Dry
     end
 
     def finalize!
+      config
       freeze
     end
 
