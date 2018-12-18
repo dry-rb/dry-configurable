@@ -59,14 +59,6 @@ module Dry
       end
     end
 
-    def null_config
-      @null_config ||= Class.new(NullConfig)
-    end
-
-    def null_config_instance
-      @null_config_instance ||= null_config.new
-    end
-
     def config
       if defined?(@config)
         @config
@@ -87,6 +79,14 @@ module Dry
     end
 
     private
+
+    def null_config
+      @null_config ||= Class.new(NullConfig)
+    end
+
+    def null_config_instance
+      @null_config_instance ||= null_config.new
+    end
 
     def define_reader_method(name, type)
       return unless reader_option?(type)
