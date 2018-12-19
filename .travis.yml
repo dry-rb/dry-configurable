@@ -8,7 +8,6 @@ script:
 after_success:
   - '[ -d coverage ] && bundle exec codeclimate-test-reporter'
 rvm:
-  - 2.2
   - 2.3.1
   - jruby-9.1.5.0
   - ruby-head
