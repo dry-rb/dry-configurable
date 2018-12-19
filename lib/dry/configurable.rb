@@ -45,6 +45,10 @@ module Dry
       super
     end
 
+    def condition(name, &block)
+      set_condition(name, &block)
+    end
+
     def setting(name, type_or_value = nil, &block)
       raise_already_defined_config(name) if defined?(@config)
       set_setting(name, type_or_value, &block)
@@ -121,6 +125,10 @@ module Dry
     def set_setting(name, type, &block)
       struct_class.setting(name, type, &block)
       null_config.setting(name, type, &block)
+    end
+
+    def set_condition(name, &block)
+      null_config.condition(name, &block)
     end
 
     # @private

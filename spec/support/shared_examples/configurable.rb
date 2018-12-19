@@ -362,5 +362,49 @@ RSpec.shared_examples 'a configurable class' do
         end
       end
     end
+
+    describe 'conditions' do
+      it 'allows to set conditions and execute code if they return true' do
+        begin
+          ENVIRONMENT = :production
+          klass.condition :environment do |value = :development|
+            ENVIRONMENT == value
+          end
+
+          klass.setting :hello, Test::Types::String.default('dry-rb')
+
+          klass.configure do |config|
+            config.environment(:production) do
+              config.hello = 'world'
+            end
+          end
+
+          expect(klass.config.hello).to eq 'world'
+        ensure
+          Object.send(:remove_const, :ENVIRONMENT)
+        end
+      end
+
+      it 'allows to set conditions and does not execute code if they return false' do
+        begin
+          ENVIRONMENT = :development
+          klass.condition :environment do |value = :development|
+            ENVIRONMENT == value
+          end
+
+          klass.setting :hello, Test::Types::String.default('dry-rb')
+
+          klass.configure do |config|
+            config.environment(:production) do
+              config.hello = 'world'
+            end
+          end
+
+          expect(klass.config.hello).to eq 'dry-rb'
+        ensure
+          Object.send(:remove_const, :ENVIRONMENT)
+        end
+      end
+    end
   end
 end
