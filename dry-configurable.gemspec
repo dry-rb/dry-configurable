@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Andy Holland']
   spec.email         = ['andyholland1991@aol.com']
   spec.summary       = 'A mixin to add configuration functionality to your classes'
-  spec.homepage      = 'https://github.com/dryrb/dry-configurable'
+  spec.homepage      = 'https://github.com/dry-rb/dry-configurable'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0")
