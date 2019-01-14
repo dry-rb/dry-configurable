@@ -1,8 +1,13 @@
-if ENV['COVERAGE'] == 'true' && RUBY_ENGINE == 'ruby' && RUBY_VERSION == '2.3.1'
-  require 'simplecov'
+if RUBY_ENGINE == 'ruby' && ENV['COVERAGE'] == 'true'
+  require 'yaml'
+  rubies = YAML.load(File.read(File.join(__dir__, '..', '.travis.yml')))['rvm']
+  latest_mri = rubies.select { |v| v =~ /\A\d+\.\d+.\d+\z/ }.max
 
-  SimpleCov.start do
-    add_filter '/spec/'
+  if RUBY_VERSION == latest_mri
+    require 'simplecov'
+    SimpleCov.start do
+      add_filter '/spec/'
+    end
   end
 end
 
@@ -82,14 +87,6 @@ RSpec.configure do |config|
   # test failures related to randomization by passing the same `--seed` value
   # as the one that triggered the failure.
   Kernel.srand config.seed
-end
-
-require 'dry-types'
-
-module Test
-  module Types
-    include Dry::Types.module
-  end
 end
 
 require 'dry/configurable'
