@@ -1,5 +1,9 @@
 ## Unreleased
 
+## Changed
+
+* [BREAKING] Minimal supported Ruby version is set to 2.3 (flash-gordon)
+
 [Compare v0.7.0...HEAD](https://github.com/dry-rb/dry-configurable/compare/v0.7.0...HEAD)
 
 ## 0.7.0
