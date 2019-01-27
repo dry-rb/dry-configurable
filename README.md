@@ -11,36 +11,24 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/25311e81391498d6b7c8/test_coverage)](https://codeclimate.com/github/dry-rb/dry-configurable/test_coverage)
 [![API Documentation Coverage](http://inch-ci.org/github/dry-rb/dry-configurable.svg)][inch]
 
-## Synopsis
+## Installation
+
+Add this line to your application's Gemfile:
 
 ```ruby
-class App
-  extend Dry::Configurable
+gem 'dry-configurable'
+```
 
-  # Pass a block for nested configuration (works to any depth)
-  setting :database do
-    # Can pass a default value
-    setting :dsn, 'sqlite:memory'
-  end
-  # Defaults to nil if no default value is given
-  setting :adapter
-  # Passing the reader option as true will create reader method for the class
-  setting :pool, 5, reader: true
-  # Passing the reader attributes works with nested configuration
-  setting :uploader, reader: true do
-    setting :bucket, 'dev'
-  end
-end
+And then execute:
 
-App.configure do |config|
-  config.database.dsn = 'jdbc:sqlite:memory'
-end
+```sh
+$ bundle
+```
 
-App.config.database.dsn
-# => 'jdbc:sqlite:memory'
-App.config.adapter # => nil
-App.pool # => 5
-App.uploader.bucket # => 'dev'
+Or install it yourself as:
+
+```sh
+$ gem install dry-configurable
 ```
 
 ## Links
