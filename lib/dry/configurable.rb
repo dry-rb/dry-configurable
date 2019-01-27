@@ -141,6 +141,7 @@ module Dry
     # @private
     def create_config
       @_config_mutex.synchronize do
+        return @config if defined? @config
         create_config_for_nested_configurations
         @_config = ::Dry::Configurable::Config.create(_settings) unless _settings.empty?
       end
