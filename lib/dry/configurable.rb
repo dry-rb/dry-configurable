@@ -1,4 +1,4 @@
-require 'concurrent'
+require 'concurrent/array'
 require 'dry/configurable/config'
 require 'dry/configurable/error'
 require 'dry/configurable/nested_config'
@@ -21,10 +21,7 @@ module Dry
   #     end
   #   end
   #
-  #   App.configure do |config|
-  #     config.database.dsn = 'jdbc:sqlite:memory'
-  #   end
-  #
+  #   App.config.database.dsn = 'jdbc:sqlite:memory'
   #   App.config.database.dsn
   #     # => "jdbc:sqlite:memory'"
   #

@@ -1,3 +1,5 @@
+require 'concurrent/hash'
+
 module Dry
   module Configurable
     # @private
