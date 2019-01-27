@@ -190,9 +190,7 @@ RSpec.shared_examples 'a configurable class' do
           end
 
           before do
-            klass.configure do |config|
-              config.dsn = 'jdbc:sqlite:memory'
-            end
+            klass.config.dsn = 'jdbc:sqlite:memory'
           end
 
           it 'updates the config value' do
@@ -206,9 +204,7 @@ RSpec.shared_examples 'a configurable class' do
           end
 
           before do
-            klass.configure do |config|
-              config.dsn = 'jdbc:sqlite'
-            end
+            klass.config.dsn = 'jdbc:sqlite'
           end
 
           it 'updates the config value' do
@@ -224,9 +220,7 @@ RSpec.shared_examples 'a configurable class' do
               setting :dsn, 'sqlite:memory'
             end
 
-            klass.configure do |config|
-              config.database.dsn = 'jdbc:sqlite:memory'
-            end
+            klass.config.database.dsn = 'jdbc:sqlite:memory'
           end
 
           it 'updates the config value' do
@@ -240,9 +234,7 @@ RSpec.shared_examples 'a configurable class' do
               setting(:dsn, 'sqlite') { |dsn| "#{dsn}:memory" }
             end
 
-            klass.configure do |config|
-              config.database.dsn = 'jdbc:sqlite'
-            end
+            klass.config.database.dsn = 'jdbc:sqlite'
           end
 
           it 'updates the config value' do
@@ -254,17 +246,13 @@ RSpec.shared_examples 'a configurable class' do
       context 'when finalized' do
         before do
           klass.setting :dsn
-          klass.configure do |config|
-            config.dsn = 'jdbc:sqlite'
-          end
+          klass.config.dsn = 'jdbc:sqlite'
           klass.finalize!
         end
 
         it 'disallows modification' do
           expect do
-            klass.configure do |config|
-              config.dsn = 'jdbc:sqlite'
-            end
+            klass.config.dsn = 'jdbc:sqlite'
           end.to raise_error(Dry::Configurable::FrozenConfig, 'Cannot modify frozen config')
         end
 
@@ -279,9 +267,7 @@ RSpec.shared_examples 'a configurable class' do
         context 'without processor' do
           before do
             klass.setting :dsn
-            klass.configure do |config|
-              config.dsn = 'jdbc:sqlite:memory'
-            end
+            klass.config.dsn = 'jdbc:sqlite:memory'
           end
 
           subject!(:subclass) { Class.new(klass) }
@@ -292,9 +278,7 @@ RSpec.shared_examples 'a configurable class' do
 
           context 'when the inherited config is modified' do
             before do
-              subclass.configure do |config|
-                config.dsn = 'jdbc:sqlite:file'
-              end
+              subclass.config.dsn = 'jdbc:sqlite:file'
             end
 
             it 'does not modify the original' do
@@ -307,9 +291,7 @@ RSpec.shared_examples 'a configurable class' do
         context 'with processor' do
           before do
             klass.setting(:dsn) { |dsn| "#{dsn}:memory" }
-            klass.configure do |config|
-              config.dsn = 'jdbc:sqlite'
-            end
+            klass.config.dsn = 'jdbc:sqlite'
           end
 
           subject!(:subclass) { Class.new(klass) }
@@ -320,9 +302,7 @@ RSpec.shared_examples 'a configurable class' do
 
           context 'when the inherited config is modified' do
             before do
-              subclass.configure do |config|
-                config.dsn = 'sqlite'
-              end
+              subclass.config.dsn = 'sqlite'
             end
 
             it 'does not modify the original' do
@@ -336,9 +316,7 @@ RSpec.shared_examples 'a configurable class' do
           before do
             klass.setting :dsn
             subclass.setting :db
-            klass.configure do |config|
-              config.dsn = 'jdbc:sqlite:memory'
-            end
+            klass.config.dsn = 'jdbc:sqlite:memory'
           end
 
           subject!(:subclass) { Class.new(klass) }
@@ -360,10 +338,8 @@ RSpec.shared_examples 'a configurable class' do
             setting :size, nil
           end
 
-          klass.configure do |config|
-            config.dsn = 'sqlite:memory'
-            config.pool.size = 5
-          end
+          klass.config.dsn = 'sqlite:memory'
+          klass.config.pool.size = 5
 
           klass.reset_config
         end
