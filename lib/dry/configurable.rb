@@ -67,7 +67,7 @@ module Dry
     # @api public
     def configure
       raise_frozen_config if frozen?
-      yield(config) if block_given?
+      yield(config)
     end
 
     # Finalize and freeze configuration
