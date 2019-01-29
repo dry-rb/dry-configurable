@@ -19,72 +19,28 @@ module Dry
   module Configurable
     # @private
     class ArgumentParser
-      VALID_OPTIONS = %i(reader).freeze
+      def call(val, opts, block)
+        if block && block.parameters.empty?
+          raise ArgumentError unless Undefined.equal?(opts)
 
-      def self.call(data)
-        parsed = new(data)
-        [parsed.value, parsed.options]
-      end
+          processor = Config::DEFAULT_PROCESSOR
 
-      def initialize(data)
-        @data = data
-      end
-
-      def value
-        parse_args[:value]
-      end
-
-      def options
-        parse_args[:options]
-      end
-
-      private
-
-      attr_reader :data
-
-      # @private
-      def default_args
-        { value: nil, options: {} }
-      end
-
-      # @private
-      def parse_args
-        return default_args if data.empty?
-        if data.size > 1
-          { value: data.first, options: check_options(data.last) }
+          value, options = NestedConfig.new(&block), val
         else
-          default_args.merge(check_for_value_or_options(data.first))
+          processor = block || Config::DEFAULT_PROCESSOR
+
+          if Undefined.equal?(opts) && val.is_a?(Hash) && val.key?(:reader)
+            value, options = Undefined, val
+          else
+            value, options = val, opts
+          end
         end
+
+        [value, options(Undefined.default(options, EMPTY_HASH)), processor]
       end
 
-      # @private
-      def check_options(opts)
-        return {} if opts.empty?
-        opts.select { |k, _| VALID_OPTIONS.include?(k) }
-      end
-
-      # @private
-      def check_for_value_or_options(args)
-        case args
-        when Hash
-          parse_hash(args)
-        else
-          { value: args }
-        end
-      end
-
-      # @private
-      def parse_hash(args)
-        if hash_include_options_key(args)
-          { options: check_options(args) }
-        else
-          { value: args }
-        end
-      end
-
-      # @private
-      def hash_include_options_key(hash)
-        hash.any? { |k, _| VALID_OPTIONS.include?(k) }
+      def options(reader: false)
+        { reader: reader }
       end
     end
   end

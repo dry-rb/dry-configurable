@@ -3,9 +3,6 @@ module Dry
     class Config
       # @private
       class Value
-        # @private
-        NONE = ::Object.new.freeze
-
         attr_reader :name, :processor
 
         def initialize(name, value, processor)
@@ -15,11 +12,15 @@ module Dry
         end
 
         def value
-          none? ? nil : @value
+          Undefined.default(@value, nil)
         end
 
-        def none?
-          @value.equal?(::Dry::Configurable::Config::Value::NONE)
+        def undefined?
+          Undefined.eql?(@value)
+        end
+
+        def nested_config?
+          @value.is_a?(::Dry::Configurable::NestedConfig)
         end
       end
     end

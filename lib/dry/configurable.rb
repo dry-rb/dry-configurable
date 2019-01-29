@@ -1,4 +1,5 @@
 require 'concurrent/array'
+require 'dry/core/constants'
 require 'dry/configurable/config'
 require 'dry/configurable/error'
 require 'dry/configurable/nested_config'
@@ -27,21 +28,101 @@ module Dry
   #
   # @api public
   module Configurable
-    # @private
-    def self.extended(base)
-      base.class_eval do
-        @_config_mutex = ::Mutex.new
-        @_settings = ::Concurrent::Array.new
-        @_reader_attributes = ::Concurrent::Array.new
+    include Dry::Core::Constants
+
+    module ClassInterface
+      Parser = ArgumentParser.new.freeze
+
+      # Add a setting to the configuration
+      #
+      # @param [Mixed] key
+      #   The accessor key for the configuration value
+      # @param [Mixed] default
+      #   The default config value
+      #
+      # @yield
+      #   If a block is given, it will be evaluated in the context of
+      #   and new configuration class, and bound as the default value
+      #
+      # @return [Dry::Configurable::Config]
+      #
+      # @api public
+      def setting(key, value = Undefined, options = Undefined, &block)
+        extended = singleton_class < Configurable
+        raise_already_defined_config(key) if extended && configured?
+
+        value, options, processor = Parser.(value, options, block)
+
+        _settings << Config::Value.new(key, value, processor)
+
+        if options[:reader]
+          readers = extended ? singleton_class : self
+          readers.define_method(key) { config.public_send(key) }
+        end
+      end
+
+      # Return an array of setting names
+      #
+      # @return [Array]
+      #
+      # @api public
+      def settings
+        _settings.map(&:name)
+      end
+
+      # @private
+      def nested_configs
+        _settings.select { |setting| setting.value.is_a?(::Dry::Configurable::NestedConfig) }.map(&:value)
+      end
+
+      # @private no, really...
+      def _settings
+        @settings
+      end
+
+      private
+
+      # @private
+      def raise_already_defined_config(key)
+        raise AlreadyDefinedConfig,
+              "Cannot add setting +#{key}+, #{self} is already configured"
+      end
+
+      # @private
+      def _config_for(&block)
+        ::Dry::Configurable::NestedConfig.new(&block)
+      end
+
+      # @private
+      def self.extended(base)
+        base.class_eval do
+          @settings = ::Concurrent::Array.new
+        end
       end
     end
 
     # @private
+    def self.extended(base)
+      base.class_eval do
+        @config_mutex = ::Mutex.new
+      end
+      base.extend(ClassInterface)
+    end
+
+    # @private
+    def self.included(base)
+      base.extend(ClassInterface)
+    end
+
+    def initialize
+      @config_mutex = ::Mutex.new
+    end
+
+    # @private
     def inherited(subclass)
-      subclass.instance_variable_set(:@_config_mutex, ::Mutex.new)
-      subclass.instance_variable_set(:@_settings, @_settings.clone)
-      subclass.instance_variable_set(:@_reader_attributes, @_reader_attributes.clone)
-      subclass.instance_variable_set(:@_config, @_config.clone) if defined?(@_config)
+      subclass.instance_variable_set(:@config_mutex, ::Mutex.new)
+      subclass.instance_variable_set(:@settings, @settings.clone)
+      subclass.instance_variable_set(:@config, @config.clone) if defined?(@config)
       super
     end
 
@@ -51,7 +132,7 @@ module Dry
     #
     # @api public
     def config
-      return @_config if defined?(@_config)
+      return @config if defined?(@config)
       create_config
     end
 
@@ -77,107 +158,29 @@ module Dry
       config.finalize!
     end
 
-    # Add a setting to the configuration
-    #
-    # @param [Mixed] key
-    #   The accessor key for the configuration value
-    # @param [Mixed] default
-    #   The default config value
-    #
-    # @yield
-    #   If a block is given, it will be evaluated in the context of
-    #   and new configuration class, and bound as the default value
-    #
-    # @return [Dry::Configurable::Config]
-    #
-    # @api public
-    def setting(key, *args, &block)
-      raise_already_defined_config(key) if defined?(@_config)
-      value, options = ArgumentParser.call(args)
-      if block
-        if block.parameters.empty?
-          value = _config_for(&block)
-        else
-          processor = block
-        end
-      end
-
-      _settings << ::Dry::Configurable::Config::Value.new(
-        key,
-        !value.nil? ? value : ::Dry::Configurable::Config::Value::NONE,
-        processor || ::Dry::Configurable::Config::DEFAULT_PROCESSOR
-      )
-      store_reader_options(key, options) if options.any?
-    end
-
-    # Return an array of setting names
-    #
-    # @return [Array]
-    #
-    # @api public
-    def settings
-      _settings.map(&:name)
-    end
-
-    # @private no, really...
-    def _settings
-      @_settings
-    end
-
-    def _reader_attributes
-      @_reader_attributes
+    def configured?
+      defined?(@config)
     end
 
     private
 
     # @private
-    def _config_for(&block)
-      ::Dry::Configurable::NestedConfig.new(&block)
-    end
-
-    # @private
     def create_config
-      @_config_mutex.synchronize do
-        return @config if defined? @config
-        create_config_for_nested_configurations
-        @_config = ::Dry::Configurable::Config.create(_settings) unless _settings.empty?
+      @config_mutex.synchronize do
+        unless _settings.empty?
+          break @config if defined? @config
+          @config = ::Dry::Configurable::Config.create(_settings)
+        end
       end
     end
 
-    # @private
-    def create_config_for_nested_configurations
-      nested_configs.map(&:create_config)
-    end
-
-    # @private
-    def nested_configs
-      _settings.select { |setting| setting.value.is_a?(::Dry::Configurable::NestedConfig) }.map(&:value)
-    end
-
-    # @private
-    def raise_already_defined_config(key)
-      raise AlreadyDefinedConfig,
-            "Cannot add setting +#{key}+, #{self} is already configured"
+    def _settings
+      self.class._settings
     end
 
     # @private
     def raise_frozen_config
       raise FrozenConfig, 'Cannot modify frozen config'
-    end
-
-    # @private
-    def store_reader_options(key, options)
-      _reader_attributes << key if options.fetch(:reader, false)
-    end
-
-    # @private
-    def method_missing(method, *args, &block)
-      _reader_attributes.include?(method) ? config.public_send(method, *args, &block) : super
-    end
-
-    # @private
-    def respond_to_missing?(method, _include_private = false)
-      _reader_attributes.include?(method) || super
     end
   end
 end

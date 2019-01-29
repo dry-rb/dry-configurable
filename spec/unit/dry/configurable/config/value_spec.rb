@@ -22,12 +22,12 @@ RSpec.describe Dry::Configurable::Config::Value do
   describe '#value' do
     subject! { config.value }
 
-    context 'when value is not NONE' do
+    context 'when value is defined' do
       it { is_expected.to eq(value) }
     end
 
-    context 'when value is NONE' do
-      let(:value) { klass::NONE }
+    context 'when value is undefined' do
+      let(:value) { Dry::Configurable::Undefined }
 
       it { is_expected.to be(nil) }
     end
@@ -39,15 +39,15 @@ RSpec.describe Dry::Configurable::Config::Value do
     it { is_expected.to eq(processor) }
   end
 
-  describe '#none?' do
-    subject! { config.none? }
+  describe '#undefined?' do
+    subject! { config.undefined? }
 
-    context 'when value is not NONE' do
+    context 'when value is defined' do
       it { is_expected.to be(false) }
     end
 
-    context 'when value is NONE' do
-      let(:value) { klass::NONE }
+    context 'when value is undefined' do
+      let(:value) { Dry::Configurable::Undefined }
 
       it { is_expected.to be(true) }
     end

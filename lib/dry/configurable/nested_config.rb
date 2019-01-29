@@ -3,23 +3,17 @@ module Dry
     # @private
     class NestedConfig
       def initialize(&block)
-        klass = ::Class.new { extend ::Dry::Configurable }
-        klass.instance_eval(&block)
-        @klass = klass
+        @definition = block
       end
 
       # @private no, really...
       def create_config
-        if @klass.instance_variables.include?(:@_config)
-          @klass.__send__(:create_config)
-        end
+        klass = ::Class.new { extend ::Dry::Configurable }
+        klass.instance_exec(&@definition)
+        klass.config
       end
 
       private
-
-      def config
-        @klass.config
-      end
 
       def method_missing(method, *args, &block)
         config.respond_to?(method) ? config.public_send(method, *args, &block) : super

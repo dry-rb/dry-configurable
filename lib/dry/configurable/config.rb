@@ -4,7 +4,7 @@ module Dry
   module Configurable
     # @private
     class Config
-      DEFAULT_PROCESSOR = ->(v) { v }.freeze
+      DEFAULT_PROCESSOR = -> (v) { v }.freeze
 
       def self.create(settings)
         klass = ::Class.new(self)
@@ -27,10 +27,16 @@ module Dry
         @config = ::Concurrent::Hash.new
 
         settings.each do |setting|
-          if setting.none?
+          if setting.undefined?
             @config[setting.name] = nil
           else
-            public_send("#{setting.name}=", setting.value)
+            if setting.nested_config?
+              value = setting.value.create_config
+            else
+              value = setting.value
+            end
+
+            public_send("#{setting.name}=", value)
           end
         end
       end

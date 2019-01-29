@@ -5,11 +5,11 @@ RSpec.describe Dry::Configurable::Config do
     [
       value_class.new(:db, 'sqlite', ->(v) { "#{v}:memory" }),
       value_class.new(:user, 'root', ->(v) { v }),
-      value_class.new(:pass, none, ->(v) { v })
+      value_class.new(:pass, undefined, ->(v) { v })
     ]
   end
   let(:value_class) { Dry::Configurable::Config::Value }
-  let(:none) { value_class::NONE }
+  let(:undefined) { Dry::Configurable::Undefined }
 
   describe '.create' do
     it 'creates a config subclass from the given settings' do
@@ -85,7 +85,7 @@ RSpec.describe Dry::Configurable::Config do
         [
           value_class.new(:db, 'sqlite', ->(v) { "#{v}:memory" }),
           value_class.new(:user, 'root', ->(v) { v }),
-          value_class.new(:pass, none, ->(v) { v }),
+          value_class.new(:pass, undefined, ->(v) { v }),
           value_class.new(:foo, nested_setting, ->(v) { v })
         ]
       end
@@ -123,7 +123,7 @@ RSpec.describe Dry::Configurable::Config do
         [
           value_class.new(:db, 'sqlite', ->(v) { "#{v}:memory" }),
           value_class.new(:user, 'root', ->(v) { v }),
-          value_class.new(:pass, none, ->(v) { v }),
+          value_class.new(:pass, undefined, ->(v) { v }),
           value_class.new(:foo, nested_setting, ->(v) { v })
         ]
       end

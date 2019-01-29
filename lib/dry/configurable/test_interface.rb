@@ -8,6 +8,8 @@ module Dry
       #
       # @api public
       def reset_config
+        remove_instance_variable(:@config)
+
         create_config
       end
     end
