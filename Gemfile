@@ -13,5 +13,5 @@ group :tools do
   gem 'guard'
   gem 'guard-rspec'
   gem 'listen', '3.0.6'
-  gem 'pry-byebug'
+  gem 'pry-byebug', platform: :mri
 end
