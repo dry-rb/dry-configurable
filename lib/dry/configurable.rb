@@ -77,6 +77,24 @@ module Dry
       end
 
       # @private
+      def inherited(subclass)
+        parent = self
+        subclass.instance_exec do
+          @settings = parent._settings.dup
+        end
+
+        if singleton_class < Configurable
+          parent_config = @config
+          subclass.instance_exec do
+            @config = _settings.create_config
+            @config.define!(parent_config) if parent_config.defined?
+          end
+        end
+
+        super
+      end
+
+      # @private
       def self.extended(base)
         base.class_eval do
           @settings = Settings.new
@@ -99,18 +117,6 @@ module Dry
 
     def initialize
       @config = _settings.create_config
-    end
-
-    # @private
-    def inherited(subclass)
-      parent = self
-      parent_config = @config
-      subclass.instance_exec do
-        @settings = parent._settings.dup
-        @config = @settings.create_config
-        @config.define!(parent_config) if parent_config.defined?
-      end
-      super
     end
 
     # Return configuration

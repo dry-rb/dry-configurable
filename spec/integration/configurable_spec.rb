@@ -42,5 +42,30 @@ RSpec.describe Dry::Configurable do
         expect(obj.config.dsn).to eql('jdbc:sqlite:memory')
       end
     end
+
+    context 'with inheritance and custom constructor in child calss' do
+      let(:base_klass) do
+        Class.new do
+          include Dry::Configurable
+        end
+      end
+
+      let(:klass) do
+        Class.new(base_klass) do
+          setting :dsn
+
+          def initialize(value)
+            super()
+
+            self.config.dsn = value
+          end
+        end
+      end
+
+      it 'allows to configure class instances' do
+        obj = klass.new('jdbc:sqlite:memory')
+        expect(obj.config.dsn).to eql('jdbc:sqlite:memory')
+      end
+    end
   end
 end
