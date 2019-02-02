@@ -45,7 +45,7 @@ module Dry
       def initialize(settings = ::Concurrent::Array.new)
         @settings = settings
         @config_class = Config[self]
-        @names = Set.new
+        @names = Set.new(settings.map(&:name))
         yield(self) if block_given?
       end
 
