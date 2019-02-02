@@ -20,8 +20,8 @@ module Dry
           @settings = Settings.new
         end
 
-        def setting(*args, **kwargs, &block)
-          @settings.add(*args, **kwargs, &block)
+        def setting(*args, &block)
+          @settings.add(*args, &block)
         end
       end
 
