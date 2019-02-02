@@ -99,6 +99,16 @@ RSpec.shared_examples 'a configurable object' do
           end
         end
 
+        context 'with nil as default value' do
+          before do
+            klass.setting(:dsn, nil, reader: true) { |dsn| "sqlite:#{dsn || :memory}" }
+          end
+
+          it 'applies processor to nil' do
+            expect(object.dsn).to eql('sqlite:memory')
+          end
+        end
+
         context 'without default value' do
           before do
             klass.setting(:dsn, reader: true) { |dsn| "sqlite:#{dsn}" }
