@@ -1,5 +1,7 @@
 module Dry
   module Configurable
+    # This class represents a setting and is used internally.
+    #
     # @private
     class Setting
       attr_reader :name

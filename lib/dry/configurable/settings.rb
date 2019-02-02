@@ -6,6 +6,9 @@ require 'dry/configurable/config'
 
 module Dry
   module Configurable
+    # A collection of settings. This is not part of the public API.
+    #
+    # @private
     class Settings
       Parser = ArgumentParser.new.freeze
 
@@ -26,6 +29,9 @@ module Dry
         end
       end
 
+      # Capture nested config definition
+      #
+      # @return [Dry::Configurable::Setting]
       def self.capture(&block)
         DSL.(&block)
       end

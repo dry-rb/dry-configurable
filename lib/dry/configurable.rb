@@ -8,7 +8,7 @@ require 'dry/configurable/version'
 module Dry
   # A simple configuration mixin
   #
-  # @example
+  # @example class-level configuration
   #
   #   class App
   #     extend Dry::Configurable
@@ -20,7 +20,23 @@ module Dry
   #
   #   App.config.database.dsn = 'jdbc:sqlite:memory'
   #   App.config.database.dsn
-  #     # => "jdbc:sqlite:memory'"
+  #     # => "jdbc:sqlite:memory"
+  #
+  # @example instance-level configuration
+  #
+  #   class App
+  #     include Dry::Configurable
+  #
+  #     setting :database
+  #   end
+  #
+  #   production = App.new
+  #   production.config.database = ENV['DATABASE_URL']
+  #   production.finalize!
+  #
+  #   development = App.new
+  #   development.config.database = 'jdbc:sqlite:memory'
+  #   development.finalize!
   #
   # @api public
   module Configurable
@@ -116,6 +132,7 @@ module Dry
       end
     end
 
+    # @private
     def initialize(*)
       @config = self.class._settings.create_config
       super
@@ -141,6 +158,7 @@ module Dry
     def configure
       raise FrozenConfig, 'Cannot modify frozen config' if frozen?
       yield(config)
+      self
     end
 
     # Finalize and freeze configuration

@@ -5,6 +5,7 @@ module Dry
     # @private
     class Config
       class << self
+        # @private
         def [](settings)
           ::Class.new(Config) do
             @settings = settings
@@ -15,6 +16,7 @@ module Dry
           end
         end
 
+        # @private
         def define_accessors!
           @lock.synchronize do
             break if config_defined?
@@ -34,6 +36,7 @@ module Dry
           end
         end
 
+        # @private
         def config_defined?
           @config_defined
         end
@@ -56,6 +59,7 @@ module Dry
         @defined
       end
 
+      # @private
       def define!(parent_config = EMPTY_HASH)
         @lock.synchronize do
           break if self.defined?
@@ -69,12 +73,18 @@ module Dry
         self
       end
 
+      # @private
       def finalize!
         define!
         config.freeze
         freeze
       end
 
+      # Serialize config to a Hash
+      #
+      # @return [Hash]
+      #
+      # @api public
       def to_h
         config.each_with_object({}) do |(key, value), hash|
           case value
@@ -87,22 +97,37 @@ module Dry
       end
       alias to_hash to_h
 
+      # Get config value by a key
+      #
+      # @param [String,Symbol] name
+      #
+      # @return Config value
       def [](name)
         raise_unknown_setting_error(name) unless key?(name.to_sym)
         public_send(name)
       end
 
+      # Set config value.
+      # Note that finalized configs cannot be changed.
+      #
+      # @param [String,Symbol] name
+      # @param [Object] value
       def []=(name, value)
         raise_unknown_setting_error(name) unless key?(name.to_sym)
         public_send("#{name}=", value)
       end
 
+      # Whether config has a key
+      #
+      # @param [Symbol] key
+      # @return [Bool]
       def key?(name)
         settings.name?(name)
       end
 
       private
 
+      # @private
       def set_values!(parent_config)
         settings.each do |setting|
           if parent_config.key?(setting.name)
@@ -119,6 +144,7 @@ module Dry
         end
       end
 
+      # @private
       def raise_unknown_setting_error(name)
         raise ArgumentError, "+#{name}+ is not a setting name"
       end
