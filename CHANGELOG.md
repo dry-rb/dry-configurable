@@ -1,8 +1,8 @@
-## Unreleased
+## 0.8.0 - to-be-released
 
 ## Added
 
-* Support for instance-level configuration landed. For usage, `include` the module instead of extending  (flash-gordon)
+* Support for instance-level configuration landed. For usage, `include` the module instead of extending ([flash-gordon](https://github.com/flash-gordon))
   ```ruby
   class App
     include Dry::Configurable
@@ -21,11 +21,11 @@
 
 ## Changed
 
-* [BREAKING] Minimal supported Ruby version is set to 2.3 (flash-gordon)
+* [BREAKING] Minimal supported Ruby version is set to 2.3 ([flash-gordon](https://github.com/flash-gordon))
 
 [Compare v0.7.0...HEAD](https://github.com/dry-rb/dry-configurable/compare/v0.7.0...HEAD)
 
-## 0.7.0
+## 0.7.0 - 2017-04-25
 
 ## Added
 
