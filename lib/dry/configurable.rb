@@ -72,7 +72,7 @@ module Dry
 
         if setting.reader?
           readers = extended ? singleton_class : self
-          readers.define_method(setting.name) { config[setting.name] }
+          readers.send(:define_method, setting.name) { config[setting.name] }
         end
       end
 
