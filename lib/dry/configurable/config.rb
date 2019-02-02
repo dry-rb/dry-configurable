@@ -4,66 +4,88 @@ module Dry
   module Configurable
     # @private
     class Config
-      DEFAULT_PROCESSOR = -> (v) { v }.freeze
+      def self.[](settings)
+        ::Class.new(Config) do
+          @settings = settings
+          singleton_class.attr_reader :settings
 
-      def self.create(settings)
-        klass = ::Class.new(self)
-
-        settings.each do |setting|
-          klass.__send__(:define_method, setting.name) do
-            @config[setting.name]
-          end
-
-          klass.__send__(:define_method, "#{setting.name}=") do |value|
-            raise_frozen_config if frozen?
-            @config[setting.name] = setting.processor.call(value)
-          end
+          @defintion_mutex = ::Mutex.new
+          @accessors_defined = false
         end
-
-        klass.new(settings)
       end
 
-      def initialize(settings)
-        @config = ::Concurrent::Hash.new
+      def self.define_accessors!
+        @defintion_mutex.synchronize do
+          break if @accessors_defined
 
-        settings.each do |setting|
-          if setting.undefined?
-            @config[setting.name] = nil
-          else
-            if setting.nested_config?
-              value = setting.value.create_config
-            else
-              value = setting.value
+          settings.each do |setting|
+            define_method(setting.name) do
+              @config[setting.name]
             end
 
-            public_send("#{setting.name}=", value)
+            define_method("#{setting.name}=") do |value|
+              raise FrozenConfig, 'Cannot modify frozen config' if frozen?
+              @config[setting.name] = setting.processor.(value)
+            end
           end
+
+          @accessors_defined = true
         end
       end
 
-      def dup
-        dup = super
-        dup.instance_variable_set(:@config, @config.dup)
-        dup
+      attr_reader :config
+      protected :config
+
+      def initialize(lock: ::Mutex.new)
+        @config = ::Concurrent::Hash.new
+        @lock = lock
+        @defined = false
       end
 
-      def clone
-        clone = super
-        clone.instance_variable_set(:@config, @config.clone)
-        clone
+      def settings
+        self.class.settings
+      end
+
+      def defined?
+        @defined
+      end
+
+      def define!(parent_config = EMPTY_HASH)
+        @lock.synchronize do
+          break if self.defined?
+
+          self.class.define_accessors!
+
+          settings.each do |setting|
+            if parent_config.key?(setting.name)
+              config[setting.name] = parent_config[setting.name]
+            elsif setting.undefined?
+              config[setting.name] = nil
+            elsif setting.node?
+              value = setting.value.create_config
+              value.define!
+              public_send("#{setting.name}=", value)
+            else
+              public_send("#{setting.name}=", setting.value)
+            end
+          end
+
+          @defined = true
+        end
+
+        self
       end
 
       def finalize!
-        @config.freeze
+        define!
+        config.freeze
         freeze
       end
 
       def to_h
-        @config.each_with_object({}) do |tuple, hash|
-          key, value = tuple
-
+        config.each_with_object({}) do |(key, value), hash|
           case value
-          when ::Dry::Configurable::Config, ::Dry::Configurable::NestedConfig
+          when Config
             hash[key] = value.to_h
           else
             hash[key] = value
@@ -82,18 +104,18 @@ module Dry
         public_send("#{name}=", value)
       end
 
-      private
-
-      def raise_frozen_config
-        raise FrozenConfig, 'Cannot modify frozen config'
+      def key?(name)
+        config.key?(name)
       end
+
+      private
 
       def raise_unknown_setting_error(name)
         raise ArgumentError, "+#{name}+ is not a setting name"
       end
 
       def setting?(name)
-        @config.key?(name.to_sym)
+        config.key?(name.to_sym)
       end
     end
   end

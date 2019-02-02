@@ -1,7 +1,7 @@
-RSpec.describe Dry::Configurable::ArgumentParser do
+RSpec.describe Dry::Configurable::Settings::ArgumentParser do
   let(:undefined) { Dry::Configurable::Undefined }
 
-  let(:parser) { Dry::Configurable::ArgumentParser.new }
+  let(:parser) { described_class.new }
 
   let(:value) { undefined }
 
@@ -13,9 +13,9 @@ RSpec.describe Dry::Configurable::ArgumentParser do
 
   let(:parsed_value) { output[0] }
 
-  let(:parsed_options) { output[1] }
+  let(:parsed_processor) { output[1] }
 
-  let(:parsed_processor) { output[2] }
+  let(:parsed_options) { output[2] }
 
   context 'with no args' do
     it 'returns default values' do

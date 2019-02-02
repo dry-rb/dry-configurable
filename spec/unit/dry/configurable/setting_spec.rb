@@ -1,5 +1,5 @@
-RSpec.describe Dry::Configurable::Config::Value do
-  let(:klass) { Dry::Configurable::Config::Value }
+RSpec.describe Dry::Configurable::Setting do
+  let(:klass) { described_class }
   let(:config) { klass.new(name, value, processor) }
   let(:name) { :db }
   let(:value) { 'test' }

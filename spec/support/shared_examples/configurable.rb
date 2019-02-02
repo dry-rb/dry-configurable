@@ -227,15 +227,15 @@ RSpec.shared_examples 'a configurable class' do
       end
 
       it 'disallows modification' do
-        expect do
+        expect {
           klass.config.dsn = 'jdbc:sqlite'
-        end.to raise_error(Dry::Configurable::FrozenConfig, 'Cannot modify frozen config')
+        }.to raise_error(Dry::Configurable::FrozenConfig, 'Cannot modify frozen config')
       end
 
       it 'disallows direct modification on config' do
-        expect do
+        expect {
           klass.config.dsn = 'jdbc:sqlite:memory'
-        end.to raise_error(Dry::Configurable::FrozenConfig, 'Cannot modify frozen config')
+        }.to raise_error(Dry::Configurable::FrozenConfig, 'Cannot modify frozen config')
       end
     end
 
@@ -246,10 +246,10 @@ RSpec.shared_examples 'a configurable class' do
           klass.config.dsn = 'jdbc:sqlite:memory'
         end
 
-        subject!(:subclass) { Class.new(klass) }
+        subject(:subclass) { Class.new(klass) }
 
         it 'retains its configuration' do
-          expect(subclass.config.dsn).to eq('jdbc:sqlite:memory')
+          expect(subclass.config.dsn).to eql('jdbc:sqlite:memory')
         end
 
         context 'when the inherited config is modified' do
@@ -258,8 +258,8 @@ RSpec.shared_examples 'a configurable class' do
           end
 
           it 'does not modify the original' do
-            expect(klass.config.dsn).to eq('jdbc:sqlite:memory')
-            expect(subclass.config.dsn).to eq('jdbc:sqlite:file')
+            expect(klass.config.dsn).to eql('jdbc:sqlite:memory')
+            expect(subclass.config.dsn).to eql('jdbc:sqlite:file')
           end
         end
       end
