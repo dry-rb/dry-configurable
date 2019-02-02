@@ -114,8 +114,9 @@ module Dry
       base.extend(ClassMethods)
     end
 
-    def initialize
+    def initialize(*)
       @config = _settings.create_config
+      super
     end
 
     # Return configuration
