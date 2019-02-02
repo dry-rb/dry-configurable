@@ -42,9 +42,6 @@ module Dry
         end
       end
 
-      attr_reader :config
-      protected :config
-
       def initialize
         @config = ::Concurrent::Hash.new
         @lock = ::Mutex.new
@@ -72,7 +69,7 @@ module Dry
       # @private
       def finalize!
         define!
-        config.freeze
+        @config.freeze
         freeze
       end
 
@@ -82,7 +79,7 @@ module Dry
       #
       # @api public
       def to_h
-        config.each_with_object({}) do |(key, value), hash|
+        @config.each_with_object({}) do |(key, value), hash|
           case value
           when Config
             hash[key] = value.to_h
@@ -127,9 +124,9 @@ module Dry
       def set_values!(parent_config)
         self.class.settings.each do |setting|
           if parent_config.key?(setting.name)
-            config[setting.name] = parent_config[setting.name]
+            @config[setting.name] = parent_config[setting.name]
           elsif setting.undefined?
-            config[setting.name] = nil
+            @config[setting.name] = nil
           elsif setting.node?
             value = setting.value.create_config
             value.define!
