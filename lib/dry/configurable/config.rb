@@ -51,10 +51,6 @@ module Dry
         @defined = false
       end
 
-      def settings
-        self.class.settings
-      end
-
       def defined?
         @defined
       end
@@ -122,14 +118,14 @@ module Dry
       # @param [Symbol] key
       # @return [Bool]
       def key?(name)
-        settings.name?(name)
+        self.class.settings.name?(name)
       end
 
       private
 
       # @private
       def set_values!(parent_config)
-        settings.each do |setting|
+        self.class.settings.each do |setting|
           if parent_config.key?(setting.name)
             config[setting.name] = parent_config[setting.name]
           elsif setting.undefined?
