@@ -27,6 +27,13 @@ module Dry
     include Dry::Core::Constants
 
     module ClassMethods
+      # @private
+      def self.extended(base)
+        base.instance_exec do
+          @settings = Settings.new
+        end
+      end
+
       # Add a setting to the configuration
       #
       # @param [Mixed] key
@@ -49,17 +56,17 @@ module Dry
 
         if setting.reader?
           readers = extended ? singleton_class : self
-          readers.define_method(setting.name) { config.public_send(setting.name) }
+          readers.define_method(setting.name) { config[setting.name] }
         end
       end
 
       # Return an array of setting names
       #
-      # @return [Array]
+      # @return [Set]
       #
       # @api public
       def settings
-        _settings.map(&:name)
+        _settings.names
       end
 
       # @private no, really...
@@ -92,30 +99,25 @@ module Dry
 
         super
       end
+    end
 
+    class << self
       # @private
-      def self.extended(base)
+      def extended(base)
+        base.extend(ClassMethods)
         base.class_eval do
-          @settings = Settings.new
+          @config = _settings.create_config
         end
       end
-    end
 
-    # @private
-    def self.extended(base)
-      base.extend(ClassMethods)
-      base.class_eval do
-        @config = _settings.create_config
+      # @private
+      def included(base)
+        base.extend(ClassMethods)
       end
-    end
-
-    # @private
-    def self.included(base)
-      base.extend(ClassMethods)
     end
 
     def initialize(*)
-      @config = _settings.create_config
+      @config = self.class._settings.create_config
       super
     end
 
@@ -149,16 +151,6 @@ module Dry
     def finalize!
       freeze
       config.finalize!
-    end
-
-    def configured?
-      @config.defined?
-    end
-
-    private
-
-    def _settings
-      self.class._settings
     end
   end
 end

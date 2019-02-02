@@ -1,3 +1,4 @@
+require 'set'
 require 'concurrent/array'
 require 'dry/configurable/settings/argument_parser'
 require 'dry/configurable/setting'
@@ -33,9 +34,12 @@ module Dry
 
       attr_reader :config_class
 
+      attr_reader :names
+
       def initialize(settings = ::Concurrent::Array.new)
         @settings = settings
         @config_class = Config[self]
+        @names = Set.new
         yield(self) if block_given?
       end
 
@@ -45,6 +49,7 @@ module Dry
 
         Setting.new(key, *Parser.(value, options, block)).tap do |s|
           settings << s
+          names << s.name
         end
       end
 
@@ -52,12 +57,12 @@ module Dry
         settings.each { |s| yield(s) }
       end
 
-      def map
-        settings.map { |s| yield(s) }
-      end
-
       def empty?
         settings.empty?
+      end
+
+      def name?(name)
+        names.include?(name)
       end
 
       def dup

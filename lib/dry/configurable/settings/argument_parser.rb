@@ -20,7 +20,7 @@ module Dry
     class Settings
       # @private
       class ArgumentParser
-        DEFAULT_PROCESSOR = -> (v) { v }
+        DEFAULT_PROCESSOR = ->(v) { v }
 
         def call(val, opts, block)
           if block && block.parameters.empty?

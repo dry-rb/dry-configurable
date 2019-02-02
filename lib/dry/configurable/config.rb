@@ -10,13 +10,13 @@ module Dry
             @settings = settings
             singleton_class.attr_reader :settings
 
-            @mutex = ::Mutex.new
+            @lock = ::Mutex.new
             @config_defined = false
           end
         end
 
         def define_accessors!
-          @mutex.synchronize do
+          @lock.synchronize do
             break if config_defined?
 
             settings.each do |setting|
@@ -42,9 +42,9 @@ module Dry
       attr_reader :config
       protected :config
 
-      def initialize(lock: ::Mutex.new)
+      def initialize
         @config = ::Concurrent::Hash.new
-        @lock = lock
+        @lock = ::Mutex.new
         @defined = false
       end
 
@@ -61,20 +61,7 @@ module Dry
           break if self.defined?
 
           self.class.define_accessors!
-
-          settings.each do |setting|
-            if parent_config.key?(setting.name)
-              config[setting.name] = parent_config[setting.name]
-            elsif setting.undefined?
-              config[setting.name] = nil
-            elsif setting.node?
-              value = setting.value.create_config
-              value.define!
-              public_send("#{setting.name}=", value)
-            else
-              public_send("#{setting.name}=", setting.value)
-            end
-          end
+          set_values!(parent_config)
 
           @defined = true
         end
@@ -101,27 +88,39 @@ module Dry
       alias to_hash to_h
 
       def [](name)
-        raise_unknown_setting_error(name) unless setting?(name)
+        raise_unknown_setting_error(name) unless key?(name.to_sym)
         public_send(name)
       end
 
       def []=(name, value)
-        raise_unknown_setting_error(name) unless setting?(name)
+        raise_unknown_setting_error(name) unless key?(name.to_sym)
         public_send("#{name}=", value)
       end
 
       def key?(name)
-        config.key?(name)
+        settings.name?(name)
       end
 
       private
 
-      def raise_unknown_setting_error(name)
-        raise ArgumentError, "+#{name}+ is not a setting name"
+      def set_values!(parent_config)
+        settings.each do |setting|
+          if parent_config.key?(setting.name)
+            config[setting.name] = parent_config[setting.name]
+          elsif setting.undefined?
+            config[setting.name] = nil
+          elsif setting.node?
+            value = setting.value.create_config
+            value.define!
+            self[setting.name] = value
+          else
+            self[setting.name] = setting.value
+          end
+        end
       end
 
-      def setting?(name)
-        config.key?(name.to_sym)
+      def raise_unknown_setting_error(name)
+        raise ArgumentError, "+#{name}+ is not a setting name"
       end
     end
   end
