@@ -9,7 +9,7 @@ module Dry
         def [](settings)
           ::Class.new(Config) do
             @settings = settings
-            singleton_class.attr_reader :settings
+            singleton_class.send(:attr_reader, :settings)
 
             @lock = ::Mutex.new
             @config_defined = false
