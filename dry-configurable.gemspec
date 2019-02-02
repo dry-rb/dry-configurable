@@ -16,6 +16,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 2.3.0"
   spec.add_runtime_dependency 'concurrent-ruby', '~> 1.0'
+  spec.add_runtime_dependency 'dry-core', '~> 0.4', '>= 0.4.7'
 
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'

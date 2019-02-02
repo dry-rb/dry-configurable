@@ -1,15 +1,15 @@
 RSpec.describe Dry::Configurable::Config do
   let(:klass) { Dry::Configurable::Config }
-  let(:config) { klass.create(settings) }
+  let(:config) { klass[settings].new.define! }
   let(:settings) do
-    [
-      value_class.new(:db, 'sqlite', ->(v) { "#{v}:memory" }),
-      value_class.new(:user, 'root', ->(v) { v }),
-      value_class.new(:pass, none, ->(v) { v })
-    ]
+    settings = Dry::Configurable::Settings.new
+    settings.add(:db, 'sqlite') { |v| "#{v}:memory" }
+    settings.add(:user, 'root')
+    settings.add(:pass)
+    settings
   end
-  let(:value_class) { Dry::Configurable::Config::Value }
-  let(:none) { value_class::NONE }
+  let(:value_class) { Dry::Configurable::Setting }
+  let(:undefined) { Dry::Configurable::Undefined }
 
   describe '.create' do
     it 'creates a config subclass from the given settings' do
@@ -77,18 +77,20 @@ RSpec.describe Dry::Configurable::Config do
 
     context 'with nesting' do
       let(:nested_setting) do
-        ::Dry::Configurable::NestedConfig.new do
-          setting(:bar, 'baz') { |v| v }
-        end.tap(&:create_config)
+        ::Dry::Configurable::Settings.new do |settings|
+          settings.add(:bar, 'baz') { |v| v }
+        end
       end
+
       let(:settings) do
-        [
-          value_class.new(:db, 'sqlite', ->(v) { "#{v}:memory" }),
-          value_class.new(:user, 'root', ->(v) { v }),
-          value_class.new(:pass, none, ->(v) { v }),
-          value_class.new(:foo, nested_setting, ->(v) { v })
-        ]
+        Dry::Configurable::Settings.new do |settings|
+          settings.add(:db, 'sqlite') { |v|  "#{v}:memory" }
+          settings.add(:user, 'root')
+          settings.add(:pass, undefined)
+          settings.add(:foo, nested_setting)
+        end
       end
+
       it 'returns a config hash' do
         is_expected.to eq(
           db: 'sqlite:memory',
@@ -107,7 +109,7 @@ RSpec.describe Dry::Configurable::Config do
 
     context 'without nesting' do
       it 'returns a config hash' do
-        is_expected.to eq(
+        is_expected.to eql(
           db: 'sqlite:memory',
           user: 'root',
           pass: nil
@@ -117,18 +119,22 @@ RSpec.describe Dry::Configurable::Config do
 
     context 'with nesting' do
       let(:nested_setting) do
-        klass.create([value_class.new(:bar, 'baz', ->(v) { v })])
+        Dry::Configurable::Settings.new do |settings|
+          settings.add(:bar, 'baz')
+        end
       end
+
       let(:settings) do
-        [
-          value_class.new(:db, 'sqlite', ->(v) { "#{v}:memory" }),
-          value_class.new(:user, 'root', ->(v) { v }),
-          value_class.new(:pass, none, ->(v) { v }),
-          value_class.new(:foo, nested_setting, ->(v) { v })
-        ]
+        Dry::Configurable::Settings.new do |settings|
+          settings.add(:db, 'sqlite') { |v| "#{v}:memory" }
+          settings.add(:user, 'root')
+          settings.add(:pass, undefined)
+          settings.add(:foo, nested_setting)
+        end
       end
+
       it 'returns a config hash' do
-        is_expected.to eq(
+        is_expected.to eql(
           db: 'sqlite:memory',
           user: 'root',
           pass: nil,

@@ -8,7 +8,11 @@ module Dry
       #
       # @api public
       def reset_config
-        create_config
+        if self.is_a?(Class)
+          @config = _settings.create_config
+        else
+          @config = self.class._settings.create_config
+        end
       end
     end
 
