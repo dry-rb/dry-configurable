@@ -4,32 +4,38 @@ module Dry
   module Configurable
     # @private
     class Config
-      def self.[](settings)
-        ::Class.new(Config) do
-          @settings = settings
-          singleton_class.attr_reader :settings
+      class << self
+        def [](settings)
+          ::Class.new(Config) do
+            @settings = settings
+            singleton_class.attr_reader :settings
 
-          @defintion_mutex = ::Mutex.new
-          @accessors_defined = false
-        end
-      end
-
-      def self.define_accessors!
-        @defintion_mutex.synchronize do
-          break if @accessors_defined
-
-          settings.each do |setting|
-            define_method(setting.name) do
-              @config[setting.name]
-            end
-
-            define_method("#{setting.name}=") do |value|
-              raise FrozenConfig, 'Cannot modify frozen config' if frozen?
-              @config[setting.name] = setting.processor.(value)
-            end
+            @mutex = ::Mutex.new
+            @config_defined = false
           end
+        end
 
-          @accessors_defined = true
+        def define_accessors!
+          @mutex.synchronize do
+            break if config_defined?
+
+            settings.each do |setting|
+              define_method(setting.name) do
+                @config[setting.name]
+              end
+
+              define_method("#{setting.name}=") do |value|
+                raise FrozenConfig, 'Cannot modify frozen config' if frozen?
+                @config[setting.name] = setting.processor.(value)
+              end
+            end
+
+            @config_defined = true
+          end
+        end
+
+        def config_defined?
+          @config_defined
         end
       end
 

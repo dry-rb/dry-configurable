@@ -6,6 +6,9 @@ RSpec.describe Dry::Configurable do
       end
     end
 
+    let(:object) { klass }
+
+    it_behaves_like 'a configurable object'
     it_behaves_like 'a configurable class'
   end
 
@@ -20,6 +23,9 @@ RSpec.describe Dry::Configurable do
       Class.new(base_klass)
     end
 
+    let(:object) { klass }
+
+    it_behaves_like 'a configurable object'
     it_behaves_like 'a configurable class'
   end
 
@@ -29,6 +35,10 @@ RSpec.describe Dry::Configurable do
         include Dry::Configurable
       end
     end
+
+    let(:object) { klass.new }
+
+    it_behaves_like 'a configurable object'
 
     describe 'shallow config' do
       before do
@@ -43,7 +53,7 @@ RSpec.describe Dry::Configurable do
       end
     end
 
-    context 'with inheritance and custom constructor in child calss' do
+    context 'with inheritance and custom constructor in child class' do
       let(:base_klass) do
         Class.new do
           include Dry::Configurable

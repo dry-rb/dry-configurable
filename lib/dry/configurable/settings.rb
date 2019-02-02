@@ -72,6 +72,10 @@ module Dry
       def create_config
         config_class.new
       end
+
+      def config_defined?
+        config_class.config_defined?
+      end
     end
   end
 end

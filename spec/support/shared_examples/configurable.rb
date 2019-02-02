@@ -1,10 +1,10 @@
-RSpec.shared_examples 'a configurable class' do
+RSpec.shared_examples 'a configurable object' do
   describe 'settings' do
     context 'without default value' do
       before { klass.setting :dsn }
 
       it 'returns nil' do
-        expect(klass.config.dsn).to be(nil)
+        expect(object.config.dsn).to be(nil)
       end
     end
 
@@ -12,7 +12,7 @@ RSpec.shared_examples 'a configurable class' do
       before { klass.setting :dsn, nil }
 
       it 'returns the default value' do
-        expect(klass.config.dsn).to be(nil)
+        expect(object.config.dsn).to be(nil)
       end
     end
 
@@ -20,7 +20,7 @@ RSpec.shared_examples 'a configurable class' do
       before { klass.setting :dsn, false }
 
       it 'returns the default value' do
-        expect(klass.config.dsn).to be(false)
+        expect(object.config.dsn).to be(false)
       end
     end
 
@@ -28,7 +28,7 @@ RSpec.shared_examples 'a configurable class' do
       before { klass.setting :dsn, 'sqlite:memory' }
 
       it 'returns the default value' do
-        expect(klass.config.dsn).to eq('sqlite:memory')
+        expect(object.config.dsn).to eq('sqlite:memory')
       end
     end
 
@@ -41,7 +41,7 @@ RSpec.shared_examples 'a configurable class' do
       end
 
       it 'returns the default value' do
-        expect(klass.config.db_config).to eq(
+        expect(object.config.db_config).to eq(
           user: 'root',
           password: ''
         )
@@ -51,7 +51,7 @@ RSpec.shared_examples 'a configurable class' do
     context 'reader option' do
       context 'without passing option' do
         before { klass.setting :dsn }
-        before { klass.config.dsn = 'jdbc:sqlite:memory' }
+        before { object.config.dsn = 'jdbc:sqlite:memory' }
 
         it 'will not create a getter method' do
           expect(klass).not_to respond_to(:dsn)
@@ -62,8 +62,8 @@ RSpec.shared_examples 'a configurable class' do
         before { klass.setting :dsn, { foo: 'bar' }, reader: true }
 
         it 'will create a getter method' do
-          expect(klass.dsn).to eq(foo: 'bar')
-          expect(klass).to respond_to(:dsn)
+          expect(object.dsn).to eq(foo: 'bar')
+          expect(object).to respond_to(:dsn)
         end
       end
 
@@ -71,8 +71,8 @@ RSpec.shared_examples 'a configurable class' do
         before { klass.setting :dsn, 'testing', reader: true }
 
         it 'will create a getter method' do
-          expect(klass.dsn).to eq 'testing'
-          expect(klass).to respond_to(:dsn)
+          expect(object.dsn).to eq 'testing'
+          expect(object).to respond_to(:dsn)
         end
       end
 
@@ -84,7 +84,7 @@ RSpec.shared_examples 'a configurable class' do
         end
 
         it 'will create a nested getter method' do
-          expect(klass.dsn.pool).to eq 5
+          expect(object.dsn.pool).to eq 5
         end
       end
 
@@ -95,7 +95,7 @@ RSpec.shared_examples 'a configurable class' do
           end
 
           it 'returns the default value' do
-            expect(klass.dsn).to eq('sqlite:memory')
+            expect(object.dsn).to eq('sqlite:memory')
           end
         end
 
@@ -105,7 +105,7 @@ RSpec.shared_examples 'a configurable class' do
           end
 
           it 'returns the default value' do
-            expect(klass.dsn).to eq(nil)
+            expect(object.dsn).to eq(nil)
           end
         end
       end
@@ -119,7 +119,7 @@ RSpec.shared_examples 'a configurable class' do
       end
 
       it 'returns the default value' do
-        expect(klass.config.database.dsn).to eq('sqlite:memory')
+        expect(object.config.database.dsn).to eq('sqlite:memory')
       end
     end
 
@@ -130,7 +130,7 @@ RSpec.shared_examples 'a configurable class' do
         end
 
         it 'returns nil' do
-          expect(klass.config.dsn).to be(nil)
+          expect(object.config.dsn).to be(nil)
         end
       end
 
@@ -140,7 +140,7 @@ RSpec.shared_examples 'a configurable class' do
         end
 
         it 'returns the default value' do
-          expect(klass.config.dsn).to eq('sqlite:memory')
+          expect(object.config.dsn).to eq('sqlite:memory')
         end
       end
 
@@ -152,7 +152,7 @@ RSpec.shared_examples 'a configurable class' do
         end
 
         it 'returns the default value' do
-          expect(klass.config.database.dsn).to eq('sqlite:memory')
+          expect(object.config.database.dsn).to eq('sqlite:memory')
         end
       end
     end
@@ -166,11 +166,11 @@ RSpec.shared_examples 'a configurable class' do
         end
 
         before do
-          klass.config.dsn = 'jdbc:sqlite:memory'
+          object.config.dsn = 'jdbc:sqlite:memory'
         end
 
         it 'updates the config value' do
-          expect(klass.config.dsn).to eq('jdbc:sqlite:memory')
+          expect(object.config.dsn).to eq('jdbc:sqlite:memory')
         end
       end
 
@@ -180,11 +180,11 @@ RSpec.shared_examples 'a configurable class' do
         end
 
         before do
-          klass.config.dsn = 'jdbc:sqlite'
+          object.config.dsn = 'jdbc:sqlite'
         end
 
         it 'updates the config value' do
-          expect(klass.config.dsn).to eq('jdbc:sqlite:memory')
+          expect(object.config.dsn).to eq('jdbc:sqlite:memory')
         end
       end
     end
@@ -196,11 +196,11 @@ RSpec.shared_examples 'a configurable class' do
             setting :dsn, 'sqlite:memory'
           end
 
-          klass.config.database.dsn = 'jdbc:sqlite:memory'
+          object.config.database.dsn = 'jdbc:sqlite:memory'
         end
 
         it 'updates the config value' do
-          expect(klass.config.database.dsn).to eq('jdbc:sqlite:memory')
+          expect(object.config.database.dsn).to eq('jdbc:sqlite:memory')
         end
       end
 
@@ -210,11 +210,11 @@ RSpec.shared_examples 'a configurable class' do
             setting(:dsn, 'sqlite') { |dsn| "#{dsn}:memory" }
           end
 
-          klass.config.database.dsn = 'jdbc:sqlite'
+          object.config.database.dsn = 'jdbc:sqlite'
         end
 
         it 'updates the config value' do
-          expect(klass.config.database.dsn).to eq('jdbc:sqlite:memory')
+          expect(object.config.database.dsn).to eq('jdbc:sqlite:memory')
         end
       end
     end
@@ -222,90 +222,26 @@ RSpec.shared_examples 'a configurable class' do
     context 'when finalized' do
       before do
         klass.setting :dsn
-        klass.config.dsn = 'jdbc:sqlite'
-        klass.finalize!
+        object.config.dsn = 'jdbc:sqlite'
+        object.finalize!
       end
 
       it 'disallows modification' do
         expect {
-          klass.config.dsn = 'jdbc:sqlite'
+          object.config.dsn = 'jdbc:sqlite'
         }.to raise_error(Dry::Configurable::FrozenConfig, 'Cannot modify frozen config')
       end
 
       it 'disallows direct modification on config' do
         expect {
-          klass.config.dsn = 'jdbc:sqlite:memory'
+          object.config.dsn = 'jdbc:sqlite:memory'
         }.to raise_error(Dry::Configurable::FrozenConfig, 'Cannot modify frozen config')
-      end
-    end
-
-    context 'when inherited' do
-      context 'without processor' do
-        before do
-          klass.setting :dsn
-          klass.config.dsn = 'jdbc:sqlite:memory'
-        end
-
-        subject(:subclass) { Class.new(klass) }
-
-        it 'retains its configuration' do
-          expect(subclass.config.dsn).to eql('jdbc:sqlite:memory')
-        end
-
-        context 'when the inherited config is modified' do
-          before do
-            subclass.config.dsn = 'jdbc:sqlite:file'
-          end
-
-          it 'does not modify the original' do
-            expect(klass.config.dsn).to eql('jdbc:sqlite:memory')
-            expect(subclass.config.dsn).to eql('jdbc:sqlite:file')
-          end
-        end
-      end
-
-      context 'with processor' do
-        before do
-          klass.setting(:dsn) { |dsn| "#{dsn}:memory" }
-          klass.config.dsn = 'jdbc:sqlite'
-        end
-
-        subject!(:subclass) { Class.new(klass) }
-
-        it 'retains its configuration' do
-          expect(subclass.config.dsn).to eq('jdbc:sqlite:memory')
-        end
-
-        context 'when the inherited config is modified' do
-          before do
-            subclass.config.dsn = 'sqlite'
-          end
-
-          it 'does not modify the original' do
-            expect(klass.config.dsn).to eq('jdbc:sqlite:memory')
-            expect(subclass.config.dsn).to eq('sqlite:memory')
-          end
-        end
-      end
-
-      context 'when the inherited settings are modified' do
-        before do
-          klass.setting :dsn
-          subclass.setting :db
-          klass.config.dsn = 'jdbc:sqlite:memory'
-        end
-
-        subject!(:subclass) { Class.new(klass) }
-
-        it 'does not modify the original' do
-          expect(klass.settings).to_not include(:db)
-        end
       end
     end
   end
 
   context 'Test Interface' do
-    before { klass.enable_test_interface }
+    before { object.enable_test_interface }
 
     describe 'reset_config' do
       before do
@@ -314,15 +250,15 @@ RSpec.shared_examples 'a configurable class' do
           setting :size, nil
         end
 
-        klass.config.dsn = 'sqlite:memory'
-        klass.config.pool.size = 5
+        object.config.dsn = 'sqlite:memory'
+        object.config.pool.size = 5
 
-        klass.reset_config
+        object.reset_config
       end
 
       it 'resets configuration to default values' do
-        expect(klass.config.dsn).to be_nil
-        expect(klass.config.pool.size).to be_nil
+        expect(object.config.dsn).to be_nil
+        expect(object.config.pool.size).to be_nil
       end
     end
   end
@@ -330,7 +266,7 @@ RSpec.shared_examples 'a configurable class' do
   context 'Try to set new value after config has been created' do
     before do
       klass.setting :dsn, 'sqlite:memory'
-      klass.config
+      object.config
     end
 
     it 'raise an exception' do

@@ -26,7 +26,7 @@ module Dry
   module Configurable
     include Dry::Core::Constants
 
-    module ClassInterface
+    module ClassMethods
       # Add a setting to the configuration
       #
       # @param [Mixed] key
@@ -43,8 +43,7 @@ module Dry
       # @api public
       def setting(key, value = Undefined, options = Undefined, &block)
         extended = singleton_class < Configurable
-
-        raise_already_defined_config(key) if extended && configured?
+        raise_already_defined_config(key) if _settings.config_defined?
 
         setting = _settings.add(key, value, options, &block)
 
@@ -104,7 +103,7 @@ module Dry
 
     # @private
     def self.extended(base)
-      base.extend(ClassInterface)
+      base.extend(ClassMethods)
       base.class_eval do
         @config = _settings.create_config
       end
@@ -112,7 +111,7 @@ module Dry
 
     # @private
     def self.included(base)
-      base.extend(ClassInterface)
+      base.extend(ClassMethods)
     end
 
     def initialize
