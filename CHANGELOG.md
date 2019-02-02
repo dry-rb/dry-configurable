@@ -1,5 +1,24 @@
 ## Unreleased
 
+## Added
+
+* Support for instance-level configuration landed. For usage, `include` the module instead of extending  (flash-gordon)
+  ```ruby
+  class App
+    include Dry::Configurable
+
+    setting :database
+  end
+
+  production = App.new
+  production.config.database = ENV['DATABASE_URL']
+  production.finalize!
+
+  development = App.new
+  development.config.database = 'jdbc:sqlite:memory'
+  development.finalize!
+  ```
+
 ## Changed
 
 * [BREAKING] Minimal supported Ruby version is set to 2.3 (flash-gordon)
