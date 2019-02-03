@@ -62,6 +62,37 @@ RSpec.shared_examples 'a configurable class' do
           expect(klass.settings).to_not include(:db)
         end
       end
+
+      context 'when settings nested and parent class has default value' do
+        let(:klass) do
+          Class.new do
+            extend Dry::Configurable
+
+            setting :nested do
+              setting :thing, 'from base klass'
+            end
+          end
+        end
+
+        let(:subclass) do
+          Class.new(klass) do
+            configure do |k|
+              k.nested.thing = 'from klass'
+            end
+          end
+        end
+
+        before do
+          # instantiate config of base class
+          klass.config
+          # create a subclass and instantiate its config
+          subclass
+        end
+
+        it 'does not modify parent class values' do
+          expect(klass.config.nested.thing).to eql('from base klass')
+        end
+      end
     end
   end
 end

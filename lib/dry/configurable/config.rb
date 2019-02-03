@@ -121,15 +121,15 @@ module Dry
       private
 
       # @private
-      def set_values!(parent_config)
+      def set_values!(parent)
         self.class.settings.each do |setting|
-          if parent_config.key?(setting.name)
-            @config[setting.name] = parent_config[setting.name]
+          if parent.key?(setting.name) && !setting.node?
+            @config[setting.name] = parent[setting.name]
           elsif setting.undefined?
             @config[setting.name] = nil
           elsif setting.node?
             value = setting.value.create_config
-            value.define!
+            value.define!(parent.fetch(setting.name, EMPTY_HASH))
             self[setting.name] = value
           else
             self[setting.name] = setting.value

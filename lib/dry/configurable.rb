@@ -109,7 +109,7 @@ module Dry
           parent_config = @config
           subclass.instance_exec do
             @config = _settings.create_config
-            @config.define!(parent_config) if parent_config.defined?
+            @config.define!(parent_config.to_h) if parent_config.defined?
           end
         end
 
