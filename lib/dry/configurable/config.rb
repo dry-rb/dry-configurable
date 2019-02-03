@@ -118,6 +118,21 @@ module Dry
         self.class.settings.name?(name)
       end
 
+      # Recursively update values from a hash
+      #
+      # @param [Hash] values to set
+      # @return [Config]
+      def update(values)
+        values.each do |key, value|
+          if self[key].is_a?(Config)
+            self[key].update(value)
+          else
+            self[key] = value
+          end
+        end
+        self
+      end
+
       private
 
       # @private

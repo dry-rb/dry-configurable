@@ -189,4 +189,46 @@ RSpec.describe Dry::Configurable::Config do
         .to('whoami')
     end
   end
+
+  describe '#update' do
+    context 'shallow' do
+      before do
+        config.update(db: 'jdbc:sqlite', pass: 'h4xz0rz')
+      end
+
+      it 'loads values from a hash' do
+        expect(config.db).to eql('jdbc:sqlite:memory')
+        expect(config.user).to eql('root')
+        expect(config.pass).to eql('h4xz0rz')
+      end
+    end
+
+    context 'with nesting' do
+      let(:nested_setting) do
+        Dry::Configurable::Settings.new do |settings|
+          settings.add(:bar, 'baz')
+        end
+      end
+
+      let(:settings) do
+        Dry::Configurable::Settings.new do |settings|
+          settings.add(:db, 'sqlite') { |v| "#{v}:memory" }
+          settings.add(:user, 'root')
+          settings.add(:pass, undefined)
+          settings.add(:foo, nested_setting)
+        end
+      end
+
+      before do
+        config.update(db: 'jdbc:sqlite', foo: { bar: 'qux' })
+      end
+
+      it 'returns a config hash' do
+        expect(config.db).to eql('jdbc:sqlite:memory')
+        expect(config.user).to eql('root')
+        expect(config.pass).to be_nil
+        expect(config.foo.bar).to eql('qux')
+      end
+    end
+  end
 end
