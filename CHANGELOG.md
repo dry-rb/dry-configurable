@@ -1,5 +1,9 @@
 ## 0.8.0 - to-be-released
 
+## Fixed
+
+* A number of bugs related to inheriting settings from parent class were fixed. Ideally, new behavior will be :100: predictable but if you observe any anomaly, please report ([flash-gordon](https://github.com/flash-gordon))
+
 ## Added
 
 * Support for instance-level configuration landed. For usage, `include` the module instead of extending ([flash-gordon](https://github.com/flash-gordon))
