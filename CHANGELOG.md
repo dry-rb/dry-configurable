@@ -18,6 +18,19 @@
   development.config.database = 'jdbc:sqlite:memory'
   development.finalize!
   ```
+* Config values can be set from a hash with `.update`. Nested settings are supported ([flash-gordon](https://github.com/flash-gordon))
+  ```ruby
+  class App
+    extend Dry::Configurable
+
+    setting :db do
+      setting :host
+      setting :port
+    end
+
+    config.update(YAML.load(File.read("config.yml")))
+  end
+  ```
 
 ## Changed
 
