@@ -1,4 +1,4 @@
-## 0.8.0 - to-be-released
+## 0.8.0 - 2019-02-05
 
 ## Fixed
 
@@ -40,7 +40,7 @@
 
 * [BREAKING] Minimal supported Ruby version is set to 2.3 ([flash-gordon](https://github.com/flash-gordon))
 
-[Compare v0.7.0...HEAD](https://github.com/dry-rb/dry-configurable/compare/v0.7.0...HEAD)
+[Compare v0.7.0...v0.8.0](https://github.com/dry-rb/dry-configurable/compare/v0.7.0...v0.8.0)
 
 ## 0.7.0 - 2017-04-25
 
