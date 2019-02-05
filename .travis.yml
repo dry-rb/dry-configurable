@@ -3,15 +3,13 @@ dist: trusty
 sudo: required
 cache: bundler
 bundler_args: --without console
-script:
-  - bundle exec rake spec
 after_success:
   - '[ -d coverage ] && bundle exec codeclimate-test-reporter'
 rvm:
   - 2.3.8
   - 2.4.5
   - 2.5.3
-  - 2.6.0
+  - 2.6.1
   - jruby-9.2.5.0
 env:
   global:
