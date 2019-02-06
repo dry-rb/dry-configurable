@@ -1,3 +1,11 @@
+## 0.8.1 - 2019-02-06
+
+## Fixed
+
+* `.configure` doesn't require a block, this makes the behavior consistent with the previous versions ([flash-gordon](https://github.com/flash-gordon))
+
+[Compare v0.8.0...v0.8.1](https://github.com/dry-rb/dry-configurable/compare/v0.8.0...v0.8.1)
+
 ## 0.8.0 - 2019-02-05
 
 ## Fixed
