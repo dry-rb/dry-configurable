@@ -8,11 +8,11 @@ module Dry
       #
       # @api public
       def reset_config
-        if self.is_a?(Class)
-          @config = _settings.create_config
-        else
-          @config = self.class._settings.create_config
-        end
+        @config = if [Class, Module].include? self.class
+                    _settings.create_config
+                  else
+                    self.class._settings.create_config
+                  end
       end
     end
 
