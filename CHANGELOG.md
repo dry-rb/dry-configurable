@@ -1,3 +1,11 @@
+## 0.8.2 - 2019-02-25
+
+## Fixed
+
+* Test interface support for modules ([Neznauy](https://github.com/Neznauy))
+
+[Compare v0.8.1...v0.8.2](https://github.com/dry-rb/dry-configurable/compare/v0.8.1...v0.8.2)
+
 ## 0.8.1 - 2019-02-06
 
 ## Fixed
