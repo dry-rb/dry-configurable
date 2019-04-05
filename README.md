@@ -2,8 +2,9 @@
 [gem]: https://rubygems.org/gems/dry-configurable
 [travis]: https://travis-ci.org/dry-rb/dry-configurable
 [inch]: http://inch-ci.org/github/dry-rb/dry-configurable
+[chat]: https://dry-rb.zulipchat.com
 
-# dry-configurable [![Join the Gitter chat](https://badges.gitter.im/Join%20Chat.svg)][gitter]
+# dry-configurable [![Join the chat at https://dry-rb.zulipchat.com](https://img.shields.io/badge/dry--rb-join%20chat-%23346b7a.svg)][chat]
 
 [![Gem Version](https://img.shields.io/gem/v/dry-configurable.svg)][gem]
 [![Build Status](https://img.shields.io/travis/dry-rb/dry-configurable.svg)][travis]
