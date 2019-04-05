@@ -6,7 +6,6 @@ bundler_args: --without console
 after_success:
   - '[ -d coverage ] && bundle exec codeclimate-test-reporter'
 rvm:
-  - 2.3.8
   - 2.4.6
   - 2.5.5
   - 2.6.2
