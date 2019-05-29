@@ -170,5 +170,23 @@ module Dry
       freeze
       config.finalize!
     end
+
+    # @api public
+    def dup
+      super.tap do |copy|
+        copy.instance_variable_set(:@config, config.dup)
+      end
+    end
+
+    # @api public
+    def clone
+      if frozen?
+        super
+      else
+        super.tap do |copy|
+          copy.instance_variable_set(:@config, config.dup)
+        end
+      end
+    end
   end
 end

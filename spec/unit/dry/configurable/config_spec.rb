@@ -231,4 +231,46 @@ RSpec.describe Dry::Configurable::Config do
       end
     end
   end
+
+  describe '#dup' do
+    let(:copy) { config.dup }
+
+    context 'copy after definition' do
+      before do
+        config.update(db: 'jdbc:sqlite', pass: 'h4xz0rz')
+        copy.update(db: 'jdbc:mysql', pass: '$ekre_|_')
+      end
+
+      it 'creates a copy' do
+        expect(copy).to be_defined
+        expect(config.db).to eql('jdbc:sqlite:memory')
+        expect(config.pass).to eql('h4xz0rz')
+        expect(copy.db).to eql('jdbc:mysql:memory')
+        expect(copy.pass).to eql('$ekre_|_')
+      end
+    end
+
+    context 'copy before definition' do
+      let(:config) { klass[settings].new }
+
+      before do
+        copy
+        config.define!
+        config.update(db: 'jdbc:sqlite', pass: 'h4xz0rz')
+      end
+
+      it 'creates a copy' do
+        expect(copy).not_to be_defined
+        expect(config.db).to eql('jdbc:sqlite:memory')
+        expect(config.pass).to eql('h4xz0rz')
+
+        copy.define!(db: 'jdbc:mysql', pass: '$ekre_|_')
+        expect(copy).to be_defined
+        expect(copy.db).to eql('jdbc:mysql')
+        expect(copy.pass).to eql('$ekre_|_')
+        expect(config.db).to eql('jdbc:sqlite:memory')
+        expect(config.pass).to eql('h4xz0rz')
+      end
+    end
+  end
 end

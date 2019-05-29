@@ -103,5 +103,42 @@ RSpec.describe Dry::Configurable do
         expect(obj.config.dsn).to be_nil
       end
     end
+
+    describe '#dup' do
+      let(:obj) { klass.new }
+
+      let(:copy) { obj.dup }
+
+      before do
+        klass.setting :dsn
+        copy
+        obj.config.dsn = 'jdbc:sqlite:memory'
+      end
+
+      it 'creates a copy with unshared config' do
+        expect(obj.config.dsn).to eql('jdbc:sqlite:memory')
+        expect(copy.config.dsn).to be_nil
+      end
+    end
+
+    describe '#clone' do
+      let(:obj) { klass.new }
+
+      let(:copy) { obj.clone }
+
+      before do
+        klass.setting :dsn
+        copy.finalize!
+        obj.config.dsn = 'jdbc:sqlite:memory'
+        obj.finalize!
+      end
+
+      it 'creates a copy with unshared config' do
+        expect(obj.config.dsn).to eql('jdbc:sqlite:memory')
+        expect(copy.config.dsn).to be_nil
+        expect(copy).to be_frozen
+        expect(obj).to be_frozen
+      end
+    end
   end
 end
