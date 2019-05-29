@@ -1,3 +1,11 @@
+## 0.8.3 - 2019-05-29
+
+## Fixed
+
+* `Configurable#dup` and `Configurable#clone` make a copy of instance-level config so that it doesn't get mutated/shared across instances (flash-gordon)
+
+[Compare v0.8.2...v0.8.3](https://github.com/dry-rb/dry-configurable/compare/v0.8.2...v0.8.3)
+
 ## 0.8.2 - 2019-02-25
 
 ## Fixed
