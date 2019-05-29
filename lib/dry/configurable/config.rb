@@ -134,7 +134,11 @@ module Dry
       end
 
       def dup
-        self.class.new.define!(to_h)
+        if self.defined?
+          self.class.new.define!(to_h)
+        else
+          self.class.new
+        end
       end
 
       private
