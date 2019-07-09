@@ -40,12 +40,13 @@ module Dry
 
       attr_reader :config_class
 
-      attr_reader :names
+      attr_reader :index
+      private :index
 
       def initialize(settings = ::Concurrent::Array.new)
         @settings = settings
         @config_class = Config[self]
-        @names = Set.new(settings.map(&:name))
+        @index = settings.map { |s| [s.name, s] }.to_h
         yield(self) if block_given?
       end
 
@@ -53,9 +54,12 @@ module Dry
         extended = singleton_class < Configurable
         raise_already_defined_config(key) if extended && configured?
 
-        Setting.new(key, *Parser.(value, options, block)).tap do |s|
+        *args, opts = Parser.(value, options, block)
+
+        Setting.new(key, *args, { **opts, reserved: reserved?(key) }).tap do |s|
           settings << s
-          names << s.name
+          index[s.name] = s
+          @names = nil
         end
       end
 
@@ -63,12 +67,20 @@ module Dry
         settings.each { |s| yield(s) }
       end
 
+      def names
+        @names ||= index.keys.to_set
+      end
+
+      def [](name)
+        index[name]
+      end
+
       def empty?
         settings.empty?
       end
 
       def name?(name)
-        names.include?(name)
+        index.key?(name)
       end
 
       def dup
@@ -86,6 +98,18 @@ module Dry
 
       def config_defined?
         config_class.config_defined?
+      end
+
+      def reserved?(name)
+        reserved_names.include?(name)
+      end
+
+      def reserved_names
+        @reserved_names ||= [
+          config_class.instance_methods(false),
+          config_class.superclass.instance_methods(false),
+          %i(class public_send)
+        ].reduce(:+)
       end
     end
   end

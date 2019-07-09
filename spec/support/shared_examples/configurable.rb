@@ -285,4 +285,87 @@ RSpec.shared_examples 'a configurable object' do
       )
     end
   end
+
+  context 'reserved keywords' do
+    describe 'reserved built-in methods' do
+      before do
+        klass.setting :class, Object
+        klass.setting :public_send, true
+      end
+
+      specify 'how +class+ is supported' do
+        expect(object.config.class).to be < Dry::Configurable::Config
+        expect(object.config[:class]).to be(Object)
+        object.config[:class] = String
+        expect(object.config[:class]).to be(String)
+
+        expect(object.config[:public_send]).to be(true)
+        expect(object.config.public_send(:[], :public_send)).to be(true)
+      end
+    end
+
+    describe 'reserved defined methods' do
+      before do
+        klass.setting :dup, true
+        klass.setting :to_h, []
+      end
+
+      specify 'how +dup+ is supported' do
+        expect(object.config.dup).to be_a(Dry::Configurable::Config)
+        expect(object.config[:dup]).to be(true)
+        object.config[:dup] = false
+        expect(object.config[:dup]).to be(false)
+
+        expect(object.config.to_h).to be_a(Hash)
+        expect(object.config[:to_h]).to be_an(Array)
+      end
+    end
+
+    describe 'ruby keywords' do
+      before do
+        klass.setting :if, true
+        klass.setting :else, :something
+      end
+
+      it 'is fully supported' do
+        expect(object.config.if).to be(true)
+        expect(object.config.else).to be(:something)
+
+        object.config.if = false
+
+        expect(object.config.if).to be(false)
+      end
+    end
+
+    describe 'Kernel' do
+      before do
+        klass.setting :raise, true
+      end
+
+      it 'is fully supported' do
+        expect(object.config.raise).to be(true)
+        expect { object.config[:missing] }.to raise_error(ArgumentError, /not a setting/)
+      end
+    end
+
+    describe 'invalid names' do
+      it 'rejects' do
+        %i(foo? bar! d'oh 7 {} - ==).each do |name|
+          expect { klass.setting name }.to raise_error(ArgumentError, /not a valid/)
+        end
+      end
+    end
+  end
+
+  describe 'capital letters' do
+    before do
+      klass.setting :WOW, :SUCH
+    end
+
+    it 'is supported' do
+      expect(object.config.WOW).to eql(:SUCH)
+      object.config.WOW = :VALUE
+      expect(object.config.WOW).to eql(:VALUE)
+    end
+  end
 end
