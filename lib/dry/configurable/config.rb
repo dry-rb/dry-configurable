@@ -22,6 +22,8 @@ module Dry
             break if config_defined?
 
             settings.each do |setting|
+              next if setting.reserved?
+
               define_method(setting.name) do
                 @config[setting.name]
               end
@@ -96,8 +98,15 @@ module Dry
       #
       # @return Config value
       def [](name)
-        raise_unknown_setting_error(name) unless key?(name.to_sym)
-        public_send(name)
+        setting = self.class.settings[name.to_sym]
+
+        if setting.nil?
+          raise_unknown_setting_error(name)
+        elsif setting.reserved?
+          @config[setting.name]
+        else
+          public_send(name)
+        end
       end
 
       # Set config value.
@@ -106,8 +115,15 @@ module Dry
       # @param [String,Symbol] name
       # @param [Object] value
       def []=(name, value)
-        raise_unknown_setting_error(name) unless key?(name.to_sym)
-        public_send("#{name}=", value)
+        setting = self.class.settings[name.to_sym]
+
+        if setting.nil?
+          raise_unknown_setting_error(name)
+        elsif setting.reserved?
+          @config[setting.name] = setting.processor.(value)
+        else
+          public_send("#{name}=", value)
+        end
       end
 
       # Whether config has a key
@@ -162,7 +178,7 @@ module Dry
 
       # @private
       def raise_unknown_setting_error(name)
-        raise ArgumentError, "+#{name}+ is not a setting name"
+        ::Kernel.raise ArgumentError, "+#{name}+ is not a setting name"
       end
     end
   end
