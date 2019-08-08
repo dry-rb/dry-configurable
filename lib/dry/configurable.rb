@@ -59,7 +59,7 @@ module Dry
       #
       # @yield
       #   If a block is given, it will be evaluated in the context of
-      #   and new configuration class, and bound as the default value
+      #   a new configuration class, and bound as the default value
       #
       # @return [Dry::Configurable::Config]
       #
