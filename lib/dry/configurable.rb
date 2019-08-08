@@ -65,13 +65,12 @@ module Dry
       #
       # @api public
       def setting(key, value = Undefined, options = Undefined, &block)
-        extended = singleton_class < Configurable
         raise_already_defined_config(key) if _settings.config_defined?
 
         setting = _settings.add(key, value, options, &block)
 
         if setting.reader?
-          readers = extended ? singleton_class : self
+          readers = singleton_class < Configurable ? singleton_class : self
           readers.send(:define_method, setting.name) { config[setting.name] }
         end
       end
