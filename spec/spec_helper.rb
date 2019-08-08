@@ -16,6 +16,10 @@ begin
 rescue LoadError
 end
 
+require 'warning'
+
+Warning.process { |w| raise RuntimeError, w }
+
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|

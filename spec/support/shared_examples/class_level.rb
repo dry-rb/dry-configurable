@@ -93,6 +93,29 @@ RSpec.shared_examples 'a configurable class' do
           expect(klass.config.nested.thing).to eql('from base klass')
         end
       end
+
+      context 'redefining settings in subclasses' do
+        let(:klass) do
+          Class.new do
+            extend Dry::Configurable
+
+            setting :some, :parent
+          end
+        end
+
+        let(:subclass) do
+          Class.new(klass) do
+            setting :some, :child
+          end
+        end
+
+        before { subclass }
+
+        it 'is working w/o a warning' do
+          expect(klass.config.some).to be(:parent)
+          expect(subclass.config.some).to be(:child)
+        end
+      end
     end
   end
 end

@@ -57,6 +57,7 @@ module Dry
         *args, opts = Parser.(value, options, block)
 
         Setting.new(key, *args, { **opts, reserved: reserved?(key) }).tap do |s|
+          settings.delete_if { |e| e.name.eql?(s.name) }
           settings << s
           index[s.name] = s
           @names = nil
