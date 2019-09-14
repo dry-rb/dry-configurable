@@ -38,7 +38,7 @@ module Dry
             end
           end
 
-          [value, processor, options(Undefined.default(options, EMPTY_HASH))]
+          [value, processor, options(**Undefined.default(options, EMPTY_HASH))]
         end
 
         def options(reader: false)
