@@ -18,6 +18,7 @@ end
 
 require 'warning'
 
+Warning.ignore(/rspec\/mocks/)
 Warning.process { |w| raise RuntimeError, w }
 
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
