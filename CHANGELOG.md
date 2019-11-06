@@ -6,7 +6,7 @@
 - Settings can be redefined in subclasses without a warning about overriding exsting methods (flash-gordon)
 - Fix warnings about using keyword arguments in 2.7 (koic)
 
-[Compare v0.8.3...0.9.0](https://github.com/dry-rb/dry-configurable/compare/v0.8.3...0.9.0)
+[Compare v0.8.3...v0.9.0](https://github.com/dry-rb/dry-configurable/compare/v0.8.3...v0.9.0)
 
 ## 0.8.3 - 2019-05-29
 
