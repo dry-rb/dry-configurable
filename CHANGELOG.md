@@ -1,11 +1,12 @@
-## 0.9.0 - unreleased
+## 0.9.0 - 2019-11-06
 
 ## Fixed
 
 - Support for reserved names in settings. Some Kernel methods (`public_send` and `class` specifically) are not available if you use access settings via method call. Same for methods of the `Config` class. You can still access them with `[]` and `[]=`. Ruby keywords are fully supported. Invalid names containing special symbols (including `!` and `?`) are rejected. Note that these changes don't affect the `reader` option, if you define a setting named `:class` and pass `reader: true` ... well ... (flash-gordon)
 - Settings can be redefined in subclasses without a warning about overriding exsting methods (flash-gordon)
+- Fix warnings about using keyword arguments in 2.7 (koic)
 
-[Compare v0.8.3...master](https://github.com/dry-rb/dry-configurable/compare/v0.8.3...master)
+[Compare v0.8.3...0.9.0](https://github.com/dry-rb/dry-configurable/compare/v0.8.3...0.9.0)
 
 ## 0.8.3 - 2019-05-29
 
