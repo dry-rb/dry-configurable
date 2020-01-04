@@ -1,13 +1,10 @@
 source 'https://rubygems.org'
 
+eval_gemfile 'Gemfile.devtools'
+
 gemspec
 
 group :test do
-  platforms :mri do
-    gem 'codeclimate-test-reporter', require: false
-    gem 'simplecov', require: false
-  end
-
   gem 'warning'
 end
 
@@ -16,5 +13,4 @@ group :tools do
   gem 'guard-rspec'
   gem 'listen', '3.0.6'
   gem 'pry-byebug', platform: :mri
-  gem "ossy", git: "https://github.com/solnic/ossy.git", branch: "master"
 end
