@@ -1,15 +1,10 @@
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+require_relative 'support/coverage'
 
 require 'pathname'
 
-SPEC_ROOT = Pathname(__FILE__).dirname
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
-if ENV['COVERAGE'] == 'true'
-  require 'simplecov'
-  SimpleCov.start do
-    add_filter '/spec/'
-  end
-end
+SPEC_ROOT = Pathname(__FILE__).dirname
 
 begin
   require 'pry-byebug'
@@ -19,6 +14,8 @@ end
 require 'warning'
 
 Warning.ignore(/rspec\/mocks/)
+Warning.ignore(/codacy/)
+
 Warning.process { |w| raise RuntimeError, w }
 
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
