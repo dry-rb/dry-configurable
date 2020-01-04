@@ -1,40 +1,28 @@
-[gitter]: https://gitter.im/dry-rb/chat
 [gem]: https://rubygems.org/gems/dry-configurable
-[ci]: https://github.com/dry-rb/dry-configurable/actions?query=workflow%3Aci
-[inch]: http://inch-ci.org/github/dry-rb/dry-configurable
+[actions]: https://github.com/dry-rb/dry-configurable/actions
+[codacy]: https://www.codacy.com/gh/dry-rb/dry-configurable
 [chat]: https://dry-rb.zulipchat.com
+[inchpages]: http://inch-ci.org/github/dry-rb/dry-configurable
 
 # dry-configurable [![Join the chat at https://dry-rb.zulipchat.com](https://img.shields.io/badge/dry--rb-join%20chat-%23346b7a.svg)][chat]
 
-[![Gem Version](https://img.shields.io/gem/v/dry-configurable.svg)][gem]
-[![Build Status](https://github.com/dry-rb/dry-configurable/workflows/ci/badge.svg)][ci]
-[![Maintainability](https://api.codeclimate.com/v1/badges/25311e81391498d6b7c8/maintainability)](https://codeclimate.com/github/dry-rb/dry-configurable/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/25311e81391498d6b7c8/test_coverage)](https://codeclimate.com/github/dry-rb/dry-configurable/test_coverage)
-[![API Documentation Coverage](http://inch-ci.org/github/dry-rb/dry-configurable.svg)][inch]
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'dry-configurable'
-```
-
-And then execute:
-
-```sh
-$ bundle
-```
-
-Or install it yourself as:
-
-```sh
-$ gem install dry-configurable
-```
+[![Gem Version](https://badge.fury.io/rb/dry-configurable.svg)][gem]
+[![CI Status](https://github.com/dry-rb/dry-configurable/workflows/ci/badge.svg)][actions]
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/22edf59617be4aef97cfbe4e1c99f1ce)][codacy]
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/22edf59617be4aef97cfbe4e1c99f1ce)][codacy]
+[![Inline docs](http://inch-ci.org/github/dry-rb/dry-configurable.svg?branch=master)][inchpages]
 
 ## Links
 
-- [Documentation](http://dry-rb.org/gems/dry-configurable)
+* [User documentation](http://dry-rb.org/gems/dry-configurable)
+* [API documentation](http://rubydoc.info/gems/dry-configurable)
+
+## Supported Ruby versions
+
+This library officially supports the following Ruby versions:
+
+* MRI >= `2.4`
+* jruby >= `9.2`
 
 ## License
 
