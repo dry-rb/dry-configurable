@@ -1,3 +1,5 @@
+require 'bundler/setup'
+
 require_relative 'support/coverage'
 
 require 'pathname'
