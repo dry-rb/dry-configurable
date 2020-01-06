@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'set'
 require 'concurrent/array'
 require 'dry/configurable/settings/argument_parser'

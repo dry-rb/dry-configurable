@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Dry::Configurable::Config do
   let(:klass) { Dry::Configurable::Config }
   let(:config) { klass[settings].new.define! }

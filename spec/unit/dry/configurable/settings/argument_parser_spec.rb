@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Dry::Configurable::Settings::ArgumentParser do
   let(:undefined) { Dry::Configurable::Undefined }
 

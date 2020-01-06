@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Dry
   module Configurable
     # This class represents a setting and is used internally.

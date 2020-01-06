@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Dry::Configurable::TestInterface do
   context "when configurable class" do
     let(:klass) do

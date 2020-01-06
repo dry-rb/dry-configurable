@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Dry::Configurable::Setting do
   let(:klass) { described_class }
   let(:config) { klass.new(name, value, processor) }

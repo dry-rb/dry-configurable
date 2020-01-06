@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Dry::Configurable, 'block syntax' do
   context 'when extended' do
     let(:klass) do

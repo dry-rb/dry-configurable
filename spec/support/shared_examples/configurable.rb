@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'a configurable object' do
   describe 'settings' do
     context 'without default value' do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Dry
   module Configurable
     # Methods meant to be used in a testing scenario
