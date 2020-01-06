@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
     'changelog_uri' => 'https://github.com/dry-rb/dry-configurable/blob/master/CHANGELOG.md'
   }
 
-  spec.required_ruby_version = ">= 2.4.0"
+  spec.required_ruby_version = '>= 2.4.0'
   spec.add_runtime_dependency 'concurrent-ruby', '~> 1.0'
   spec.add_runtime_dependency 'dry-core', '~> 0.4', '>= 0.4.7'
 

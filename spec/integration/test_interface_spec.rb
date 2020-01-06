@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Dry::Configurable::TestInterface do
-  context "when configurable class" do
+  context 'when configurable class' do
     let(:klass) do
       Class.new do
         extend Dry::Configurable
@@ -15,7 +15,7 @@ RSpec.describe Dry::Configurable::TestInterface do
     it_behaves_like 'valid test interface behavior'
   end
 
-  context "when configurable module" do
+  context 'when configurable module' do
     let(:modulle) do
       Module.new do
         extend Dry::Configurable
@@ -29,7 +29,7 @@ RSpec.describe Dry::Configurable::TestInterface do
     it_behaves_like 'valid test interface behavior'
   end
 
-  context "when configurable instance" do
+  context 'when configurable instance' do
     let(:klass) do
       Class.new do
         include Dry::Configurable
