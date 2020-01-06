@@ -84,7 +84,7 @@ RSpec.describe Dry::Configurable::Config do
 
       let(:settings) do
         Dry::Configurable::Settings.new do |settings|
-          settings.add(:db, 'sqlite') { |v|  "#{v}:memory" }
+          settings.add(:db, 'sqlite') { |v| "#{v}:memory" }
           settings.add(:user, 'root')
           settings.add(:pass, undefined)
           settings.add(:foo, nested_setting)

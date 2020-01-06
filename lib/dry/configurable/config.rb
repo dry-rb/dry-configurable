@@ -30,6 +30,7 @@ module Dry
 
               define_method("#{setting.name}=") do |value|
                 raise FrozenConfig, 'Cannot modify frozen config' if frozen?
+
                 @config[setting.name] = setting.processor.(value)
               end
             end

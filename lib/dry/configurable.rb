@@ -144,6 +144,7 @@ module Dry
     # @api public
     def config
       return @config if @config.defined?
+
       @config.define!
     end
 
@@ -156,6 +157,7 @@ module Dry
     # @api public
     def configure
       raise FrozenConfig, 'Cannot modify frozen config' if frozen?
+
       yield(config) if block_given?
       self
     end

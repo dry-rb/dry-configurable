@@ -16,6 +16,7 @@ module Dry
         unless VALID_NAME =~ name.to_s
           raise ArgumentError, "+#{name}+ is not a valid setting name"
         end
+
         @name = name.to_sym
         @value = value
         @processor = processor
