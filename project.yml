@@ -1,2 +1,13 @@
 name: dry-configurable
 codacy_id: 0276a97990e04eb0ac722b3e7f3620b5
+gemspec:
+  authors: ["Andy Holland"]
+  email: ["andyholland1991@aol.com"]
+  summary: "A mixin to add configuration functionality to your classes"
+  development_dependencies:
+    - bundler
+    - rake
+    - rspec
+  runtime_dependencies:
+    - [concurrent-ruby, "~> 1.0"]
+    - [dry-core, "~> 0.4", ">= 0.4.7"]
