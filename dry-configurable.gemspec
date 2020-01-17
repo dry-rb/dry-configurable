@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.summary       = "A mixin to add configuration functionality to your classes"
   spec.description   = spec.summary
   spec.homepage      = 'https://dry-rb.org/gems/dry-configurable'
-  spec.files         = Dir['CHANGELOG.md', 'LICENSE', 'README.md', 'dry-configurable.gemspec', 'lib/**/*']
+  spec.files         = Dir["CHANGELOG.md", "LICENSE", "README.md", "dry-configurable.gemspec", "lib/**/*"]
   spec.require_paths = ['lib']
 
   spec.metadata['allowed_push_host'] = 'https://rubygems.org'
