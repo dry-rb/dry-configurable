@@ -7,6 +7,7 @@
 - Settings can be redefined in subclasses without a warning about overriding exsting methods (flash-gordon)
 - Fix warnings about using keyword arguments in 2.7 (koic)
 
+
 [Compare v0.8.3...v0.9.0](https://github.com/dry-rb/dry-configurable/compare/v0.8.3...v0.9.0)
 
 ## 0.8.3 2019-05-29
@@ -15,6 +16,7 @@
 ### Fixed
 
 - `Configurable#dup` and `Configurable#clone` make a copy of instance-level config so that it doesn't get mutated/shared across instances (flash-gordon)
+
 
 [Compare v0.8.2...v0.8.3](https://github.com/dry-rb/dry-configurable/compare/v0.8.2...v0.8.3)
 
@@ -25,6 +27,7 @@
 
 - Test interface support for modules ([Neznauy](https://github.com/Neznauy))
 
+
 [Compare v0.8.1...v0.8.2](https://github.com/dry-rb/dry-configurable/compare/v0.8.1...v0.8.2)
 
 ## 0.8.1 2019-02-06
@@ -33,6 +36,7 @@
 ### Fixed
 
 - `.configure` doesn't require a block, this makes the behavior consistent with the previous versions ([flash-gordon](https://github.com/flash-gordon))
+
 
 [Compare v0.8.0...v0.8.1](https://github.com/dry-rb/dry-configurable/compare/v0.8.0...v0.8.1)
 
@@ -80,6 +84,7 @@
 ### Changed
 
 - [BREAKING] Minimal supported Ruby version is set to 2.3 ([flash-gordon](https://github.com/flash-gordon))
+
 [Compare v0.7.0...v0.8.0](https://github.com/dry-rb/dry-configurable/compare/v0.7.0...v0.8.0)
 
 ## 0.7.0 2017-04-25
