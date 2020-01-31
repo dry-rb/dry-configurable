@@ -136,8 +136,9 @@ module Dry
     #
     # @api public
     def config
-      return @config if @config.defined?
+      return @config if defined?(@config) && @config.defined?
 
+      @config = _settings.create_config unless defined?(@config)
       @config.define!
     end
 

@@ -12,7 +12,7 @@ RSpec.shared_examples 'a configurable class' do
         let(:subclass) { Class.new(klass) }
 
         it 'retains its configuration' do
-          expect(subclass.config.dsn).to eql('jdbc:sqlite:memory')
+          expect(object.config.dsn).to eql('jdbc:sqlite:memory')
         end
 
         context 'when the inherited config is modified' do
@@ -36,7 +36,7 @@ RSpec.shared_examples 'a configurable class' do
         subject!(:subclass) { Class.new(klass) }
 
         it 'retains its configuration' do
-          expect(subclass.config.dsn).to eq('jdbc:sqlite:memory')
+          expect(object.config.dsn).to eq('jdbc:sqlite:memory')
         end
 
         context 'when the inherited config is modified' do
