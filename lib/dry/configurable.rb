@@ -102,12 +102,14 @@ module Dry
       # @private
       def inherited(subclass)
         parent = self
+
         subclass.instance_exec do
           @settings = parent._settings.dup
         end
 
         if singleton_class < Configurable
           parent_config = @config
+
           subclass.instance_exec do
             @config = _settings.create_config
             @config.define!(parent_config.to_h) if parent_config.defined?
