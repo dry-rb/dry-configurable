@@ -1,3 +1,12 @@
+## 0.10.0 2020-01-31
+
+
+### Changed
+
+- Inheriting settings no longer defines the config object. This change fixed a use case where parent class that already used its config would prevent a child class from adding new settings (@solnic)
+
+[Compare v0.9.0...v0.10.0](https://github.com/dry-rb/dry-configurable/compare/v0.9.0...v0.10.0)
+
 ## 0.9.0 2019-11-06
 
 
