@@ -1,5 +1,6 @@
 ## 0.10.0 2020-01-31
 
+YANKED because the change also broke inheritance for classes that used `configured` before other classes inherited from them.
 
 ### Changed
 
