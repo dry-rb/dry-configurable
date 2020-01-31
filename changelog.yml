@@ -1,9 +1,9 @@
 ---
 - version: 0.10.0
-  summary: 
+  summary: 'YANKED because the change also broke inheritance for classes that used `configured` before other classes inherited from them.'
   date: '2020-01-31'
-  fixed: 
-  added: 
+  fixed:
+  added:
   changed:
   - Inheriting settings no longer defines the config object. This change fixed a use
     case where parent class that already used its config would prevent a child class
