@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
   # to update dependencies edit project.yml
   spec.add_runtime_dependency "concurrent-ruby", "~> 1.0"
   spec.add_runtime_dependency "dry-core", "~> 0.4", ">= 0.4.7"
+  spec.add_runtime_dependency "dry-equalizer", "~> 0.2"
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"
