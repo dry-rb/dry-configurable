@@ -1,48 +1,115 @@
 # frozen_string_literal: true
 
+require 'dry/equalizer'
+
+require 'dry/configurable/constants'
+require 'dry/configurable/config'
+
 module Dry
   module Configurable
     # This class represents a setting and is used internally.
     #
-    # @private
+    # @api private
     class Setting
-      VALID_NAME = /\A[a-z_]\w*\z/i
+      include Dry::Equalizer(:name, :options)
 
+      OPTIONS = %i[value default reader constructor settings].freeze
+
+      DEFAULT_CONSTRUCTOR = -> v { v }.freeze
+
+      # @api private
       attr_reader :name
 
+      # @api private
+      attr_reader :default
+
+      # @api private
       attr_reader :options
 
-      attr_reader :processor
+      # @api private
+      def self.[](name, **options)
+        type = options.key?(:settings) ? Nested : Setting
+        type.new(name, options)
+      end
 
-      def initialize(name, value, processor, options = EMPTY_HASH)
-        unless VALID_NAME =~ name.to_s
-          raise ArgumentError, "+#{name}+ is not a valid setting name"
+      # Specialized Setting which includes nested settings
+      #
+      # @api private
+      class Nested < Setting
+        # @api private
+        def pristine
+          with(value: default, settings: settings.pristine)
         end
 
-        @name = name.to_sym
-        @value = value
-        @processor = processor
+        # @api private
+        def settings
+          options[:settings]
+        end
+
+        # @api private
+        def config
+          @config ||= Config.new(options[:settings])
+        end
+        alias_method :value, :config
+
+        # @api private
+        def dup
+          with(options.dup.merge(settings: settings.dup))
+        end
+      end
+
+      # @api private
+      def initialize(name, **options)
+        @name = name
+        @default = options[:default]
         @options = options
       end
 
+      # @api private
+      def to_h
+        { name => value }
+      end
+
+      # @api private
       def value
-        Undefined.default(@value, nil)
+        @value ||= undefined? ? nil : constructor[options[:value]]
       end
 
-      def undefined?
-        Undefined.equal?(@value)
+      # @api private
+      def pristine
+        with(value: default)
       end
 
+      # @api private
+      def clone
+        clone = dup
+        clone.freeze if frozen?
+        clone
+      end
+
+      # @api private
+      def dup
+        with(options.dup)
+      end
+
+      # @api private
+      def with(new_opts)
+        Setting[name, options.merge(new_opts)]
+      end
+
+      # @api private
+      def constructor
+        options[:constructor] || DEFAULT_CONSTRUCTOR
+      end
+
+      # @api private
       def reader?
-        options[:reader]
+        options[:reader].equal?(true)
       end
 
-      def node?
-        Settings === @value
-      end
-
-      def reserved?
-        options[:reserved]
+      # @api private
+      def undefined?
+        options[:value].equal?(Undefined)
       end
     end
   end

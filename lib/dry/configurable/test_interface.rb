@@ -10,11 +10,7 @@ module Dry
       #
       # @api public
       def reset_config
-        @config = if self.is_a?(Module)
-                    _settings.create_config
-                  else
-                    self.class._settings.create_config
-                  end
+        @config = config.pristine
       end
     end
 

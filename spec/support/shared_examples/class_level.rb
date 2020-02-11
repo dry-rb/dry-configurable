@@ -61,7 +61,7 @@ RSpec.shared_examples 'a configurable class' do
         subject!(:subclass) { Class.new(klass) }
 
         it 'does not modify the original' do
-          expect(klass.settings).to_not include(:db)
+          expect(klass.settings[:db]).to be(nil)
         end
       end
 

@@ -258,6 +258,7 @@ RSpec.shared_examples 'a configurable object' do
     describe 'reset_config' do
       before do
         klass.setting :dsn, nil
+
         klass.setting :pool do
           setting :size, nil
         end
@@ -275,19 +276,6 @@ RSpec.shared_examples 'a configurable object' do
     end
   end
 
-  context 'Try to set new value after config has been created' do
-    before do
-      klass.setting :dsn, 'sqlite:memory'
-      object.config
-    end
-
-    it 'raise an exception' do
-      expect { klass.setting :pool, 5 }.to raise_error(
-        Dry::Configurable::AlreadyDefinedConfig
-      )
-    end
-  end
-
   context 'reserved keywords' do
     describe 'reserved built-in methods' do
       before do
@@ -296,7 +284,9 @@ RSpec.shared_examples 'a configurable object' do
       end
 
       specify 'how +class+ is supported' do
-        expect(object.config.class).to be < Dry::Configurable::Config
+
+
+        expect(object.config).to be_a(Dry::Configurable::Config)
         expect(object.config[:class]).to be(Object)
         object.config[:class] = String
         expect(object.config[:class]).to be(String)
@@ -315,7 +305,9 @@ RSpec.shared_examples 'a configurable object' do
       specify 'how +dup+ is supported' do
         expect(object.config.dup).to be_a(Dry::Configurable::Config)
         expect(object.config[:dup]).to be(true)
+
         object.config[:dup] = false
+
         expect(object.config[:dup]).to be(false)
 
         expect(object.config.to_h).to be_a(Hash)
