@@ -13,8 +13,12 @@ module Dry
       attr_reader :settings
 
       # @api private
+      attr_reader :resolved
+
+      # @api private
       def initialize(settings)
         @settings = settings
+        @resolved = Concurrent::Map.new
         @values = nil
       end
 
@@ -85,11 +89,11 @@ module Dry
 
       # @api private
       def method_missing(meth, *args)
-        setting = settings[meth.to_s.tr('=', '').to_sym]
+        setting = settings[resolve(meth)]
 
         super unless setting
 
-        if meth.to_s.end_with?('=')
+        if setting.writer?(meth)
           raise FrozenConfig, 'Cannot modify frozen config' if frozen?
 
           settings[setting.name] = setting.with(value: args[0])
@@ -98,6 +102,11 @@ module Dry
         else
           setting.value
         end
+      end
+
+      # @api private
+      def resolve(meth)
+        resolved.fetch(meth) { resolved[meth] = meth.to_s.tr('=', '').to_sym }
       end
     end
   end
