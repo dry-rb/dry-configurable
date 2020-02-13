@@ -57,11 +57,6 @@ module Dry
 
         compiler.visit(ast.last)
       end
-
-      # @api private
-      def call
-        compiler.(ast)
-      end
     end
   end
 end

@@ -5,59 +5,63 @@ RSpec.describe Dry::Configurable::DSL do
     Dry::Configurable::DSL.new
   end
 
-  it 'compiles a flat list of settings' do
-    dsl.setting :user
-    dsl.setting :pass
+  it 'compiles a setting with no options' do
+    setting = dsl.setting :user
 
-    settings = dsl.()
+    expect(setting.name).to be(:user)
+    expect(setting).to be_undefined
+    expect(setting.value).to be(nil)
+  end
 
-    expect(settings[:user].value).to be(nil)
-    expect(settings[:pass].value).to be(nil)
+  it 'compiles a setting with default' do
+    setting = dsl.setting :user, 'root'
+
+    expect(setting.name).to be(:user)
+    expect(setting.value).to eql('root')
+    expect(setting).to_not be_undefined
   end
 
   it 'compiles a setting with a reader set' do
     setting = dsl.setting(:dsn, 'sqlite', reader: true)
 
+    expect(setting.name).to be(:dsn)
     expect(setting).to be_reader
   end
 
   it 'compiles a setting with a default string value' do
-    dsl.setting(:dsn, 'sqlite')
+    setting = dsl.setting(:dsn, 'sqlite')
 
-    settings = dsl.()
-
-    expect(settings[:dsn].value).to eql('sqlite')
+    expect(setting.name).to be(:dsn)
+    expect(setting.value).to eql('sqlite')
   end
 
   it 'compiles a setting with a default hash value' do
     default = { user: 'root', pass: 'secret' }
 
-    dsl.setting(:dsn, default)
+    setting = dsl.setting(:dsn, default)
 
-    settings = dsl.()
-
-    expect(settings[:dsn].value).to eql(default)
+    expect(setting.name).to be(:dsn)
+    expect(setting.value).to eql(default)
   end
 
   it 'compiles a setting with a constructor' do
-    dsl.setting(:dsn, 'sqlite') { |value| "jdbc:#{value}" }
+    setting = dsl.setting(:dsn, 'sqlite') { |value| "jdbc:#{value}" }
 
-    settings = dsl.()
-
-    expect(settings[:dsn].value).to eql('jdbc:sqlite')
+    expect(setting.name).to be(:dsn)
+    expect(setting.value).to eql('jdbc:sqlite')
   end
 
   it 'compiles a nested list of settings' do
-    dsl.setting :db do
-      setting :cred do
-        setting :user
-        setting :pass
+    setting =
+      dsl.setting(:db) do
+        setting(:cred) do
+          setting(:user)
+          setting(:pass)
+        end
       end
-    end
 
-    settings = dsl.()
-
-    expect(settings[:db].config.cred.user).to be(nil)
-    expect(settings[:db].config.cred.pass).to be(nil)
+    expect(setting.name).to be(:db)
+    expect(setting.config.cred.user).to be(nil)
+    expect(setting.config.cred.pass).to be(nil)
   end
 end
