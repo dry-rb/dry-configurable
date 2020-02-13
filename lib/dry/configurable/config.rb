@@ -48,7 +48,7 @@ module Dry
       #
       # @api public
       def to_h
-        values.map { |key, value| [key, value.respond_to?(:to_h) ? value.to_h : value] }.to_h
+        values.map { |key, value| [key, value.is_a?(self.class) ? value.to_h : value] }.to_h
       end
       alias_method :to_hash, :to_h
 

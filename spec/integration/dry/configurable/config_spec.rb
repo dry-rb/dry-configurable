@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'pathname'
+require 'set'
 
 RSpec.describe Dry::Configurable::Config do
   subject(:config) do
@@ -18,9 +19,10 @@ RSpec.describe Dry::Configurable::Config do
       klass.setting :db do
         setting :user, 'root'
         setting :pass, 'secret'
+        setting :ports, Set[123, 321]
       end
 
-      expect(Hash(klass.config)).to eql(db: { user: 'root', pass: 'secret' })
+      expect(Hash(klass.config)).to eql(db: { user: 'root', pass: 'secret', ports: Set[123, 321] })
     end
   end
 
