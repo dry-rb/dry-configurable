@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'dry/configurable/constants'
-require 'dry/configurable/error'
+require 'dry/configurable/errors'
 
 module Dry
   module Configurable
