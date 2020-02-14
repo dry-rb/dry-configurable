@@ -19,6 +19,12 @@ module Dry
       end
 
       # @api private
+      def <<(setting)
+        elements[setting.name] = setting
+        self
+      end
+
+      # @api private
       def [](name)
         elements[name]
       end

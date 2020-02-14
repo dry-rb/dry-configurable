@@ -12,8 +12,7 @@ module Dry
       def call(ast)
         Settings.new.tap do |settings|
           ast.each do |node|
-            setting = visit(node)
-            settings[setting.name] = setting
+            settings << visit(node)
           end
         end
       end

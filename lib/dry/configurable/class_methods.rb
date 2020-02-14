@@ -36,7 +36,7 @@ module Dry
       def setting(*args, &block)
         setting = __config_dsl__.setting(*args, &block)
 
-        _settings[setting.name] = setting
+        _settings << setting
 
         __config_reader__.define(setting.name) if setting.reader?
 
