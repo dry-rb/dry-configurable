@@ -26,6 +26,26 @@ RSpec.describe Dry::Configurable::Config do
     end
   end
 
+  describe '#dup' do
+    it 'returns a deep-copy' do
+      klass.setting :db do
+        setting :user, 'root'
+        setting :pass, 'secret'
+        setting :ports, Set[123], &:dup
+      end
+
+      subclass = Class.new(klass) do
+        config.db.ports << 312
+      end
+
+      expect(klass.config.db.ports).to eql(Set[123])
+
+      expect(subclass.config.db.ports).to eql(Set[123, 312])
+
+      expect(subclass.config.dup.db.ports).to eql(Set[123, 312])
+    end
+  end
+
   describe '#[]' do
     it 'raises ArgumentError when name is not valid' do
       expect { klass.config[:hello] }.to raise_error(ArgumentError, /hello/)
