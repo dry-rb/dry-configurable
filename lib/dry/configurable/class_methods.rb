@@ -15,8 +15,12 @@ module Dry
       # @api private
       def inherited(klass)
         super
+
         klass.instance_variable_set('@_settings', _settings.clone.pristine)
-        klass.instance_variable_set('@config', config.clone) if instance_variable_defined?('@config')
+
+        if instance_variable_defined?('@config')
+          klass.instance_variable_set('@config', config.clone)
+        end
       end
 
       # Add a setting to the configuration

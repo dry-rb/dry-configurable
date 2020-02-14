@@ -20,6 +20,7 @@ module Dry
       # @api public
       def finalize!
         return self if config.frozen?
+
         config.finalize!
         self
       end

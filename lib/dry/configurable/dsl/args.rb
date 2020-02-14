@@ -27,6 +27,7 @@ module Dry
         # @api private
         def ensure_valid_options
           return unless options
+
           keys = options.keys - opts
           raise ArgumentError, "Invalid options: #{keys.inspect}" unless keys.empty?
         end
