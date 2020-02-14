@@ -57,7 +57,7 @@ module Dry
 
         # @api private
         def dup
-          with(options.dup.merge(settings: settings.dup))
+          with(options.merge(settings: settings.dup))
         end
       end
 
