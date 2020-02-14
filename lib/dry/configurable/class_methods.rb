@@ -16,7 +16,7 @@ module Dry
       def inherited(klass)
         super
 
-        klass.instance_variable_set('@_settings', _settings.clone.pristine)
+        klass.instance_variable_set('@_settings', _settings.dup)
 
         if instance_variable_defined?('@config')
           klass.instance_variable_set('@config', config.dup)
