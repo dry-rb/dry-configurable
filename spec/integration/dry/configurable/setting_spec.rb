@@ -165,6 +165,18 @@ RSpec.describe Dry::Configurable, '.setting' do
         Class.new(klass)
       end
 
+      it 'maintains mutated value in a child config' do
+        klass.setting :db do
+          setting :ports, Set[123]
+        end
+
+        klass.config.db.ports << 312
+
+        subclass = Class.new(klass)
+
+        expect(subclass.config.db.ports).to eql(Set[123, 312])
+      end
+
       it 'allows defining more settings' do
         klass.setting :db, 'sqlite'
 
@@ -276,35 +288,45 @@ RSpec.describe Dry::Configurable, '.setting' do
       expect(object.config.db).to eql('sqlite')
     end
 
-    it 'can be cloned' do
-      klass.setting :env
+    shared_examples 'copying' do
+      before do
+        klass.setting :env
 
-      klass.setting :db do
-        setting :user, 'root'
-        setting :pass, 'secret'
+        klass.setting :db do
+          setting :user, 'root'
+          setting :pass, 'secret'
+        end
       end
 
-      object.freeze
+      it 'can be copied' do
+        clone = object.clone
 
-      clone = object.clone
+        expect(object.config.env).to be(nil)
+        expect(clone.config.env).to be(nil)
 
-      expect(clone).to be_frozen
+        expect(object.config.db.user).to eql('root')
+        expect(clone.config.db.user).to eql('root')
 
-      expect(object.config.env).to be(nil)
-      expect(clone.config.env).to be(nil)
+        object.config.env = 'production'
+        object.config.db.user = 'jane'
 
-      expect(object.config.db.user).to eql('root')
-      expect(clone.config.db.user).to eql('root')
+        expect(object.config.env).to eql('production')
 
-      object.config.env = 'production'
-      object.config.db.user = 'jane'
+        expect(object.config.db.user).to eql('jane')
+        expect(clone.config.db.user).to eql('root')
 
-      expect(object.config.env).to eql('production')
+        expect(clone.config.db.pass).to be(object.config.db.pass)
+      end
+    end
 
-      expect(object.config.db.user).to eql('jane')
-      expect(clone.config.db.user).to eql('root')
+    include_examples 'copying' do
+      it 'stays frozen when cloning' do
+        expect(object.finalize!.clone).to be_frozen
+      end
 
-      expect(clone.config.db.pass).to be(object.config.db.pass)
+      it 'stays unfrozen when duping' do
+        expect(object.finalize!.dup).to_not be_frozen
+      end
     end
 
     it 'can be configured' do

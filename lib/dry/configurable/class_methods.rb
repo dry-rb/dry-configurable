@@ -19,7 +19,7 @@ module Dry
         klass.instance_variable_set('@_settings', _settings.clone.pristine)
 
         if instance_variable_defined?('@config')
-          klass.instance_variable_set('@config', config.clone)
+          klass.instance_variable_set('@config', config.dup)
         end
       end
 

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'dry/configurable/constants'
 require 'concurrent/map'
 
 module Dry
@@ -14,8 +15,8 @@ module Dry
       attr_reader :elements
 
       # @api private
-      def initialize(settings = [])
-        @elements = settings.each_with_object(Concurrent::Map.new) { |s, m| m[s.name] = s }
+      def initialize(elements = EMPTY_ARRAY)
+        initialize_elements(elements)
       end
 
       # @api private
@@ -54,16 +55,16 @@ module Dry
         self.class.new(map(&:pristine))
       end
 
+      private
+
       # @api private
-      def clone
-        clone = dup
-        clone.freeze if frozen?
-        clone
+      def initialize_copy(source)
+        initialize_elements(source.map(&:dup))
       end
 
       # @api private
-      def dup
-        self.class.new(map(&:clone))
+      def initialize_elements(elements)
+        @elements = elements.each_with_object(Concurrent::Map.new) { |s, m| m[s.name] = s }
       end
     end
   end

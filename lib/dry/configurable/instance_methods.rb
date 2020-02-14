@@ -20,7 +20,7 @@ module Dry
 
       # @api private
       def initialize(*)
-        @config = Config.new(self.class._settings.clone)
+        @config = Config.new(self.class._settings.dup)
         super
       end
 
@@ -35,17 +35,9 @@ module Dry
       end
 
       # @api public
-      def clone
-        clone = dup
-        clone.freeze if frozen?
-        clone
-      end
-
-      # @api public
-      def dup
-        copy = super
-        copy.instance_variable_set('@config', config.clone)
-        copy
+      def initialize_copy(source)
+        super
+        @config = source.config.dup
       end
     end
   end

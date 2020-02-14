@@ -53,15 +53,9 @@ module Dry
       alias_method :to_hash, :to_h
 
       # @api public
-      def clone
-        clone = dup
-        clone.freeze if frozen?
-        clone
-      end
-
-      # @api public
-      def dup
-        self.class.new(settings.dup)
+      def initialize_copy(source)
+        super
+        @settings = source.settings.dup
       end
 
       # @api private
