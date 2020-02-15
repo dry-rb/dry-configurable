@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'concurrent/map'
+
 require 'dry/equalizer'
 
 require 'dry/configurable/constants'
