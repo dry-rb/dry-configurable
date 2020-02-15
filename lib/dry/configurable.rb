@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
-require 'dry/core/constants'
-require 'dry/configurable/settings'
-require 'dry/configurable/error'
-require 'dry/configurable/version'
+require 'concurrent/array'
 
-# A collection of micro-libraries, each intended to encapsulate
-# a common task in Ruby
+require 'dry/configurable/constants'
+require 'dry/configurable/class_methods'
+require 'dry/configurable/instance_methods'
+require 'dry/configurable/config'
+require 'dry/configurable/setting'
+
 module Dry
   # A simple configuration mixin
   #
@@ -42,144 +43,22 @@ module Dry
   #
   # @api public
   module Configurable
-    include Dry::Core::Constants
-
-    module ClassMethods
-      # @private
-      def self.extended(base)
-        base.instance_exec do
-          @settings = Settings.new
-        end
-      end
-
-      # Add a setting to the configuration
-      #
-      # @param [Mixed] key
-      #   The accessor key for the configuration value
-      # @param [Mixed] default
-      #   The default config value
-      #
-      # @yield
-      #   If a block is given, it will be evaluated in the context of
-      #   a new configuration class, and bound as the default value
-      #
-      # @return [Dry::Configurable::Config]
-      #
-      # @api public
-      def setting(key, value = Undefined, options = Undefined, &block)
-        raise_already_defined_config(key) if _settings.config_defined?
-
-        setting = _settings.add(key, value, options, &block)
-
-        if setting.reader?
-          readers = singleton_class < Configurable ? singleton_class : self
-          readers.send(:define_method, setting.name) { config[setting.name] }
-        end
-      end
-
-      # Return an array of setting names
-      #
-      # @return [Set]
-      #
-      # @api public
-      def settings
-        _settings.names
-      end
-
-      # @private no, really...
-      def _settings
-        @settings
-      end
-
-      private
-
-      # @private
-      def raise_already_defined_config(key)
-        raise AlreadyDefinedConfig,
-              "Cannot add setting +#{key}+, #{self} is already configured"
-      end
-
-      # @private
-      def inherited(subclass)
-        parent = self
-        subclass.instance_exec do
-          @settings = parent._settings.dup
-        end
-        super
-      end
-    end
-
-    class << self
-      # @private
-      def extended(base)
-        base.extend(ClassMethods)
-        base.class_eval do
-          @config = _settings.create_config
-        end
-      end
-
-      # @private
-      def included(base)
-        base.extend(ClassMethods)
-      end
-    end
-
-    # @private
-    def initialize(*)
-      @config = self.class._settings.create_config
+    # @api private
+    def self.extended(klass)
       super
+      klass.extend(ClassMethods)
     end
 
-    # Return configuration
-    #
-    # @return [Dry::Configurable::Config]
-    #
-    # @api public
-    def config
-      return @config if defined?(@config) && @config.defined?
+    # @api private
+    def self.included(klass)
+      super
+      klass.class_eval do
+        extend(ClassMethods)
+        include(InstanceMethods)
 
-      @config = _settings.create_config unless defined?(@config)
-      @config.define!
-    end
-
-    # Return configuration
-    #
-    # @yield [Dry::Configuration::Config]
-    #
-    # @return [Dry::Configurable::Config]
-    #
-    # @api public
-    def configure
-      raise FrozenConfig, 'Cannot modify frozen config' if frozen?
-
-      yield(config) if block_given?
-      self
-    end
-
-    # Finalize and freeze configuration
-    #
-    # @return [Dry::Configurable::Config]
-    #
-    # @api public
-    def finalize!
-      freeze
-      config.finalize!
-    end
-
-    # @api public
-    def dup
-      super.tap do |copy|
-        copy.instance_variable_set(:@config, config.dup)
-      end
-    end
-
-    # @api public
-    def clone
-      if frozen?
-        super
-      else
-        super.tap do |copy|
-          copy.instance_variable_set(:@config, config.dup)
+        class << self
+          undef :config
+          undef :configure
         end
       end
     end

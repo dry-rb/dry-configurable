@@ -6,10 +6,11 @@ eval_gemfile 'Gemfile.devtools'
 
 gemspec
 
-group :test do
-  gem 'warning'
+group :benchmarks do
+  gem 'benchmark-ips'
 end
 
 group :tools do
+  gem 'hotch'
   gem 'pry-byebug', platform: :mri
 end

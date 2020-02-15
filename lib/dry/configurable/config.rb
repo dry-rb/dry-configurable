@@ -1,99 +1,29 @@
 # frozen_string_literal: true
 
-require 'concurrent/hash'
+require 'dry/equalizer'
+
+require 'dry/configurable/constants'
+require 'dry/configurable/errors'
 
 module Dry
   module Configurable
-    # @private
+    # Config exposes setting values through a convenient API
+    #
+    # @api public
     class Config
-      class << self
-        # @private
-        def [](settings)
-          ::Class.new(Config) do
-            @settings = settings
-            singleton_class.send(:attr_reader, :settings)
+      include Dry::Equalizer(:values)
 
-            @lock = ::Mutex.new
-            @config_defined = false
-          end
-        end
+      # @api private
+      attr_reader :settings
 
-        # @private
-        def define_accessors!
-          @lock.synchronize do
-            break if config_defined?
+      # @api private
+      attr_reader :resolved
 
-            settings.each do |setting|
-              next if setting.reserved?
-
-              define_method(setting.name) do
-                @config[setting.name]
-              end
-
-              define_method("#{setting.name}=") do |value|
-                raise FrozenConfig, 'Cannot modify frozen config' if frozen?
-
-                @config[setting.name] = setting.processor.(value)
-              end
-            end
-
-            @config_defined = true
-          end
-        end
-
-        # @private
-        def config_defined?
-          @config_defined
-        end
+      # @api private
+      def initialize(settings)
+        @settings = settings.dup
+        @resolved = Concurrent::Map.new
       end
-
-      def initialize
-        @config = ::Concurrent::Hash.new
-        @lock = ::Mutex.new
-        @defined = false
-      end
-
-      def defined?
-        @defined
-      end
-
-      # @private
-      def define!(parent_config = EMPTY_HASH)
-        @lock.synchronize do
-          break if self.defined?
-
-          self.class.define_accessors!
-          set_values!(parent_config)
-
-          @defined = true
-        end
-
-        self
-      end
-
-      # @private
-      def finalize!
-        define!
-        @config.freeze
-        freeze
-      end
-
-      # Serialize config to a Hash
-      #
-      # @return [Hash]
-      #
-      # @api public
-      def to_h
-        @config.each_with_object({}) do |(key, value), hash|
-          case value
-          when Config
-            hash[key] = value.to_h
-          else
-            hash[key] = value
-          end
-        end
-      end
-      alias to_hash to_h
 
       # Get config value by a key
       #
@@ -101,15 +31,9 @@ module Dry
       #
       # @return Config value
       def [](name)
-        setting = self.class.settings[name.to_sym]
+        raise ArgumentError, "+#{name}+ is not a setting name" unless settings.key?(name)
 
-        if setting.nil?
-          raise_unknown_setting_error(name)
-        elsif setting.reserved?
-          @config[setting.name]
-        else
-          public_send(name)
-        end
+        settings[name].value
       end
 
       # Set config value.
@@ -118,70 +42,65 @@ module Dry
       # @param [String,Symbol] name
       # @param [Object] value
       def []=(name, value)
-        setting = self.class.settings[name.to_sym]
-
-        if setting.nil?
-          raise_unknown_setting_error(name)
-        elsif setting.reserved?
-          @config[setting.name] = setting.processor.(value)
-        else
-          public_send("#{name}=", value)
-        end
+        public_send(:"#{name}=", value)
       end
 
-      # Whether config has a key
+      # Dump config into a hash
       #
-      # @param [Symbol] key
-      # @return [Bool]
-      def key?(name)
-        self.class.settings.name?(name)
-      end
-
-      # Recursively update values from a hash
+      # @return [Hash]
       #
-      # @param [Hash] values to set
-      # @return [Config]
-      def update(values)
-        values.each do |key, value|
-          if self[key].is_a?(Config)
-            self[key].update(value)
-          else
-            self[key] = value
-          end
-        end
-        self
+      # @api public
+      def values
+        settings
+          .map { |setting| [setting.name, setting.value] }
+          .map { |key, value| [key, value.is_a?(self.class) ? value.to_h : value] }
+          .to_h
+      end
+      alias_method :to_h, :values
+      alias_method :to_hash, :values
+
+      # @api private
+      def finalize!
+        settings.freeze
+        freeze
       end
 
-      def dup
-        if self.defined?
-          self.class.new.define!(to_h)
-        else
-          self.class.new
-        end
+      # @api private
+      def pristine
+        self.class.new(settings.pristine)
+      end
+
+      # @api private
+      def respond_to_missing?(meth, include_private = false)
+        super || settings.key?(resolve(meth))
       end
 
       private
 
-      # @private
-      def set_values!(parent)
-        self.class.settings.each do |setting|
-          if parent.key?(setting.name) && !setting.node?
-            @config[setting.name] = parent[setting.name]
-          elsif setting.undefined?
-            @config[setting.name] = nil
-          elsif setting.node?
-            value = setting.value.create_config
-            value.define!(parent.fetch(setting.name, EMPTY_HASH))
-            self[setting.name] = value
-          else
-            self[setting.name] = setting.value
-          end
+      # @api private
+      def method_missing(meth, *args)
+        setting = settings[resolve(meth)]
+
+        super unless setting
+
+        if setting.writer?(meth)
+          raise FrozenConfig, 'Cannot modify frozen config' if frozen?
+
+          settings << setting.with(input: args[0])
+        else
+          setting.value
         end
       end
 
-      # @private
-      def raise_unknown_setting_error(name)
-        ::Kernel.raise ArgumentError, "+#{name}+ is not a setting name"
+      # @api private
+      def resolve(meth)
+        resolved.fetch(meth) { resolved[meth] = meth.to_s.tr('=', '').to_sym }
+      end
+
+      # @api private
+      def initialize_copy(source)
+        super
+        @settings = source.settings.dup
       end
     end
   end

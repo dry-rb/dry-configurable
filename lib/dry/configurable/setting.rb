@@ -1,48 +1,118 @@
 # frozen_string_literal: true
 
+require 'set'
+
+require 'dry/equalizer'
+
+require 'dry/configurable/constants'
+require 'dry/configurable/config'
+
 module Dry
   module Configurable
     # This class represents a setting and is used internally.
     #
-    # @private
+    # @api private
     class Setting
-      VALID_NAME = /\A[a-z_]\w*\z/i
+      include Dry::Equalizer(:name, :value, :options)
 
+      OPTIONS = %i[input default reader constructor settings].freeze
+
+      DEFAULT_CONSTRUCTOR = -> v { v }.freeze
+
+      CLONABLE_VALUE_TYPES = [Array, Hash, Set, Config].freeze
+
+      # @api private
       attr_reader :name
 
+      # @api private
+      attr_reader :writer_name
+
+      # @api private
+      attr_reader :input
+
+      # @api private
+      attr_reader :default
+
+      # @api private
+      attr_reader :value
+
+      # @api private
       attr_reader :options
 
-      attr_reader :processor
+      # Specialized Setting which includes nested settings
+      #
+      # @api private
+      class Nested < Setting
+        CONSTRUCTOR = Config.method(:new)
 
-      def initialize(name, value, processor, options = EMPTY_HASH)
-        unless VALID_NAME =~ name.to_s
-          raise ArgumentError, "+#{name}+ is not a valid setting name"
+        # @api private
+        def pristine
+          with(input: input.pristine)
         end
 
-        @name = name.to_sym
-        @value = value
-        @processor = processor
+        # @api private
+        def constructor
+          CONSTRUCTOR
+        end
+      end
+
+      # @api private
+      def initialize(name, input: Undefined, default: Undefined, **options)
+        @name = name
+        @writer_name = :"#{name}="
+        @input = input.equal?(Undefined) ? default : input
+        @default = default
         @options = options
+        set!
       end
 
-      def value
-        Undefined.default(@value, nil)
+      # @api private
+      def nested(settings)
+        Nested.new(name, input: settings, **options)
       end
 
-      def undefined?
-        Undefined.equal?(@value)
+      # @api private
+      def pristine
+        with(input: Undefined)
       end
 
+      # @api private
+      def with(new_opts)
+        self.class.new(name, input: input, default: default, **options, **new_opts)
+      end
+
+      # @api private
+      def constructor
+        options[:constructor] || DEFAULT_CONSTRUCTOR
+      end
+
+      # @api private
       def reader?
-        options[:reader]
+        options[:reader].equal?(true)
       end
 
-      def node?
-        Settings === @value
+      # @api private
+      def writer?(meth)
+        writer_name.equal?(meth)
       end
 
-      def reserved?
-        options[:reserved]
+      # @api private
+      def clonable_value?
+        CLONABLE_VALUE_TYPES.any? { |type| value.is_a?(type) }
+      end
+
+      private
+
+      # @api private
+      def initialize_copy(source)
+        super
+        @value = source.value.dup if source.clonable_value?
+        @options = source.options.dup
+      end
+
+      # @api private
+      def set!
+        @value = constructor[input.equal?(Undefined) ? nil : input]
       end
     end
   end
