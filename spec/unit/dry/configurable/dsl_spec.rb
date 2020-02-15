@@ -59,7 +59,7 @@ RSpec.describe Dry::Configurable::DSL do
       end
 
     expect(setting.name).to be(:db)
-    expect(setting.config.cred.user).to be(nil)
-    expect(setting.config.cred.pass).to be(nil)
+    expect(setting.value.cred.user).to be(nil)
+    expect(setting.value.cred.pass).to be(nil)
   end
 end
