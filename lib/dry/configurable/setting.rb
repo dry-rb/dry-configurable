@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'set'
+
 require 'dry/equalizer'
 
 require 'dry/configurable/constants'
@@ -16,6 +18,8 @@ module Dry
       OPTIONS = %i[input default reader constructor settings].freeze
 
       DEFAULT_CONSTRUCTOR = -> v { v }.freeze
+
+      CLONABLE_VALUE_TYPES = [Array, Hash, Set, Config].freeze
 
       # @api private
       attr_reader :name
@@ -95,12 +99,17 @@ module Dry
         writer_name.equal?(meth)
       end
 
+      # @api private
+      def clonable_value?
+        CLONABLE_VALUE_TYPES.any? { |type| value.is_a?(type) }
+      end
+
       private
 
       # @api private
       def initialize_copy(source)
         super
-        @value = source.value.dup
+        @value = source.value.dup if source.clonable_value?
         @options = source.options.dup
       end
 

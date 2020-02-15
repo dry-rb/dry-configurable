@@ -64,7 +64,7 @@ RSpec.describe Dry::Configurable::Setting do
 
   shared_context 'copying' do
     let(:options) do
-      { input: [1, 2, 3] }
+      { input: 'hello' }
     end
 
     before do
@@ -75,14 +75,30 @@ RSpec.describe Dry::Configurable::Setting do
       expect(copy.name).to be(setting.name)
     end
 
-    it 'maintains a copy of the value' do
-      expect(copy.value).to eql(setting.value)
-      expect(copy.value).to_not be(setting.value)
-    end
-
     it 'maintains a copy of the options' do
       expect(copy.options).to eql(setting.options)
       expect(copy.options).to_not be(setting.options)
+    end
+
+    context 'with a clonable value' do
+      let(:options) do
+        { input: [1, 2, 3] }
+      end
+
+      it 'maintains a copy of the value' do
+        expect(copy.value).to eql(setting.value)
+        expect(copy.value).to_not be(setting.value)
+      end
+    end
+
+    context 'with a non-clonable value' do
+      let(:options) do
+        { input: :hello }
+      end
+
+      it 'maintains the original value' do
+        expect(copy.value).to be(setting.value)
+      end
     end
   end
 
