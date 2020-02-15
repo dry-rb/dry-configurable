@@ -38,7 +38,7 @@ module Dry
       # @api private
       def visit_nested(node)
         parent, children = node
-        visit(parent).nested(Compiler.new.(children))
+        visit(parent).nested(call(children))
       end
     end
   end
