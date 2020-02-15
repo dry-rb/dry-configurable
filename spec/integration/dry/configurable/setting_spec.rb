@@ -56,12 +56,13 @@ RSpec.describe Dry::Configurable, '.setting' do
           expect(object.config.db_config).to eql(user: 'root', password: '')
         end
 
-        it 'maintains the original hash object' do
+        it 'copies the original hash object' do
           hash = { user: 'root', password: '' }
 
           klass.setting :db_config, hash
 
-          expect(object.config.db_config).to be(hash)
+          expect(object.config.db_config).to_not be(hash)
+          expect(object.config.db_config).to eql(hash)
         end
       end
     end
@@ -106,7 +107,7 @@ RSpec.describe Dry::Configurable, '.setting' do
       it 'pre-processes the value with undefined default' do
         klass.setting(:path) { |value| "test:#{value || "fallback"}" }
 
-        expect(object.config.path).to be(nil)
+        expect(object.config.path).to eql('test:fallback')
       end
 
       it 'pre-processes the value with non-nil default' do
@@ -315,7 +316,7 @@ RSpec.describe Dry::Configurable, '.setting' do
         expect(object.config.db.user).to eql('jane')
         expect(clone.config.db.user).to eql('root')
 
-        expect(clone.config.db.pass).to be(object.config.db.pass)
+        expect(clone.config.db.pass).to eql(object.config.db.pass)
       end
     end
 
@@ -373,6 +374,7 @@ RSpec.describe Dry::Configurable, '.setting' do
           object.config.pool.size = 5
 
           object.reset_config
+
           expect(object.config.dsn).to be_nil
           expect(object.config.pool.size).to be_nil
         end

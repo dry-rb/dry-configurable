@@ -11,9 +11,9 @@ module Dry
     #
     # @api private
     class Setting
-      include Dry::Equalizer(:name, :options)
+      include Dry::Equalizer(:name, :value, :options)
 
-      OPTIONS = %i[value default reader constructor settings].freeze
+      OPTIONS = %i[input default reader constructor settings].freeze
 
       DEFAULT_CONSTRUCTOR = -> v { v }.freeze
 
@@ -24,16 +24,16 @@ module Dry
       attr_reader :writer_name
 
       # @api private
+      attr_reader :input
+
+      # @api private
       attr_reader :default
 
       # @api private
-      attr_reader :options
+      attr_reader :value
 
       # @api private
-      def self.[](name, **options)
-        type = options.key?(:settings) ? Nested : Setting
-        type.new(name, options)
-      end
+      attr_reader :options
 
       # Specialized Setting which includes nested settings
       #
@@ -41,32 +41,28 @@ module Dry
       class Nested < Setting
         # @api private
         def pristine
-          with(value: default, settings: settings.pristine)
+          with(input: input.pristine)
         end
 
         # @api private
-        def settings
-          options[:settings]
-        end
-
-        # @api private
-        def config
-          @config ||= Config.new(options[:settings])
-        end
-        alias_method :value, :config
-
-        # @api private
-        def dup
-          with(options.merge(settings: settings.dup))
+        def constructor
+          Config.method(:new)
         end
       end
 
       # @api private
-      def initialize(name, **options)
+      def initialize(name, input: Undefined, default: Undefined, **options)
         @name = name
         @writer_name = :"#{name}="
-        @default = options[:default]
+        @input = input.equal?(Undefined) ? default : input
+        @default = default
         @options = options
+        set!
+      end
+
+      # @api private
+      def nested(settings)
+        Nested.new(name, input: settings, **options)
       end
 
       # @api private
@@ -75,30 +71,13 @@ module Dry
       end
 
       # @api private
-      def value
-        @value ||= undefined? ? nil : constructor[options[:value]]
-      end
-
-      # @api private
       def pristine
-        with(value: default)
-      end
-
-      # @api private
-      def clone
-        clone = dup
-        clone.freeze if frozen?
-        clone
-      end
-
-      # @api private
-      def dup
-        with(options.dup)
+        with(input: Undefined)
       end
 
       # @api private
       def with(new_opts)
-        Setting[name, options.merge(new_opts)]
+        self.class.new(name, input: input, default: default, **options, **new_opts)
       end
 
       # @api private
@@ -116,9 +95,18 @@ module Dry
         writer_name.equal?(meth)
       end
 
+      private
+
       # @api private
-      def undefined?
-        options[:value].equal?(Undefined)
+      def initialize_copy(source)
+        super
+        @value = source.value.dup
+        @options = source.options.dup
+      end
+
+      # @api private
+      def set!
+        @value = constructor[input.equal?(Undefined) ? nil : input]
       end
     end
   end

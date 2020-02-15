@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'dry/equalizer'
+
 require 'dry/configurable/constants'
 require 'dry/configurable/errors'
 
@@ -9,6 +11,8 @@ module Dry
     #
     # @api public
     class Config
+      include Dry::Equalizer(:values)
+
       # @api private
       attr_reader :settings
 
@@ -17,9 +21,8 @@ module Dry
 
       # @api private
       def initialize(settings)
-        @settings = settings
+        @settings = settings.dup
         @resolved = Concurrent::Map.new
-        @values = nil
       end
 
       # Get config value by a key
@@ -28,9 +31,9 @@ module Dry
       #
       # @return Config value
       def [](name)
-        values.fetch(name)
-      rescue KeyError
-        raise ArgumentError, "+#{name}+ is not a setting name"
+        raise ArgumentError, "+#{name}+ is not a setting name" unless settings.key?(name)
+
+        settings[name].value
       end
 
       # Set config value.
@@ -47,25 +50,18 @@ module Dry
       # @return [Hash]
       #
       # @api public
-      def to_h
-        values.map { |key, value| [key, value.is_a?(self.class) ? value.to_h : value] }.to_h
-      end
-      alias_method :to_hash, :to_h
-
-      # @api public
-      def initialize_copy(source)
-        super
-        @settings = source.settings.dup
-      end
-
-      # @api private
       def values
-        @values || settings.map(&:to_h).reduce(:merge) || EMPTY_HASH
+        settings
+          .map { |setting| [setting.name, setting.value] }
+          .map { |key, value| [key, value.is_a?(self.class) ? value.to_h : value] }
+          .to_h
       end
+      alias_method :to_h, :values
+      alias_method :to_hash, :values
 
       # @api private
       def finalize!
-        @values = values.freeze
+        settings.freeze
         freeze
       end
 
@@ -90,9 +86,7 @@ module Dry
         if setting.writer?(meth)
           raise FrozenConfig, 'Cannot modify frozen config' if frozen?
 
-          settings << setting.with(value: args[0])
-
-          self
+          settings << setting.with(input: args[0])
         else
           setting.value
         end
@@ -101,6 +95,12 @@ module Dry
       # @api private
       def resolve(meth)
         resolved.fetch(meth) { resolved[meth] = meth.to_s.tr('=', '').to_sym }
+      end
+
+      # @api private
+      def initialize_copy(source)
+        super
+        @settings = source.settings.dup
       end
     end
   end

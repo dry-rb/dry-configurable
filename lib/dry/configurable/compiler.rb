@@ -31,14 +31,14 @@ module Dry
 
       # @api private
       def visit_setting(node)
-        name, value, opts = node
-        Setting[name, **opts, value: value, default: value]
+        name, default, opts = node
+        Setting.new(name, **opts, default: default)
       end
 
       # @api private
       def visit_nested(node)
         parent, children = node
-        visit(parent).with(settings: Compiler.new.(children))
+        visit(parent).nested(Compiler.new.(children))
       end
     end
   end

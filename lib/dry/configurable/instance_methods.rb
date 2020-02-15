@@ -34,6 +34,8 @@ module Dry
         freeze
       end
 
+      private
+
       # @api public
       def initialize_copy(source)
         super

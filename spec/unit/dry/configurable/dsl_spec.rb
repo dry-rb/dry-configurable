@@ -9,7 +9,6 @@ RSpec.describe Dry::Configurable::DSL do
     setting = dsl.setting :user
 
     expect(setting.name).to be(:user)
-    expect(setting).to be_undefined
     expect(setting.value).to be(nil)
   end
 
@@ -18,7 +17,6 @@ RSpec.describe Dry::Configurable::DSL do
 
     expect(setting.name).to be(:user)
     expect(setting.value).to eql('root')
-    expect(setting).to_not be_undefined
   end
 
   it 'compiles a setting with a reader set' do

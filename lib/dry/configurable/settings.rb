@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
-require 'dry/configurable/constants'
 require 'concurrent/map'
+
+require 'dry/equalizer'
+require 'dry/configurable/constants'
 
 module Dry
   module Configurable
@@ -9,6 +11,8 @@ module Dry
     #
     # @api private
     class Settings
+      include Dry::Equalizer(:elements)
+
       include Enumerable
 
       # @api private
@@ -64,7 +68,9 @@ module Dry
 
       # @api private
       def initialize_elements(elements)
-        @elements = elements.each_with_object(Concurrent::Map.new) { |s, m| m[s.name] = s }
+        @elements = elements.each_with_object(Concurrent::Map.new) { |s, m|
+          m[s.name] = s
+        }
       end
     end
   end
