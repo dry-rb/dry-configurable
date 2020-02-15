@@ -1,3 +1,15 @@
+## unreleased 
+
+Complete rewrite of the library while keeping the public API intact. See #78 for a detailed overview.
+
+### Changed
+
+- Accessing config in a parent class no longer prevents you from adding more settings in a child class (@solnic)
+- (internal) New low-level Setting and Config API (@solnic)
+- (internal) `config` objects use method_missing now (@solnic)
+
+[Compare v0.10.0...master](https://github.com/dry-rb/dry-configurable/compare/v0.10.0...master)
+
 ## 0.10.0 2020-01-31
 
 YANKED because the change also broke inheritance for classes that used `configured` before other classes inherited from them.
