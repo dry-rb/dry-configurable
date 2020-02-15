@@ -35,22 +35,58 @@ RSpec.describe Dry::Configurable::Config do
   end
 
   describe '#dup' do
-    it 'returns a deep-copy' do
-      klass.setting :db do
-        setting :user, 'root'
-        setting :pass, 'secret'
-        setting :ports, Set[123], &:dup
+    context 'with a class' do
+      it 'returns a deep-copy' do
+        klass = Class.new do
+          include Dry::Configurable
+
+          setting :db do
+            setting :user, 'root'
+            setting :pass, 'secret'
+            setting :ports, Set[123]
+          end
+        end
+
+        parent = Class.new(klass).new
+        parent.config.db.ports << 312
+
+        expect(parent.config.db.ports).to eql(Set[123, 312])
+        expect(parent.config.dup.db.ports).to eql(Set[123, 312])
+
+        child = Class.new(parent.class).new
+        child.config.db.ports << 476
+
+        expect(child.config.db.ports).to eql(Set[123, 476])
+        expect(child.config.dup.db.ports).to eql(Set[123, 476])
+
+        expect(klass.new.config.db.ports).to eql(Set[123])
       end
+    end
 
-      subclass = Class.new(klass) do
-        config.db.ports << 312
+    context 'with an object' do
+      it 'returns a deep-copy' do
+        klass.setting :db do
+          setting :user, 'root'
+          setting :pass, 'secret'
+          setting :ports, Set[123]
+        end
+
+        parent = Class.new(klass) do
+          config.db.ports << 312
+        end
+
+        child = Class.new(parent) do
+          config.db.ports << 476
+        end
+
+        expect(klass.config.db.ports).to eql(Set[123])
+
+        expect(parent.config.db.ports).to eql(Set[123, 312])
+        expect(child.config.db.ports).to eql(Set[123, 312, 476])
+
+        expect(parent.config.dup.db.ports).to eql(Set[123, 312])
+        expect(child.config.dup.db.ports).to eql(Set[123, 312, 476])
       end
-
-      expect(klass.config.db.ports).to eql(Set[123])
-
-      expect(subclass.config.db.ports).to eql(Set[123, 312])
-
-      expect(subclass.config.dup.db.ports).to eql(Set[123, 312])
     end
   end
 

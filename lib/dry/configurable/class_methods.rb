@@ -16,11 +16,9 @@ module Dry
       def inherited(klass)
         super
 
-        klass.instance_variable_set('@_settings', _settings.dup)
+        parent_settings = (respond_to?(:config) ? config.settings : _settings)
 
-        if instance_variable_defined?('@config')
-          klass.instance_variable_set('@config', config.dup)
-        end
+        klass.instance_variable_set('@_settings', parent_settings)
       end
 
       # Add a setting to the configuration
