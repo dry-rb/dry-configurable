@@ -1,4 +1,4 @@
-## unreleased 
+## 0.11.0 2020-02-15
 
 Complete rewrite of the library while keeping the public API intact. See #78 for a detailed overview.
 
@@ -8,7 +8,7 @@ Complete rewrite of the library while keeping the public API intact. See #78 for
 - (internal) New low-level Setting and Config API (@solnic)
 - (internal) `config` objects use method_missing now (@solnic)
 
-[Compare v0.10.0...master](https://github.com/dry-rb/dry-configurable/compare/v0.10.0...master)
+[Compare v0.10.0...v0.11.0](https://github.com/dry-rb/dry-configurable/compare/v0.10.0...v0.11.0)
 
 ## 0.10.0 2020-01-31
 
