@@ -43,6 +43,8 @@ module Dry
       #
       # @api private
       class Nested < Setting
+        CONSTRUCTOR = Config.method(:new)
+
         # @api private
         def pristine
           with(input: input.pristine)
@@ -50,7 +52,7 @@ module Dry
 
         # @api private
         def constructor
-          Config.method(:new)
+          CONSTRUCTOR
         end
       end
 
