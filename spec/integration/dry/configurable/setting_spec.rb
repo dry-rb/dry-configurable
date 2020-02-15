@@ -350,7 +350,7 @@ RSpec.describe Dry::Configurable, '.setting' do
       expect(object).to be_frozen
 
       # does not allow configure block anymore
-      expect { object.configure { } }.to raise_error(Dry::Configurable::FrozenConfig)
+      expect { object.configure {} }.to raise_error(Dry::Configurable::FrozenConfig)
     end
 
     it 'defines a reader shortcut for nested config' do
