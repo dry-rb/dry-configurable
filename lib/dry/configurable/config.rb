@@ -47,6 +47,24 @@ module Dry
         public_send(:"#{name}=", value)
       end
 
+      # Update config with new values
+      #
+      # @param [Hash] A hash with new values
+      #
+      # @return [Config]
+      #
+      # @api public
+      def update(values)
+        values.each do |key, value|
+          case value
+          when Hash
+            self[key].update(value)
+          else
+            self[key] = value
+          end
+        end
+      end
+
       # Dump config into a hash
       #
       # @return [Hash]

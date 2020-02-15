@@ -14,6 +14,28 @@ RSpec.describe Dry::Configurable::Config do
     end
   end
 
+  describe '#update' do
+    it 'sets new config values in a flat config' do
+      klass.setting :db
+
+      klass.config.update(db: 'sqlite')
+
+      expect(klass.config.db).to eql('sqlite')
+    end
+
+    it 'sets new config values in a nested config' do
+      klass.setting :db do
+        setting :user, 'root'
+        setting :pass, 'secret'
+      end
+
+      klass.config.update(db: { user: 'jane', pass: 'supersecret' })
+
+      expect(klass.config.db.user).to eql('jane')
+      expect(klass.config.db.pass).to eql('supersecret')
+    end
+  end
+
   describe '#to_h' do
     before do
       klass.setting :db do
