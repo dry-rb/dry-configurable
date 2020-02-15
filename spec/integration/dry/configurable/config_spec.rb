@@ -24,7 +24,9 @@ RSpec.describe Dry::Configurable::Config do
     end
 
     it 'dumps itself into a hash' do
-      expect(Hash(klass.config)).to eql(db: { user: 'root', pass: 'secret', ports: Set[123, 321] })
+      expect(Hash(klass.config)).to eql(
+        db: { user: 'root', pass: 'secret', ports: Set[123, 321] }
+      )
     end
 
     it 'is used for equality' do
