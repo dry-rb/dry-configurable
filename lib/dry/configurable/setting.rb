@@ -70,11 +70,6 @@ module Dry
       end
 
       # @api private
-      def to_h
-        { name => value }
-      end
-
-      # @api private
       def pristine
         with(input: Undefined)
       end
