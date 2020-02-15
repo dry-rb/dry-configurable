@@ -13,10 +13,6 @@ RSpec.describe Dry::Configurable, '.configure' do
     it 'sets the values' do
       expect(object.config.db).to eql('postgresql')
     end
-
-    it 'finalizes config' do
-      expect(object.config).to be_frozen
-    end
   end
 
   context 'when extended' do

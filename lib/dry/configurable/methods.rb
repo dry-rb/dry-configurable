@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'dry/configurable/errors'
+
 module Dry
   module Configurable
     # Common API for both classes and instances
@@ -8,8 +10,9 @@ module Dry
     module Methods
       # @api public
       def configure(&block)
+        raise FrozenConfig, 'Cannot modify frozen config' if frozen?
+
         yield(config) if block
-        config.finalize!
         self
       end
 

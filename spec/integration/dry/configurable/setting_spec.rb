@@ -337,7 +337,6 @@ RSpec.describe Dry::Configurable, '.setting' do
         config.db = 'mariadb'
       end
 
-      expect(object.config).to be_frozen
       expect(object.config.db).to eql('mariadb')
     end
 
@@ -349,6 +348,9 @@ RSpec.describe Dry::Configurable, '.setting' do
       object.finalize!
 
       expect(object).to be_frozen
+
+      # does not allow configure block anymore
+      expect { object.configure { } }.to raise_error(Dry::Configurable::FrozenConfig)
     end
 
     it 'defines a reader shortcut for nested config' do
