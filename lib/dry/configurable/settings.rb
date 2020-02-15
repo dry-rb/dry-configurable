@@ -35,11 +35,6 @@ module Dry
       end
 
       # @api private
-      def []=(name, element)
-        elements[name] = element
-      end
-
-      # @api private
       def key?(name)
         keys.include?(name)
       end
