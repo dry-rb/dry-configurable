@@ -5,7 +5,7 @@
   changed:
     - 'Accessing config in a parent class no longer prevents you from adding more settings in a child class (@solnic)'
     - '(internal) New low-level Setting and Config API (@solnic)'
-    - `(internal) `config` objects use method_missing now (@solnic)`
+    - '(internal) `config` objects use method_missing now (@solnic)'
 - version: 0.10.0
   summary: 'YANKED because the change also broke inheritance for classes that used `configured` before other classes inherited from them.'
   date: '2020-01-31'
