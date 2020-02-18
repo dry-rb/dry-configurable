@@ -141,6 +141,16 @@ RSpec.describe Dry::Configurable, '.setting' do
       end
     end
 
+    context 'with :settings as a setting name' do
+      before do
+        klass.setting :settings, true
+      end
+
+      it 'works' do
+        expect(object.config.settings).to be(true)
+      end
+    end
+
     it 'rejects invalid names' do
       %i(foo? bar! d'oh 7 {} - ==).each do |name|
         expect { klass.setting name }.to raise_error(ArgumentError, /not a valid/)
