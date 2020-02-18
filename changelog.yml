@@ -1,13 +1,13 @@
 ---
-- version: unreleased
-  summary: 
-  date: 
+- version: 0.11.1
+  summary:
+  date: '2020-02-18'
   fixed:
   - 'You can use `:settings` as a config key again (issue #80) (@solnic)'
   - Setting value is lazy-evaluated now, which fixes some cases where a constructor
     could crash with a `nil` value (@solnic)
-  added: 
-  changed: 
+  added:
+  changed:
 - version: 0.11.0
   date: '2020-02-15'
   summary: 'Complete rewrite of the library while keeping the public API intact. See
@@ -21,8 +21,8 @@
   summary: YANKED because the change also broke inheritance for classes that used
     `configured` before other classes inherited from them.
   date: '2020-01-31'
-  fixed: 
-  added: 
+  fixed:
+  added:
   changed:
   - Inheriting settings no longer defines the config object. This change fixed a use
     case where parent class that already used its config would prevent a child class
