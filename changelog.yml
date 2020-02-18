@@ -4,6 +4,8 @@
   date: 
   fixed:
   - 'You can use `:settings` as a config key again (issue #80) (@solnic)'
+  - Setting value is lazy-evaluated now, which fixes some cases where a constructor
+    could crash with a `nil` value (@solnic)
   added: 
   changed: 
 - version: 0.11.0
