@@ -1,4 +1,4 @@
-## unreleased 
+## 0.11.1 2020-02-18
 
 
 ### Fixed
@@ -7,7 +7,7 @@
 - Setting value is lazy-evaluated now, which fixes some cases where a constructor could crash with a `nil` value (@solnic)
 
 
-[Compare v0.11.0...master](https://github.com/dry-rb/dry-configurable/compare/v0.11.0...master)
+[Compare v0.11.0...v0.11.1](https://github.com/dry-rb/dry-configurable/compare/v0.11.0...v0.11.1)
 
 ## 0.11.0 2020-02-15
 
