@@ -1,3 +1,13 @@
+## unreleased 
+
+
+### Fixed
+
+- You can use `:settings` as a config key again (issue #80) (@solnic)
+
+
+[Compare v0.11.0...master](https://github.com/dry-rb/dry-configurable/compare/v0.11.0...master)
+
 ## 0.11.0 2020-02-15
 
 Complete rewrite of the library while keeping the public API intact. See #78 for a detailed overview.
