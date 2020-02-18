@@ -63,7 +63,11 @@ module Dry
         @input = input.equal?(Undefined) ? default : input
         @default = default
         @options = options
-        set!
+      end
+
+      # @api private
+      def value
+        @value ||= evaluate
       end
 
       # @api private
@@ -111,7 +115,7 @@ module Dry
       end
 
       # @api private
-      def set!
+      def evaluate
         @value = constructor[input.equal?(Undefined) ? nil : input]
       end
     end

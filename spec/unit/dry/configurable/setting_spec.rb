@@ -21,11 +21,11 @@ RSpec.describe Dry::Configurable::Setting do
 
     context 'with no default and a constructor' do
       let(:options) do
-        { constructor: -> value { value.to_s } }
+        { constructor: -> value { value + 1 } }
       end
 
       it 'returns constructed value' do
-        expect(setting.value).to eql('')
+        expect(setting.with(input: 1).value).to eql(2)
       end
     end
 
