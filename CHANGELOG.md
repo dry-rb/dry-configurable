@@ -4,6 +4,7 @@
 ### Fixed
 
 - You can use `:settings` as a config key again (issue #80) (@solnic)
+- Setting value is lazy-evaluated now, which fixes some cases where a constructor could crash with a `nil` value (@solnic)
 
 
 [Compare v0.11.0...master](https://github.com/dry-rb/dry-configurable/compare/v0.11.0...master)
