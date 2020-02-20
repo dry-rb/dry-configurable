@@ -34,9 +34,6 @@ module Dry
       attr_reader :default
 
       # @api private
-      attr_reader :value
-
-      # @api private
       attr_reader :options
 
       # Specialized Setting which includes nested settings
