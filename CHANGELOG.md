@@ -1,3 +1,13 @@
+## 0.11.2 2020-02-20
+
+
+### Fixed
+
+- Warning about redefined `Setting#value` is gone (@solnic)
+
+
+[Compare v0.11.1...v0.11.2](https://github.com/dry-rb/dry-configurable/compare/v0.11.1...v0.11.2)
+
 ## 0.11.1 2020-02-18
 
 
