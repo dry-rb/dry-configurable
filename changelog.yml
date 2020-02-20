@@ -1,4 +1,9 @@
 ---
+- version: 0.11.2
+  summary:
+  date: '2020-02-20'
+  fixed:
+  - 'Warning about redefined `Setting#value` is gone (@solnic)'
 - version: 0.11.1
   summary:
   date: '2020-02-18'
