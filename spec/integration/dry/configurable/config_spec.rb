@@ -113,6 +113,12 @@ RSpec.describe Dry::Configurable::Config do
   end
 
   describe '#[]' do
+    it 'coerces name from string' do
+      klass.setting :db, :sqlite
+
+      expect(klass.config['db']).to eql(:sqlite)
+    end
+
     it 'raises ArgumentError when name is not valid' do
       expect { klass.config[:hello] }.to raise_error(ArgumentError, /hello/)
     end
