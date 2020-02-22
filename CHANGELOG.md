@@ -1,4 +1,4 @@
-## 0.11.3 
+## 0.11.3 2020-02-22
 
 
 ### Fixed
@@ -6,7 +6,7 @@
 - Retrieving settings by a string name works again (issue #82) (@waiting-for-dev)
 
 
-[Compare v0.11.2...master](https://github.com/dry-rb/dry-configurable/compare/v0.11.2...master)
+[Compare v0.11.2...v0.11.3](https://github.com/dry-rb/dry-configurable/compare/v0.11.2...v0.11.3)
 
 ## 0.11.2 2020-02-20
 
