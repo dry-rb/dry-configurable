@@ -1,7 +1,7 @@
 ---
 - version: 0.11.3
   summary: 
-  date: 
+  date: '2020-02-22'
   fixed:
   - 'Retrieving settings by a string name works again (issue #82) (@waiting-for-dev)'
   added: 
