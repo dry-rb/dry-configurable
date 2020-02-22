@@ -43,7 +43,7 @@ module Dry
 
         default, opts = args
 
-        node = [:setting, [name, default, opts == default ? EMPTY_HASH : opts]]
+        node = [:setting, [name.to_sym, default, opts == default ? EMPTY_HASH : opts]]
 
         if block
           if block.arity.zero?

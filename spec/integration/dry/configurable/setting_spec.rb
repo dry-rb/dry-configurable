@@ -38,6 +38,12 @@ RSpec.describe Dry::Configurable, '.setting' do
       )
     end
 
+    it 'stores setting name as symbol' do
+      klass.setting 'db', 'sqlite'
+
+      expect(object.config.values.keys).to include(:db)
+    end
+
     context 'with a default value' do
       context 'string' do
         before do

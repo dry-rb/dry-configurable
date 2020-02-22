@@ -33,6 +33,7 @@ module Dry
       #
       # @return Config value
       def [](name)
+        name = name.to_sym
         raise ArgumentError, "+#{name}+ is not a setting name" unless _settings.key?(name)
 
         _settings[name].value
