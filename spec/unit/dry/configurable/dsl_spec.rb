@@ -49,6 +49,14 @@ RSpec.describe Dry::Configurable::DSL do
     expect(setting.value).to eql('jdbc:sqlite')
   end
 
+  it 'compiles a setting with a constructor and no default value' do
+    setting = dsl.setting(:name) { |value| value.upcase }
+
+    expect(setting.name).to be(:name)
+    # What should we expect for setting.value?
+    expect(setting.value).to eql('jdbc:')
+  end
+
   it 'compiles a nested list of settings' do
     setting =
       dsl.setting(:db) do
