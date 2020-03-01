@@ -13,7 +13,7 @@ module Dry
     #
     # @api private
     class Setting
-      include Dry::Equalizer(:name, :value, :options)
+      include Dry::Equalizer(:name, :value, :options, inspect: false)
 
       OPTIONS = %i[input default reader constructor settings].freeze
 
