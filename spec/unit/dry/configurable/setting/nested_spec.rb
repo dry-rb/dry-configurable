@@ -5,7 +5,7 @@ require 'dry/configurable/settings'
 
 RSpec.describe Dry::Configurable::Setting::Nested do
   subject(:setting) do
-    Dry::Configurable::Setting::Nested.new(:db, options)
+    Dry::Configurable::Setting::Nested.new(:db, **options)
   end
 
   shared_context 'copying' do

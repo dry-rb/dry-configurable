@@ -5,7 +5,7 @@ require 'set'
 
 RSpec.describe Dry::Configurable::Setting do
   subject(:setting) do
-    Dry::Configurable::Setting.new(:test, options)
+    Dry::Configurable::Setting.new(:test, **options)
   end
 
   describe '#value' do
