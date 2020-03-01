@@ -25,8 +25,8 @@ RSpec.describe Dry::Configurable::Config do
 
     it 'sets new config values in a nested config' do
       klass.setting :db do
-        setting :user, 'root'
-        setting :pass, 'secret'
+        setting :user, default: 'root'
+        setting :pass, default: 'secret'
       end
 
       klass.config.update(db: { user: 'jane', pass: 'supersecret' })
@@ -39,9 +39,9 @@ RSpec.describe Dry::Configurable::Config do
   describe '#to_h' do
     before do
       klass.setting :db do
-        setting :user, 'root'
-        setting :pass, 'secret'
-        setting :ports, Set[123, 321]
+        setting :user, default: 'root'
+        setting :pass, default: 'secret'
+        setting :ports, default:  Set[123, 321]
       end
     end
 
@@ -63,9 +63,9 @@ RSpec.describe Dry::Configurable::Config do
           include Dry::Configurable
 
           setting :db do
-            setting :user, 'root'
-            setting :pass, 'secret'
-            setting :ports, Set[123]
+            setting :user, default: 'root'
+            setting :pass, default: 'secret'
+            setting :ports, default: Set[123]
           end
         end
 
@@ -88,9 +88,9 @@ RSpec.describe Dry::Configurable::Config do
     context 'with an object' do
       it 'returns a deep-copy' do
         klass.setting :db do
-          setting :user, 'root'
-          setting :pass, 'secret'
-          setting :ports, Set[123]
+          setting :user, default: 'root'
+          setting :pass, default: 'secret'
+          setting :ports, default: Set[123]
         end
 
         parent = Class.new(klass) do
@@ -114,7 +114,7 @@ RSpec.describe Dry::Configurable::Config do
 
   describe '#[]' do
     it 'coerces name from string' do
-      klass.setting :db, :sqlite
+      klass.setting :db, default: :sqlite
 
       expect(klass.config['db']).to eql(:sqlite)
     end

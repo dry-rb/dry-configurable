@@ -4,7 +4,7 @@ require 'dry/configurable/constants'
 require 'dry/configurable/setting'
 require 'dry/configurable/settings'
 require 'dry/configurable/compiler'
-require 'dry/configurable/dsl/args'
+require 'dry/core/deprecations'
 
 module Dry
   module Configurable
@@ -32,30 +32,51 @@ module Dry
       # @see ClassMethods.setting
       # @api public
       # @return Setting
-      def setting(name, *args, &block)
+      def setting(name, default = Undefined, **options, &block)
         unless VALID_NAME.match?(name.to_s)
           raise ArgumentError, "#{name} is not a valid setting name"
         end
 
-        args = Args.new(args)
+        if default != Undefined
+          Dry::Core::Deprecations.announce(
+            'default value as positional argument to settings',
+            'Provide a `default:` keyword argument instead',
+            tag: 'dry-configurable'
+          )
+          options = options.merge(default: default)
+        end
 
-        args.ensure_valid_options
+        if block && !block.arity.zero?
+          Dry::Core::Deprecations.announce(
+            'constructor as block argument to settings',
+            'Provide Proc, Lambda, or callable object as a `constructor:` keyword argument instead',
+            tag: 'dry-configurable'
+          )
+          options = options.merge(constructor: block)
+          block = nil
+        end
 
-        default, opts = args
+        ensure_valid_options options
 
-        node = [:setting, [name.to_sym, default, opts == default ? EMPTY_HASH : opts]]
+        node = [:setting, [name.to_sym, options]]
 
         if block
-          if block.arity.zero?
-            ast << [:nested, [node, DSL.new(&block).ast]]
-          else
-            ast << [:constructor, [node, block]]
-          end
+          ast << [:nested, [node, DSL.new(&block).ast]]
         else
           ast << node
         end
 
         compiler.visit(ast.last)
+      end
+
+      private
+
+      # @api private
+      def ensure_valid_options(options)
+        return if options.none?
+
+        keys = options.keys - Setting::OPTIONS
+        raise ArgumentError, "Invalid options: #{keys.inspect}" unless keys.empty?
       end
     end
   end
