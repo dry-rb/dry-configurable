@@ -8,6 +8,38 @@ RSpec.describe Dry::Configurable::Setting do
     Dry::Configurable::Setting.new(:test, **options)
   end
 
+  describe '#input_defined?' do
+    context 'no input provided' do
+      let(:options) do
+        {}
+      end
+
+      it 'is false' do
+        expect(setting.input_defined?).to be false
+      end
+    end
+
+    context 'input provided' do
+      let(:options) do
+        {input: 1}
+      end
+
+      it 'is true' do
+        expect(setting.input_defined?).to be true
+      end
+    end
+
+    context 'default provided' do
+      let(:options) do
+        {default: 1}
+      end
+
+      it 'is true' do
+        expect(setting.input_defined?).to be true
+      end
+    end
+  end
+
   describe '#value' do
     context 'with no default' do
       let(:options) do
@@ -40,6 +72,23 @@ RSpec.describe Dry::Configurable::Setting do
     end
   end
 
+  describe '#evaluated?' do
+    let(:options) do
+      {}
+    end
+
+    it 'is false for a newly created setting' do
+      expect(setting).not_to be_evaluated
+    end
+
+    it 'becomes true after accessing the value' do
+      expect { setting.value }
+        .to change { setting.evaluated? }
+        .from(false)
+        .to(true)
+    end
+  end
+
   context '#with' do
     let(:options) do
       {}
@@ -63,41 +112,58 @@ RSpec.describe Dry::Configurable::Setting do
   end
 
   shared_context 'copying' do
-    let(:options) do
-      { input: 'hello' }
-    end
-
-    before do
-      setting.value
-    end
-
-    it 'maintains the name' do
-      expect(copy.name).to be(setting.name)
-    end
-
-    it 'maintains a copy of the options' do
-      expect(copy.options).to eql(setting.options)
-      expect(copy.options).to_not be(setting.options)
-    end
-
-    context 'with a clonable value' do
+    context 'input defined' do
       let(:options) do
-        { input: [1, 2, 3] }
+        { input: 'hello' }
       end
 
-      it 'maintains a copy of the value' do
-        expect(copy.value).to eql(setting.value)
-        expect(copy.value).to_not be(setting.value)
+      before do
+        setting.value
+      end
+
+      it 'maintains the name' do
+        expect(copy.name).to be(setting.name)
+      end
+
+      it 'maintains a copy of the options' do
+        expect(copy.options).to eql(setting.options)
+        expect(copy.options).to_not be(setting.options)
+      end
+
+      context 'with a clonable value' do
+        let(:options) do
+          { input: [1, 2, 3] }
+        end
+
+        it 'maintains a copy of the value' do
+          expect(copy.value).to eql(setting.value)
+          expect(copy.value).to_not be(setting.value)
+        end
+      end
+
+      context 'with a non-clonable value' do
+        let(:options) do
+          { input: :hello }
+        end
+
+        it 'maintains the original value' do
+          expect(copy.value).to be(setting.value)
+        end
       end
     end
 
-    context 'with a non-clonable value' do
+    context 'input undefined' do
       let(:options) do
-        { input: :hello }
+        # This constructor would crash if setting was evaluated when copied
+        {constructor: -> value {  value + 1 } }
       end
 
-      it 'maintains the original value' do
-        expect(copy.value).to be(setting.value)
+      it 'leaves input undefined' do
+        expect(copy.input_defined?).to be false
+      end
+
+      it 'does not evaluate the setting' do
+        expect(copy).not_to be_evaluated
       end
     end
   end
