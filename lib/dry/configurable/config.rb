@@ -50,7 +50,7 @@ module Dry
 
       # Update config with new values
       #
-      # @param [Hash] A hash with new values
+      # @param values [Hash] A hash with new values
       #
       # @return [Config]
       #
