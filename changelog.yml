@@ -1,4 +1,9 @@
 ---
+- version: 0.11.4
+  summary: 
+  date: '2020-03-16'
+  fixed:
+  - '`Config#update` returns `self` again (issue #60 fixed via #92) (@solnic)'
 - version: 0.11.3
   summary: 
   date: '2020-02-22'
