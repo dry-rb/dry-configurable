@@ -64,6 +64,7 @@ module Dry
             self[key] = value
           end
         end
+        self
       end
 
       # Dump config into a hash
