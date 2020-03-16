@@ -5,6 +5,9 @@
 
 - `Config#update` returns `self` again (issue #60 fixed via #92) (@solnic)
 
+### Changed
+
+- `Setting#inspect` no longer uses its value - this could cause crashes when inspecting settings that are yet to have a value applied (e.g. when they have a constructor that expects a value to be present) (@timriley)
 
 [Compare v0.11.3...v0.11.4](https://github.com/dry-rb/dry-configurable/compare/v0.11.3...v0.11.4)
 
