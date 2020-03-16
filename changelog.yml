@@ -1,30 +1,32 @@
 ---
 - version: 0.11.4
-  summary: 
+  summary:
   date: '2020-03-16'
   fixed:
   - '`Config#update` returns `self` again (issue #60 fixed via #92) (@solnic)'
+  changed:
+  - '`Setting#inspect` no longer uses its value - this could cause crashes when inspecting settings that are yet to have a value applied (e.g. when they have a constructor that expects a value to be present) (@timriley)'
 - version: 0.11.3
-  summary: 
+  summary:
   date: '2020-02-22'
   fixed:
   - 'Retrieving settings by a string name works again (issue #82) (@waiting-for-dev)'
-  added: 
-  changed: 
+  added:
+  changed:
 - version: 0.11.2
-  summary: 
+  summary:
   date: '2020-02-20'
   fixed:
   - Warning about redefined `Setting#value` is gone (@solnic)
 - version: 0.11.1
-  summary: 
+  summary:
   date: '2020-02-18'
   fixed:
   - 'You can use `:settings` as a config key again (issue #80) (@solnic)'
   - Setting value is lazy-evaluated now, which fixes some cases where a constructor
     could crash with a `nil` value (@solnic)
-  added: 
-  changed: 
+  added:
+  changed:
 - version: 0.11.0
   date: '2020-02-15'
   summary: 'Complete rewrite of the library while keeping the public API intact. See
@@ -38,8 +40,8 @@
   summary: YANKED because the change also broke inheritance for classes that used
     `configured` before other classes inherited from them.
   date: '2020-01-31'
-  fixed: 
-  added: 
+  fixed:
+  added:
   changed:
   - Inheriting settings no longer defines the config object. This change fixed a use
     case where parent class that already used its config would prevent a child class
