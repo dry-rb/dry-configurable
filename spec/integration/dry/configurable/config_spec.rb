@@ -18,9 +18,10 @@ RSpec.describe Dry::Configurable::Config do
     it 'sets new config values in a flat config' do
       klass.setting :db
 
-      klass.config.update(db: 'sqlite')
+      config = klass.config.update(db: 'sqlite')
 
-      expect(klass.config.db).to eql('sqlite')
+      expect(klass.config).to be(config)
+      expect(config.db).to eql('sqlite')
     end
 
     it 'sets new config values in a nested config' do
