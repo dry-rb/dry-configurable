@@ -1,3 +1,13 @@
+## 0.11.4 2020-03-16
+
+
+### Fixed
+
+- `Config#update` returns `self` again (issue #60 fixed via #92) (@solnic)
+
+
+[Compare v0.11.3...v0.11.4](https://github.com/dry-rb/dry-configurable/compare/v0.11.3...v0.11.4)
+
 ## 0.11.3 2020-02-22
 
 
