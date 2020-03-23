@@ -63,8 +63,18 @@ module Dry
       end
 
       # @api private
+      def input_defined?
+        !input.equal?(Undefined)
+      end
+
+      # @api private
       def value
         @value ||= evaluate
+      end
+
+      # @api private
+      def evaluated?
+        instance_variable_defined?(:@value)
       end
 
       # @api private
@@ -107,7 +117,7 @@ module Dry
       # @api private
       def initialize_copy(source)
         super
-        @value = source.value.dup if source.clonable_value?
+        @value = source.value.dup if source.input_defined? && source.clonable_value?
         @options = source.options.dup
       end
 
