@@ -1,3 +1,13 @@
+## 0.11.5 2020-03-23
+
+
+### Fixed
+
+- When settings are copied or cloned, unevaluated values will no longer be copied. This prevents unintended crashes when settings have constructors expecting a certain type of value, but that value is yet to be provided (Fixed via #87) (@timriley)
+
+
+[Compare v0.11.4...v0.11.5](https://github.com/dry-rb/dry-configurable/compare/v0.11.4...v0.11.5)
+
 ## 0.11.4 2020-03-16
 
 
