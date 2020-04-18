@@ -5,6 +5,9 @@
 
 - When settings are copied or cloned, unevaluated values will no longer be copied. This prevents unintended crashes when settings have constructors expecting a certain type of value, but that value is yet to be provided (Fixed via #87) (@timriley)
 
+### Changed
+
+- A meaningful error is raised when the extension is included more than once (issue #89 fixed via #94) (@landongrindheim)
 
 [Compare v0.11.4...v0.11.5](https://github.com/dry-rb/dry-configurable/compare/v0.11.4...v0.11.5)
 
