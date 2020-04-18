@@ -1,3 +1,12 @@
+## unreleased 
+
+
+### Changed
+
+- A meaningful error is raised when the extension is included more than once (issue #89 fixed via #94) (@landongrindheim)
+
+[Compare v0.11.5...master](https://github.com/dry-rb/dry-configurable/compare/v0.11.5...master)
+
 ## 0.11.5 2020-03-23
 
 
