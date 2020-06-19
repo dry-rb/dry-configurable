@@ -60,6 +60,8 @@ module Dry
         @input = input.equal?(Undefined) ? default : input
         @default = default
         @options = options
+
+        evaluate if input_defined?
       end
 
       # @api private

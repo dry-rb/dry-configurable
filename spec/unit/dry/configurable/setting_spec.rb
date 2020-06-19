@@ -8,6 +8,52 @@ RSpec.describe Dry::Configurable::Setting do
     Dry::Configurable::Setting.new(:test, **options)
   end
 
+  describe '#initialize' do
+    describe 'input evaluation' do
+      let(:constructor) do
+        # Allow constructor calls to be observed
+        ctx = self
+        -> val {
+          ctx.instance_variable_set :@constructor_called, true
+          val
+        }
+      end
+
+      before do
+        @constructor_called = false
+      end
+
+      context 'input defined' do
+        let(:options) do
+          {input: 1, constructor: constructor}
+        end
+
+        it 'evaluates the input' do
+          expect(setting).to be_evaluated
+        end
+
+        it 'evaluates the input through the constructor' do
+          expect { setting }.to change { @constructor_called }.from(false).to true
+        end
+      end
+
+      context 'input not defined' do
+        let(:options) do
+          {constructor: constructor}
+        end
+
+        it 'does not evaluates the input' do
+          expect(setting).not_to be_evaluated
+        end
+
+        it 'does not call the constructor' do
+          expect { setting }.not_to change { @constructor_called }
+          expect(@constructor_called).to be false
+        end
+      end
+    end
+  end
+
   describe '#input_defined?' do
     context 'no input provided' do
       let(:options) do
@@ -73,19 +119,31 @@ RSpec.describe Dry::Configurable::Setting do
   end
 
   describe '#evaluated?' do
-    let(:options) do
-      {}
+    context 'input defined' do
+      let(:options) do
+        {input: 2}
+      end
+
+      it 'is true' do
+        expect(setting).to be_evaluated
+      end
     end
 
-    it 'is false for a newly created setting' do
-      expect(setting).not_to be_evaluated
-    end
+    context 'input not defined' do
+      let(:options) do
+        {}
+      end
 
-    it 'becomes true after accessing the value' do
-      expect { setting.value }
-        .to change { setting.evaluated? }
-        .from(false)
-        .to(true)
+      it 'is false' do
+        expect(setting).not_to be_evaluated
+      end
+
+      it 'becomes true after accessing the value' do
+        expect { setting.value }
+          .to change { setting.evaluated? }
+          .from(false)
+          .to(true)
+      end
     end
   end
 
