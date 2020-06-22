@@ -1,18 +1,14 @@
 ---
 - version: unreleased
-  summary: 
-  date: 
-  fixed: 
-  added: 
-  changed: &1
+  summary:
+  date:
+  fixed:
+  added:
+  changed:
   - 'A meaningful error is raised when the extension is included more than once (issue
     #89 fixed via #94) (@landongrindheim)'
   - Evaluate setting input immediately when input is provided. This allows for earlier
     feedback from constructors designed to raise errors on invalid input (#95) (@timriley)
-- version: unreleased
-  summary: 
-  date: 
-  changed: *1
 - version: 0.11.5
   summary: 
   date: '2020-03-23'
