@@ -1,4 +1,4 @@
-## unreleased 
+## 0.11.6 2020-06-22
 
 
 ### Changed
@@ -6,7 +6,7 @@
 - A meaningful error is raised when the extension is included more than once (issue #89 fixed via #94) (@landongrindheim)
 - Evaluate setting input immediately when input is provided. This allows for earlier feedback from constructors designed to raise errors on invalid input (#95) (@timriley)
 
-[Compare v0.11.5...master](https://github.com/dry-rb/dry-configurable/compare/v0.11.5...master)
+[Compare v0.11.5...v0.11.6](https://github.com/dry-rb/dry-configurable/compare/v0.11.5...v0.11.6)
 
 ## 0.11.5 2020-03-23
 
