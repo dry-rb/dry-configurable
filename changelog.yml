@@ -1,7 +1,7 @@
 ---
-- version: unreleased
+- version: 0.11.6
   summary:
-  date:
+  date: '2020-06-22'
   fixed:
   added:
   changed:
