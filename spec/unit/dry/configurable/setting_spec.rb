@@ -10,45 +10,31 @@ RSpec.describe Dry::Configurable::Setting do
 
   describe '#initialize' do
     describe 'input evaluation' do
-      let(:constructor) do
-        # Allow constructor calls to be observed
-        ctx = self
-        -> val {
-          ctx.instance_variable_set :@constructor_called, true
-          val
-        }
-      end
-
-      before do
-        @constructor_called = false
-      end
-
       context 'input defined' do
         let(:options) do
-          {input: 1, constructor: constructor}
+          { input: 1 }
         end
 
         it 'evaluates the input' do
           expect(setting).to be_evaluated
         end
 
-        it 'evaluates the input through the constructor' do
-          expect { setting }.to change { @constructor_called }.from(false).to true
+        context 'with constructor' do
+          let(:options) do
+            { input: 1, constructor: described_class::DEFAULT_CONSTRUCTOR }
+          end
+          it 'does not evaluates the input' do
+            expect(setting).not_to be_evaluated
+          end
         end
       end
 
       context 'input not defined' do
         let(:options) do
-          {constructor: constructor}
+          {}
         end
-
         it 'does not evaluates the input' do
           expect(setting).not_to be_evaluated
-        end
-
-        it 'does not call the constructor' do
-          expect { setting }.not_to change { @constructor_called }
-          expect(@constructor_called).to be false
         end
       end
     end

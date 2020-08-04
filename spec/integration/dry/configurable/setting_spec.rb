@@ -305,6 +305,12 @@ RSpec.describe Dry::Configurable, '.setting' do
       expect(object.config.db).to eql('sqlite')
     end
 
+    it 'the config should not be memoized when used a constructor' do
+      klass.setting(:path, 'test') { |m| Pathname(m) }
+      new_object = klass.new
+      expect(object.config.path.object_id).not_to eql(new_object.config.path.object_id)
+    end
+
     shared_examples 'copying' do
       before do
         klass.setting :env

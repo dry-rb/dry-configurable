@@ -61,7 +61,7 @@ module Dry
         @default = default
         @options = options
 
-        evaluate if input_defined?
+        evaluate if input_defined? && !options[:constructor].is_a?(Proc)
       end
 
       # @api private
