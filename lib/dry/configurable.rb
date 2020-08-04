@@ -57,7 +57,7 @@ module Dry
       super
       klass.class_eval do
         extend(ClassMethods)
-        include(InstanceMethods)
+        prepend(InstanceMethods)
 
         class << self
           undef :config

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'support/coverage'
+require 'pathname'
 
 SPEC_ROOT = Pathname(__FILE__).dirname
 
@@ -8,8 +9,6 @@ begin
   require 'pry-byebug'
 rescue LoadError
 end
-
-require 'pathname'
 
 Dir[Pathname(__FILE__).dirname.join('support/**/*.rb').to_s].each do |file|
   require file
