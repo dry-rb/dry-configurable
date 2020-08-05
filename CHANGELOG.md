@@ -1,3 +1,12 @@
+## unreleased 
+
+
+### Changed
+
+- Instance behavior is now prepended, so that if you have your own `initialize`, calling `super` is no longer required (see #98 for more details) (@zabolotnov87)
+
+[Compare v0.11.6...master](https://github.com/dry-rb/dry-configurable/compare/v0.11.6...master)
+
 ## 0.11.6 2020-06-22
 
 
