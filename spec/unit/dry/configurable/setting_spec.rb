@@ -15,8 +15,8 @@ RSpec.describe Dry::Configurable::Setting do
           { input: 1 }
         end
 
-        it 'evaluates the input' do
-          expect(setting).to be_evaluated
+        it 'does not evaluates the input' do
+          expect(setting).not_to be_evaluated
         end
 
         context 'with constructor' do
@@ -110,8 +110,8 @@ RSpec.describe Dry::Configurable::Setting do
         {input: 2}
       end
 
-      it 'is true' do
-        expect(setting).to be_evaluated
+      it 'is false for a newly created setting' do
+        expect(setting).not_to be_evaluated
       end
     end
 

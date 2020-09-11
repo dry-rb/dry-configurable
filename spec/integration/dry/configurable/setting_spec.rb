@@ -162,6 +162,27 @@ RSpec.describe Dry::Configurable, '.setting' do
         expect { klass.setting name }.to raise_error(ArgumentError, /not a valid/)
       end
     end
+
+    context 'allow immediate feedback on failable settings' do
+      before do
+        klass.setting :failable do |value|
+          value.to_sym unless value.nil?
+        end
+      end
+
+      it 'fail if using bad input with .config.setting=' do
+        expect do
+          object.config.failable = 12
+        end.to raise_error(NoMethodError, /undefined method `to_sym'/)
+      end
+      it 'assign input with .configure DSL' do
+        expect do
+          object.configure do |config|
+            config.failable = 12
+          end
+        end.to raise_error(NoMethodError, /undefined method `to_sym'/)
+      end
+    end
   end
 
   context 'when extended' do

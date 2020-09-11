@@ -108,7 +108,9 @@ module Dry
         if setting.writer?(meth)
           raise FrozenConfig, 'Cannot modify frozen config' if frozen?
 
-          _settings << setting.with(input: args[0])
+          new_setting = setting.with(input: args[0])
+          new_setting.evaluate
+          _settings << new_setting
         else
           setting.value
         end

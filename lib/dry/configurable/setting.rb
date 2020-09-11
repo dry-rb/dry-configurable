@@ -60,8 +60,6 @@ module Dry
         @input = input.equal?(Undefined) ? default : input
         @default = default
         @options = options
-
-        evaluate if input_defined? && !options[:constructor].is_a?(Proc)
       end
 
       # @api private
@@ -114,6 +112,11 @@ module Dry
         CLONABLE_VALUE_TYPES.any? { |type| value.is_a?(type) }
       end
 
+      # @api private
+      def evaluate
+        @value = constructor[input.equal?(Undefined) ? nil : input]
+      end
+
       private
 
       # @api private
@@ -121,11 +124,6 @@ module Dry
         super
         @value = source.value.dup if source.input_defined? && source.clonable_value?
         @options = source.options.dup
-      end
-
-      # @api private
-      def evaluate
-        @value = constructor[input.equal?(Undefined) ? nil : input]
       end
     end
   end
