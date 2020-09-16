@@ -80,8 +80,8 @@ RSpec.describe Dry::Configurable::Setting do
         {default: 1}
       end
 
-      it 'is true' do
-        expect(setting.input_defined?).to be true
+      it 'is false' do
+        expect(setting.input_defined?).to be false
       end
     end
   end

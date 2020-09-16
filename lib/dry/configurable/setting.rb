@@ -54,10 +54,15 @@ module Dry
       end
 
       # @api private
+      def self.clonable_value?(value)
+        CLONABLE_VALUE_TYPES.any? { |type| value.is_a?(type) }
+      end
+
+      # @api private
       def initialize(name, input: Undefined, default: Undefined, **options)
         @name = name
         @writer_name = :"#{name}="
-        @input = input.equal?(Undefined) ? default : input
+        @input = input
         @default = default
         @options = options
 
@@ -109,23 +114,20 @@ module Dry
         writer_name.equal?(meth)
       end
 
-      # @api private
-      def clonable_value?
-        CLONABLE_VALUE_TYPES.any? { |type| value.is_a?(type) }
-      end
-
       private
 
       # @api private
       def initialize_copy(source)
         super
-        @value = source.value.dup if source.input_defined? && source.clonable_value?
+        @input = source.input.dup if Setting.clonable_value?(source.input)
+        @default = source.default.dup if Setting.clonable_value?(source.default)
+        @value = source.value.dup if source.evaluated? && Setting.clonable_value?(source.value)
         @options = source.options.dup
       end
 
       # @api private
       def evaluate
-        @value = constructor[input.equal?(Undefined) ? nil : input]
+        @value = constructor[Undefined.coalesce(input, default, nil)]
       end
     end
   end
