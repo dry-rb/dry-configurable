@@ -1,6 +1,10 @@
 ## unreleased 
 
 
+### Fixed
+
+- Setting values provided by defaults and/or pre-processor blocks are no longer accidentally memoized across instances of classes including Dry::Configurable (#99) (@timriley & @esparta)
+
 ### Changed
 
 - Instance behavior is now prepended, so that if you have your own `initialize`, calling `super` is no longer required (see #98 for more details) (@zabolotnov87)
