@@ -121,6 +121,16 @@ RSpec.describe Dry::Configurable, '.setting' do
 
         expect(object.config.path).to eql(Pathname('test'))
       end
+
+      it 'raises pre-processor errors immediately' do
+        klass.setting :failable do |value|
+          value.to_sym unless value.nil?
+        end
+
+        expect {
+          object.config.failable = 12
+        }.to raise_error(NoMethodError, /undefined method `to_sym'/)
+      end
     end
 
     context 'with reader: true' do
@@ -303,6 +313,16 @@ RSpec.describe Dry::Configurable, '.setting' do
       klass.setting :db, 'sqlite'
 
       expect(object.config.db).to eql('sqlite')
+    end
+
+    it 'creates distinct setting values across instances' do
+      klass.setting(:path, 'test') { |m| Pathname(m) }
+
+      new_object = klass.new
+
+      expect(object.config.path).to eq Pathname('test')
+      expect(new_object.config.path).to eq Pathname('test')
+      expect(object.config.path).not_to be(new_object.config.path)
     end
 
     shared_examples 'copying' do
