@@ -2,7 +2,7 @@
 
 require 'set'
 
-require 'dry/equalizer'
+require 'dry/core/equalizer'
 
 require 'dry/configurable/constants'
 require 'dry/configurable/config'
