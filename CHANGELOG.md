@@ -2,6 +2,7 @@
 
 ## unreleased 
 
+0.12.0
 
 ### Fixed
 
@@ -10,6 +11,7 @@
 ### Changed
 
 - Instance behavior is now prepended, so that if you have your own `initialize`, calling `super` is no longer required (see #98 for more details) (@zabolotnov87)
+- Switched to equalizer from dry-core (@solnic)
 
 [Compare v0.11.6...master](https://github.com/dry-rb/dry-configurable/compare/v0.11.6...master)
 
