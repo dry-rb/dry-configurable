@@ -1,6 +1,6 @@
 ---
 - version: unreleased
-  summary:
+  summary: 0.12.0
   date:
   fixed:
   - 'Setting values provided by defaults and/or pre-processor blocks are
@@ -10,29 +10,30 @@
   changed:
   - 'Instance behavior is now prepended, so that if you have your own `initialize`,
     calling `super` is no longer required (see #98 for more details) (@zabolotnov87)'
+  - 'Switched to equalizer from dry-core (@solnic)'
 - version: 0.11.6
-  summary: 
+  summary:
   date: '2020-06-22'
-  fixed: 
-  added: 
+  fixed:
+  added:
   changed:
   - 'A meaningful error is raised when the extension is included more than once (issue
     #89 fixed via #94) (@landongrindheim)'
   - Evaluate setting input immediately when input is provided. This allows for earlier
     feedback from constructors designed to raise errors on invalid input (#95) (@timriley)
 - version: 0.11.5
-  summary: 
+  summary:
   date: '2020-03-23'
   fixed:
   - 'When settings are copied or cloned, unevaluated values will no longer be copied.
     This prevents unintended crashes when settings have constructors expecting a certain
     type of value, but that value is yet to be provided (Fixed via #87) (@timriley)'
-  added: 
+  added:
   changed:
   - 'A meaningful error is raised when the extension is included more than once (issue
     #89 fixed via #94) (@landongrindheim)'
 - version: 0.11.4
-  summary: 
+  summary:
   date: '2020-03-16'
   fixed:
   - "`Config#update` returns `self` again (issue #60 fixed via #92) (@solnic)"
@@ -41,26 +42,26 @@
     settings that are yet to have a value applied (e.g. when they have a constructor
     that expects a value to be present) (@timriley)"
 - version: 0.11.3
-  summary: 
+  summary:
   date: '2020-02-22'
   fixed:
   - 'Retrieving settings by a string name works again (issue #82) (@waiting-for-dev)'
-  added: 
-  changed: 
+  added:
+  changed:
 - version: 0.11.2
-  summary: 
+  summary:
   date: '2020-02-20'
   fixed:
   - Warning about redefined `Setting#value` is gone (@solnic)
 - version: 0.11.1
-  summary: 
+  summary:
   date: '2020-02-18'
   fixed:
   - 'You can use `:settings` as a config key again (issue #80) (@solnic)'
   - Setting value is lazy-evaluated now, which fixes some cases where a constructor
     could crash with a `nil` value (@solnic)
-  added: 
-  changed: 
+  added:
+  changed:
 - version: 0.11.0
   date: '2020-02-15'
   summary: 'Complete rewrite of the library while keeping the public API intact. See
@@ -74,8 +75,8 @@
   summary: YANKED because the change also broke inheritance for classes that used
     `configured` before other classes inherited from them.
   date: '2020-01-31'
-  fixed: 
-  added: 
+  fixed:
+  added:
   changed:
   - Inheriting settings no longer defines the config object. This change fixed a use
     case where parent class that already used its config would prevent a child class
