@@ -1,7 +1,7 @@
 ---
-- version: '2020-12-26'
-  summary: 0.12.0
-  date:
+- version: 0.12.0
+  summary:
+  date: '2020-12-26'
   fixed:
   - 'Setting values provided by defaults and/or pre-processor blocks are
     no longer accidentally memoized across instances of classes including
