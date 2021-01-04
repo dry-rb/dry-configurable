@@ -188,7 +188,7 @@ RSpec.describe Dry::Configurable::Setting do
         expect(copy.options).to_not be(setting.options)
       end
 
-      context 'with a clonable value' do
+      context 'with a cloneable value' do
         let(:options) do
           { input: [1, 2, 3] }
         end
@@ -199,7 +199,7 @@ RSpec.describe Dry::Configurable::Setting do
         end
       end
 
-      context 'with a non-clonable value' do
+      context 'with a non-cloneable value' do
         let(:options) do
           { input: :hello }
         end
