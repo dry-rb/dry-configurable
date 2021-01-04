@@ -19,7 +19,7 @@ module Dry
 
       DEFAULT_CONSTRUCTOR = -> v { v }.freeze
 
-      CLONABLE_VALUE_TYPES = [Array, Hash, Set, Config].freeze
+      CLONEABLE_VALUE_TYPES = [Array, Hash, Set, Config].freeze
 
       # @api private
       attr_reader :name
@@ -54,8 +54,8 @@ module Dry
       end
 
       # @api private
-      def self.clonable_value?(value)
-        CLONABLE_VALUE_TYPES.any? { |type| value.is_a?(type) }
+      def self.cloneable_value?(value)
+        CLONEABLE_VALUE_TYPES.any? { |type| value.is_a?(type) }
       end
 
       # @api private
@@ -119,9 +119,9 @@ module Dry
       # @api private
       def initialize_copy(source)
         super
-        @input = source.input.dup if Setting.clonable_value?(source.input)
-        @default = source.default.dup if Setting.clonable_value?(source.default)
-        @value = source.value.dup if source.evaluated? && Setting.clonable_value?(source.value)
+        @input = source.input.dup if Setting.cloneable_value?(source.input)
+        @default = source.default.dup if Setting.cloneable_value?(source.default)
+        @value = source.value.dup if source.evaluated? && Setting.cloneable_value?(source.value)
         @options = source.options.dup
       end
 
