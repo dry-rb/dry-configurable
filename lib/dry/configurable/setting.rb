@@ -55,7 +55,8 @@ module Dry
 
       # @api private
       def self.cloneable_value?(value)
-        CLONEABLE_VALUE_TYPES.any? { |type| value.is_a?(type) }
+        CLONEABLE_VALUE_TYPES.any? { |type| value.is_a?(type) } ||
+          (value.respond_to?(:cloneable_value?) && value.cloneable_value?)
       end
 
       # @api private

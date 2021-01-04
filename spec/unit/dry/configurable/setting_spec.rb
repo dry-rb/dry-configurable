@@ -199,6 +199,36 @@ RSpec.describe Dry::Configurable::Setting do
         end
       end
 
+      context 'with a custom object reporting as a cloneable value' do
+        let(:options) do
+          { input: custom_cloneable_class.new([1,2,3]) }
+        end
+
+        let(:custom_cloneable_class) do
+          Class.new {
+            attr_reader :value
+
+            def initialize(value)
+              @value = value
+            end
+
+            def initialize_copy(source)
+              super
+              @value = source.value.dup
+            end
+
+            def cloneable_value?
+              true
+            end
+          }
+        end
+
+        it 'maintains a copy of the value' do
+          expect(copy.value.value).to eql(setting.value.value)
+          expect(copy.value.value).to_not be(setting.value.value)
+        end
+      end
+
       context 'with a non-cloneable value' do
         let(:options) do
           { input: :hello }
