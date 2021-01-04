@@ -25,6 +25,9 @@ module Dry
         return self if config.frozen?
 
         config.finalize!
+
+        super if defined?(super)
+
         self
       end
     end

@@ -45,4 +45,23 @@ RSpec.describe Dry::Configurable, '.included' do
 
     it_behaves_like 'configure'
   end
+
+  context 'when #finalize! is defined in configurable class' do
+    let(:instance) do
+      Class.new do
+        include Dry::Configurable
+
+        attr_accessor :finalized
+
+        def finalize!
+          @finalized = true
+        end
+      end.new
+    end
+
+    it 'calls finalize! in configurable class' do
+      instance.finalize!
+      expect(instance.finalized).to be(true)
+    end
+  end
 end
