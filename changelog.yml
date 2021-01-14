@@ -1,4 +1,25 @@
 ---
+- version: Unreleased
+  summary:
+  date:
+  added:
+  - |-
+    Settings may be specified with a `cloneable` option, e.g.
+
+    ```ruby
+    setting :component_dirs, Configuration::ComponentDirs.new, cloneable: true
+    ```
+
+    This change makes it possible to provide “rich” config values that carry their own
+    configuration interface.
+
+    In the above example, `ComponentDirs` could provide its own API for adding component
+    dirs and configuring aspects of their behavior at the same time. By being passed to
+    the setting along with `cloneable: true`, dry-configurable will ensure the setting's
+    values are cloned along with the setting at all the appropriate times.
+
+    A custom cloneable setting value should provide its own `#initialize_copy` (used by
+    `Object#dup`) with the appropriate logic. (@timriley in #102)
 - version: 0.12.0
   summary:
   date: '2020-12-26'

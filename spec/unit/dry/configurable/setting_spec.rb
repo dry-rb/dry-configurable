@@ -188,7 +188,7 @@ RSpec.describe Dry::Configurable::Setting do
         expect(copy.options).to_not be(setting.options)
       end
 
-      context 'with a clonable value' do
+      context 'with a naturally cloneable value' do
         let(:options) do
           { input: [1, 2, 3] }
         end
@@ -199,7 +199,28 @@ RSpec.describe Dry::Configurable::Setting do
         end
       end
 
-      context 'with a non-clonable value' do
+      context 'with cloneable option as true' do
+        let(:options) do
+          { input: "hello", cloneable: true }
+        end
+
+        it 'maintains a copy of the value' do
+          expect(copy.value).to eql(setting.value)
+          expect(copy.value).to_not be(setting.value)
+        end
+      end
+
+      context 'with cloneable option as false' do
+        let(:options) do
+          { input: [1, 2, 3], cloneable: false }
+        end
+
+        it 'maintains the original value' do
+          expect(copy.value).to be(setting.value)
+        end
+      end
+
+      context 'with a naturally non-cloneable value' do
         let(:options) do
           { input: :hello }
         end

@@ -15,11 +15,11 @@ module Dry
     class Setting
       include Dry::Equalizer(:name, :value, :options, inspect: false)
 
-      OPTIONS = %i[input default reader constructor settings].freeze
+      OPTIONS = %i[input default reader constructor cloneable settings].freeze
 
       DEFAULT_CONSTRUCTOR = -> v { v }.freeze
 
-      CLONABLE_VALUE_TYPES = [Array, Hash, Set, Config].freeze
+      CLONEABLE_VALUE_TYPES = [Array, Hash, Set, Config].freeze
 
       # @api private
       attr_reader :name
@@ -54,8 +54,8 @@ module Dry
       end
 
       # @api private
-      def self.clonable_value?(value)
-        CLONABLE_VALUE_TYPES.any? { |type| value.is_a?(type) }
+      def self.cloneable_value?(value)
+        CLONEABLE_VALUE_TYPES.any? { |type| value.is_a?(type) }
       end
 
       # @api private
@@ -114,15 +114,32 @@ module Dry
         writer_name.equal?(meth)
       end
 
+      # @api private
+      def cloneable?
+        if options.key?(:cloneable)
+          # Return cloneable option if explicitly set
+          options[:cloneable]
+        else
+          # Otherwise, infer cloneable from any of the input, default, or value
+          Setting.cloneable_value?(input) || Setting.cloneable_value?(default) || (
+            evaluated? && Setting.cloneable_value?(value)
+          )
+        end
+      end
+
       private
 
       # @api private
       def initialize_copy(source)
         super
-        @input = source.input.dup if Setting.clonable_value?(source.input)
-        @default = source.default.dup if Setting.clonable_value?(source.default)
-        @value = source.value.dup if source.evaluated? && Setting.clonable_value?(source.value)
+
         @options = source.options.dup
+
+        if source.cloneable?
+          @input = source.input.dup
+          @default = source.default.dup
+          @value = source.value.dup if source.evaluated?
+        end
       end
 
       # @api private
