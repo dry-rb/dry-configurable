@@ -5,6 +5,18 @@ require 'dry/configurable/methods'
 
 module Dry
   module Configurable
+    # Initializer method which is prepended when `Dry::Configurable`
+    # is included in a class
+    #
+    # @api private
+    module Initializer
+      # @api private
+      def initialize(*)
+        @config = Config.new(self.class._settings.dup)
+        super
+      end
+    end
+
     # Instance-level API when `Dry::Configurable` is included in a class
     #
     # @api public
@@ -17,12 +29,6 @@ module Dry
       #
       # @api public
       attr_reader :config
-
-      # @api private
-      def initialize(*)
-        @config = Config.new(self.class._settings.dup)
-        super
-      end
 
       # Finalize the config and freeze the object
       #
