@@ -1,7 +1,13 @@
 ---
-- version: Unreleased
+- version: 0.12.1
   summary:
-  date:
+  date: '2021-02-15'
+  fixed:
+  - |-
+    Only `#initialize` instance method is prepended, leaving the rest of the instance
+    methods to be included as normal again. This allows classes including
+    `Dry::Configurable` to override instance methods with their own methods as required
+    (@adam12 in #103)
   added:
   - |-
     Settings may be specified with a `cloneable` option, e.g.
