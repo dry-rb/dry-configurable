@@ -35,8 +35,6 @@ module Dry
       #
       # @api public
       def finalize!
-        return self if frozen?
-
         super
         freeze
       end

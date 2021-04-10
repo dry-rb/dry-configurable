@@ -66,7 +66,7 @@ module Dry
         @default = default
         @options = options
 
-        evaluate if input_defined?
+        value if input_defined?
       end
 
       # @api private
@@ -76,7 +76,9 @@ module Dry
 
       # @api private
       def value
-        @value ||= evaluate
+        return @value if evaluated?
+
+        @value = constructor[Undefined.coalesce(input, default, nil)]
       end
 
       # @api private
@@ -92,6 +94,12 @@ module Dry
       # @api private
       def pristine
         with(input: Undefined)
+      end
+
+      # @api private
+      def finalize!
+        value.finalize! if value.is_a?(Config)
+        freeze
       end
 
       # @api private
@@ -140,11 +148,6 @@ module Dry
           @default = source.default.dup
           @value = source.value.dup if source.evaluated?
         end
-      end
-
-      # @api private
-      def evaluate
-        @value = constructor[Undefined.coalesce(input, default, nil)]
       end
     end
   end

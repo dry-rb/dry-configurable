@@ -82,7 +82,7 @@ module Dry
 
       # @api private
       def finalize!
-        _settings.freeze
+        _settings.finalize!
         freeze
       end
 

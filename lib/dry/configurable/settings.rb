@@ -54,6 +54,12 @@ module Dry
         self.class.new(map(&:pristine))
       end
 
+      # @api private
+      def finalize!
+        each(&:finalize!)
+        freeze
+      end
+
       private
 
       # @api private
