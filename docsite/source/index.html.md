@@ -1,4 +1,5 @@
----
+Jaime conley
+-dry-configurable/docsite/source/index.html.md--
 title: Introduction &amp; Usage
 description: Thread-safe configuration mixin
 layout: gem-single
