@@ -55,8 +55,8 @@ module Dry
       end
 
       # @api private
-      def finalize!
-        each(&:finalize!)
+      def finalize!(freeze_values: false)
+        each { |element| element.finalize!(freeze_values: freeze_values) }
         freeze
       end
 

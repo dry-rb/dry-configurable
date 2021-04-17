@@ -392,6 +392,23 @@ RSpec.describe Dry::Configurable, ".setting" do
       expect { object.configure {} }.to raise_error(Dry::Configurable::FrozenConfig)
     end
 
+    it "can be finalized with freezing values" do
+      klass.setting :kafka, "kafka://127.0.0.1:9092"
+
+      object.finalize!(freeze_values: true)
+      # becomes a no-op
+      object.finalize!(freeze_values: true)
+
+      expect(object).to be_frozen
+      expect(object.config.db).to be_frozen
+      expect(object.config.db.user).to be_frozen
+
+      expect { object.config.db.user << "foo" }.to raise_error(FrozenError)
+
+      # does not allow configure block anymore
+      expect { object.configure {} }.to raise_error(Dry::Configurable::FrozenConfig)
+    end
+
     it "defines a reader shortcut for nested config" do
       klass.setting :dsn, reader: true do
         setting :pool, default: 5

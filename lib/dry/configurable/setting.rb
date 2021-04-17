@@ -66,7 +66,7 @@ module Dry
         @default = default
         @options = options
 
-        value if input_defined?
+        evaluate if input_defined?
       end
 
       # @api private
@@ -80,6 +80,8 @@ module Dry
 
         @value = constructor[Undefined.coalesce(input, default, nil)]
       end
+      alias_method :evaluate, :value
+      private :evaluate
 
       # @api private
       def evaluated?
@@ -97,8 +99,12 @@ module Dry
       end
 
       # @api private
-      def finalize!
-        value.finalize! if value.is_a?(Config)
+      def finalize!(freeze_values: false)
+        if value.is_a?(Config)
+          value.finalize!(freeze_values: freeze_values)
+        elsif freeze_values
+          value.freeze
+        end
         freeze
       end
 

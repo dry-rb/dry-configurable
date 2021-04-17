@@ -34,7 +34,7 @@ module Dry
       # Finalize the config and freeze the object
       #
       # @api public
-      def finalize!
+      def finalize!(freeze_values: false)
         super
         freeze
       end
