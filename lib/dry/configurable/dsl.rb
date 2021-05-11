@@ -5,6 +5,7 @@ require 'dry/configurable/setting'
 require 'dry/configurable/settings'
 require 'dry/configurable/compiler'
 require 'dry/configurable/dsl/args'
+require 'dry/core/deprecations'
 
 module Dry
   module Configurable
@@ -49,6 +50,11 @@ module Dry
           if block.arity.zero?
             ast << [:nested, [node, DSL.new(&block).ast]]
           else
+            Dry::Core::Deprecations.announce(
+              'passing a constructor as a block',
+              'Provide a `constructor:` keyword argument instead',
+              tag: 'dry-configurable'
+            )
             ast << [:constructor, [node, block]]
           end
         else

@@ -28,7 +28,7 @@ class App
   end
   # Defaults to nil if no default value is given
   setting :adapter
-  # Pre-process values
+  # Construct values
   setting(:path, 'test') { |value| Pathname(value) }
   # Passing the reader option as true will create attr_reader method for the class
   setting :pool, 5, reader: true
