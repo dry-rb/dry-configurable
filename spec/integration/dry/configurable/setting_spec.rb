@@ -97,9 +97,9 @@ RSpec.describe Dry::Configurable, '.setting' do
       end
     end
 
-    context 'with a value pre-processor' do
-      it 'pre-processes the value with nil default' do
-        klass.setting(:path, nil) { |value| "test:#{value || "fallback"}" }
+    context 'with a value constructor' do
+      it 'constructs the value with nil default' do
+        klass.setting(:path, nil, constructor: ->(value) { "test:#{value || "fallback"}" })
 
         expect(object.config.path).to eql("test:fallback")
 
@@ -110,22 +110,20 @@ RSpec.describe Dry::Configurable, '.setting' do
         expect(object.config.path).to eql('test:foo')
       end
 
-      it 'pre-processes the value with undefined default' do
-        klass.setting(:path) { |value| "test:#{value || "fallback"}" }
+      it 'constructs the value with undefined default' do
+        klass.setting(:path, constructor: ->(value) { "test:#{value || "fallback"}" })
 
         expect(object.config.path).to eql('test:fallback')
       end
 
-      it 'pre-processes the value with non-nil default' do
-        klass.setting(:path, 'test') { |value| Pathname(value) }
+      it 'constructs the value with non-nil default' do
+        klass.setting(:path, 'test', constructor: ->(value) { Pathname(value) })
 
         expect(object.config.path).to eql(Pathname('test'))
       end
 
-      it 'raises pre-processor errors immediately' do
-        klass.setting :failable do |value|
-          value.to_sym unless value.nil?
-        end
+      it 'raises constructor errors immediately' do
+        klass.setting(:failable, constructor: ->(value) { value.to_sym unless value.nil? })
 
         expect {
           object.config.failable = 12
@@ -316,7 +314,7 @@ RSpec.describe Dry::Configurable, '.setting' do
     end
 
     it 'creates distinct setting values across instances' do
-      klass.setting(:path, 'test') { |m| Pathname(m) }
+      klass.setting(:path, 'test', constructor: ->(m) { Pathname(m) })
 
       new_object = klass.new
 
