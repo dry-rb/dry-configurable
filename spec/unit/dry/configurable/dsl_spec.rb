@@ -50,12 +50,14 @@ RSpec.describe Dry::Configurable::DSL do
   end
 
   it 'supports but deprecates giving a constructor as a block' do
-    expect(Dry::Core::Deprecations).to receive(:announce)
+    logger = StringIO.new
+    Dry::Core::Deprecations.logger(logger)
 
     setting = dsl.setting(:dsn, 'sqlite') { |value| "jdbc:#{value}" }
 
     expect(setting.name).to be(:dsn)
     expect(setting.value).to eql('jdbc:sqlite')
+    expect(logger.string).to include('constructor as a block is deprecated')
   end
 
   it 'compiles a nested list of settings' do
