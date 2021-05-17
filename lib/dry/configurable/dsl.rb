@@ -5,6 +5,7 @@ require 'dry/configurable/setting'
 require 'dry/configurable/settings'
 require 'dry/configurable/compiler'
 require 'dry/configurable/dsl/args'
+require "dry/core/deprecations"
 
 module Dry
   module Configurable
@@ -43,14 +44,20 @@ module Dry
 
         default, opts = args
 
+        if block && !block.arity.zero?
+          Dry::Core::Deprecations.announce(
+            "passing a constructor as a block",
+            "Provide a `constructor:` keyword argument instead",
+            tag: "dry-configurable"
+          )
+          opts = opts.merge(constructor: block)
+          block = nil
+        end
+
         node = [:setting, [name.to_sym, default, opts == default ? EMPTY_HASH : opts]]
 
         if block
-          if block.arity.zero?
-            ast << [:nested, [node, DSL.new(&block).ast]]
-          else
-            ast << [:constructor, [node, block]]
-          end
+          ast << [:nested, [node, DSL.new(&block).ast]]
         else
           ast << node
         end
