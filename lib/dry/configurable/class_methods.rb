@@ -23,20 +23,22 @@ module Dry
 
       # Add a setting to the configuration
       #
-      # @param [Mixed] key
+      # @param [Mixed] name
       #   The accessor key for the configuration value
       # @param [Mixed] default
-      #   The default config value
-      #
+      #   Default value for the setting
+      # @param [#call] constructor
+      #   Transformation given value will go through
+      # @param [Boolean] reader
+      #   Whether a reader accessor must be created
       # @yield
-      #   If a block is given, it will be evaluated in the context of
-      #   a new configuration class, and bound as the default value
+      #   A block can be given to add nested settings.
       #
       # @return [Dry::Configurable::Config]
       #
       # @api public
-      def setting(*args, &block)
-        setting = __config_dsl__.setting(*args, &block)
+      def setting(*args, **options, &block)
+        setting = __config_dsl__.setting(*args, **options, &block)
 
         _settings << setting
 

@@ -32,14 +32,14 @@ RSpec.describe Dry::Configurable, '.setting' do
 
     it 'raises when invalid options are passed' do
       expect {
-        klass.setting :db_config, { user: 'root', password: '', reader: true }
+        klass.setting :db_config, user: 'root', password: '', reader: true
       }.to raise_error(
         ArgumentError, 'Invalid options: [:user, :password]'
       )
     end
 
     it 'stores setting name as symbol' do
-      klass.setting 'db', 'sqlite'
+      klass.setting 'db', default: 'sqlite'
 
       expect(object.config.values.keys).to include(:db)
     end
@@ -47,7 +47,7 @@ RSpec.describe Dry::Configurable, '.setting' do
     context 'with a default value' do
       context 'string' do
         before do
-          klass.setting :db, 'sqlite'
+          klass.setting :db, default: 'sqlite'
         end
 
         it 'presets the default value' do
@@ -57,7 +57,7 @@ RSpec.describe Dry::Configurable, '.setting' do
 
       context 'hash' do
         it 'returns the default value' do
-          klass.setting :db_config, { user: 'root', password: '' }
+          klass.setting :db_config, default: { user: 'root', password: '' }
 
           expect(object.config.db_config).to eql(user: 'root', password: '')
         end
@@ -65,7 +65,7 @@ RSpec.describe Dry::Configurable, '.setting' do
         it 'copies the original hash object' do
           hash = { user: 'root', password: '' }
 
-          klass.setting :db_config, hash
+          klass.setting :db_config, default: hash
 
           expect(object.config.db_config).to_not be(hash)
           expect(object.config.db_config).to eql(hash)
@@ -76,7 +76,7 @@ RSpec.describe Dry::Configurable, '.setting' do
     context 'with nested settings' do
       before do
         klass.setting :db do
-          setting :type, 'sqlite'
+          setting :type, default: 'sqlite'
           setting :cred do
             setting :user
             setting :pass
@@ -99,7 +99,7 @@ RSpec.describe Dry::Configurable, '.setting' do
 
     context 'with a value constructor' do
       it 'constructs the value with nil default' do
-        klass.setting(:path, nil, constructor: ->(value) { "test:#{value || "fallback"}" })
+        klass.setting(:path, default: nil, constructor: ->(value) { "test:#{value || "fallback"}" })
 
         expect(object.config.path).to eql("test:fallback")
 
@@ -117,7 +117,7 @@ RSpec.describe Dry::Configurable, '.setting' do
       end
 
       it 'constructs the value with non-nil default' do
-        klass.setting(:path, 'test', constructor: ->(value) { Pathname(value) })
+        klass.setting(:path, default: 'test', constructor: ->(value) { Pathname(value) })
 
         expect(object.config.path).to eql(Pathname('test'))
       end
@@ -139,7 +139,7 @@ RSpec.describe Dry::Configurable, '.setting' do
       end
 
       it 'defines a reader shortcut when there is default' do
-        klass.setting :db, 'sqlite', reader: true
+        klass.setting :db, default: 'sqlite', reader: true
 
         expect(object.db).to eql('sqlite')
       end
@@ -157,7 +157,7 @@ RSpec.describe Dry::Configurable, '.setting' do
 
     context 'with :settings as a setting name' do
       before do
-        klass.setting :settings, true
+        klass.setting :settings, default: true
       end
 
       it 'works' do
@@ -192,7 +192,7 @@ RSpec.describe Dry::Configurable, '.setting' do
 
       it 'maintains mutated value in a child config' do
         klass.setting :db do
-          setting :ports, Set[123]
+          setting :ports, default: Set[123]
         end
 
         klass.config.db.ports << 312
@@ -203,7 +203,7 @@ RSpec.describe Dry::Configurable, '.setting' do
       end
 
       it 'allows defining more settings' do
-        klass.setting :db, 'sqlite'
+        klass.setting :db, default: 'sqlite'
 
         subclass.setting :username, 'root'
         subclass.setting :password
@@ -216,7 +216,7 @@ RSpec.describe Dry::Configurable, '.setting' do
       end
 
       it 'adding parent setting does not affect child' do
-        klass.setting :db, 'sqlite'
+        klass.setting :db, default: 'sqlite'
 
         expect(subclass.settings).to eql(Set[:db])
 
@@ -240,10 +240,10 @@ RSpec.describe Dry::Configurable, '.setting' do
       end
 
       it 'changing child does not affect parent' do
-        klass.setting :db, 'sqlite'
+        klass.setting :db, default: 'sqlite'
 
         klass.setting :nested do
-          setting :test, 'hello'
+          setting :test, default: 'hello'
         end
 
         subclass.configure do |config|
@@ -262,14 +262,14 @@ RSpec.describe Dry::Configurable, '.setting' do
       end
 
       it 'inherits readers from parent' do
-        klass.setting :db, 'sqlite', reader: true
+        klass.setting :db, default: 'sqlite', reader: true
 
         expect(subclass.db).to eql('sqlite')
       end
 
       it 'defines a reader shortcut for nested config' do
         klass.setting :dsn, reader: true do
-          setting :pool, 5
+          setting :pool, default: 5
         end
 
         expect(klass.dsn.pool).to be(5)
@@ -291,7 +291,7 @@ RSpec.describe Dry::Configurable, '.setting' do
     include_context 'configurable behavior'
 
     it 'creates config detached from the class settings' do
-      klass.setting :db, 'sqlite'
+      klass.setting :db, default: 'sqlite'
 
       object.config.db = 'mariadb'
 
