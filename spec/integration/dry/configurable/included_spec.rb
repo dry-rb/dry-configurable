@@ -44,6 +44,19 @@ RSpec.describe Dry::Configurable, '.included' do
     end
 
     it_behaves_like 'configure'
+
+    context "required initialize parameters" do
+      let(:configurable_klass) do
+        Class.new do
+          include Dry::Configurable
+          def initialize(a, b:); end
+        end
+      end
+
+      it "passes the arguments through" do
+        expect(configurable_klass.new("a", b: "c").config).to be_a(Dry::Configurable::Config)
+      end
+    end
   end
 
   context 'when #finalize! is defined in configurable class' do

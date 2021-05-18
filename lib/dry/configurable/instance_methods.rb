@@ -11,9 +11,16 @@ module Dry
     # @api private
     module Initializer
       # @api private
-      def initialize(*)
-        @config = Config.new(self.class._settings.dup)
-        super
+      if RUBY_VERSION >= "2.7"
+        def initialize(*, **)
+          @config = Config.new(self.class._settings.dup)
+          super
+        end
+      else
+        def initialize(*)
+          @config = Config.new(self.class._settings.dup)
+          super
+        end
       end
     end
 
