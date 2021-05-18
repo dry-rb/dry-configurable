@@ -79,7 +79,6 @@ module Dry
           .to_h
       end
       alias_method :to_h, :values
-      alias_method :to_hash, :values
 
       # @api private
       def finalize!
