@@ -11,17 +11,11 @@ module Dry
     # @api private
     module Initializer
       # @api private
-      if RUBY_VERSION >= "2.7"
-        def initialize(*, **)
-          @config = Config.new(self.class._settings.dup)
-          super
-        end
-      else
-        def initialize(*)
-          @config = Config.new(self.class._settings.dup)
-          super
-        end
+      def initialize(*)
+        @config = Config.new(self.class._settings.dup)
+        super
       end
+      ruby2_keywords(:initialize) if respond_to?(:ruby2_keywords, true)
     end
 
     # Instance-level API when `Dry::Configurable` is included in a class
