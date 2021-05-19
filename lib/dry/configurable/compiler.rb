@@ -25,8 +25,8 @@ module Dry
 
       # @api private
       def visit_setting(node)
-        name, default, opts = node
-        Setting.new(name, **opts, default: default)
+        name, opts = node
+        Setting.new(name, **opts)
       end
 
       # @api private

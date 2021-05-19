@@ -4,7 +4,6 @@ require 'dry/configurable/constants'
 require 'dry/configurable/setting'
 require 'dry/configurable/settings'
 require 'dry/configurable/compiler'
-require 'dry/configurable/dsl/args'
 require "dry/core/deprecations"
 
 module Dry
@@ -33,16 +32,19 @@ module Dry
       # @see ClassMethods.setting
       # @api public
       # @return Setting
-      def setting(name, *args, &block)
+      def setting(name, default = Undefined, **options, &block)
         unless VALID_NAME.match?(name.to_s)
           raise ArgumentError, "#{name} is not a valid setting name"
         end
 
-        args = Args.new(args)
-
-        args.ensure_valid_options
-
-        default, opts = args
+        if default != Undefined
+          Dry::Core::Deprecations.announce(
+            "default value as positional argument to settings",
+            "Provide a `default:` keyword argument instead",
+            tag: "dry-configurable"
+          )
+          options = options.merge(default: default)
+        end
 
         if block && !block.arity.zero?
           Dry::Core::Deprecations.announce(
@@ -50,11 +52,13 @@ module Dry
             "Provide a `constructor:` keyword argument instead",
             tag: "dry-configurable"
           )
-          opts = opts.merge(constructor: block)
+          options = options.merge(constructor: block)
           block = nil
         end
 
-        node = [:setting, [name.to_sym, default, opts == default ? EMPTY_HASH : opts]]
+        ensure_valid_options(options)
+
+        node = [:setting, [name.to_sym, options]]
 
         if block
           ast << [:nested, [node, DSL.new(&block).ast]]
@@ -63,6 +67,15 @@ module Dry
         end
 
         compiler.visit(ast.last)
+      end
+
+      private
+
+      def ensure_valid_options(options)
+        return if options.none?
+
+        invalid_keys = options.keys - Setting::OPTIONS
+        raise ArgumentError, "Invalid options: #{invalid_keys.inspect}" unless invalid_keys.empty?
       end
     end
   end
