@@ -15,6 +15,7 @@ module Dry
         @config = Config.new(self.class._settings.dup)
         super
       end
+      ruby2_keywords(:initialize) if respond_to?(:ruby2_keywords, true)
     end
 
     # Instance-level API when `Dry::Configurable` is included in a class
