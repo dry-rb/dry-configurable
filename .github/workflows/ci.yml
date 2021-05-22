@@ -1,8 +1,8 @@
-# this file is managed by dry-rb/devtools project
+# This file is synced from dry-rb/template-get repo
 
 name: ci
 
-"on":
+on:
   push:
     paths:
       - ".github/workflows/ci.yml"
