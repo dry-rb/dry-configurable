@@ -41,7 +41,8 @@ module Dry
           Dry::Core::Deprecations.announce(
             "default value as positional argument to settings",
             "Provide a `default:` keyword argument instead",
-            tag: "dry-configurable"
+            tag: "dry-configurable",
+            uplevel: 2
           )
           options = options.merge(default: default)
         end
@@ -50,7 +51,8 @@ module Dry
           Dry::Core::Deprecations.announce(
             "passing a constructor as a block",
             "Provide a `constructor:` keyword argument instead",
-            tag: "dry-configurable"
+            tag: "dry-configurable",
+            uplevel: 2
           )
           options = options.merge(constructor: block)
           block = nil
