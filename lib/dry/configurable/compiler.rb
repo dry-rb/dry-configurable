@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'dry/configurable/setting'
-require 'dry/configurable/settings'
+require "dry/configurable/setting"
+require "dry/configurable/settings"
 
 module Dry
   module Configurable

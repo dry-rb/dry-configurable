@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'set'
+require "set"
 
-require 'dry/core/equalizer'
+require "dry/core/equalizer"
 
-require 'dry/configurable/constants'
-require 'dry/configurable/config'
+require "dry/configurable/constants"
+require "dry/configurable/config"
 
 module Dry
   module Configurable

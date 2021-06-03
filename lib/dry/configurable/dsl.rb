@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'dry/configurable/constants'
-require 'dry/configurable/setting'
-require 'dry/configurable/settings'
-require 'dry/configurable/compiler'
+require "dry/configurable/constants"
+require "dry/configurable/setting"
+require "dry/configurable/settings"
+require "dry/configurable/compiler"
 require "dry/core/deprecations"
 
 module Dry

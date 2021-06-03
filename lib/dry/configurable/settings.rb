@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'concurrent/map'
+require "concurrent/map"
 
-require 'dry/core/equalizer'
-require 'dry/configurable/constants'
+require "dry/core/equalizer"
+require "dry/configurable/constants"
 
 module Dry
   module Configurable

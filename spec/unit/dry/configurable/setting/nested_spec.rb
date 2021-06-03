@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
-require 'dry/configurable/setting'
-require 'dry/configurable/settings'
+require "dry/configurable/setting"
+require "dry/configurable/settings"
 
 RSpec.describe Dry::Configurable::Setting::Nested do
   subject(:setting) do
     Dry::Configurable::Setting::Nested.new(:db, **options)
   end
 
-  shared_context 'copying' do
+  shared_context "copying" do
     let(:options) do
-      { input: settings }
+      {input: settings}
     end
 
     let(:settings) do
@@ -19,26 +19,26 @@ RSpec.describe Dry::Configurable::Setting::Nested do
       )
     end
 
-    it 'maintains a copy of settings' do
+    it "maintains a copy of settings" do
       setting.value.ports << 321
 
       expect(copy.value.ports).to eql([123, 321])
     end
   end
 
-  describe '#dup' do
+  describe "#dup" do
     let(:copy) do
       setting.dup
     end
 
-    include_context 'copying'
+    include_context "copying"
   end
 
-  describe '#clone' do
+  describe "#clone" do
     let(:copy) do
       setting.clone
     end
 
-    include_context 'copying'
+    include_context "copying"
   end
 end

@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'concurrent/map'
+require "concurrent/map"
 
-require 'dry/core/equalizer'
+require "dry/core/equalizer"
 
-require 'dry/configurable/constants'
-require 'dry/configurable/errors'
+require "dry/configurable/constants"
+require "dry/configurable/errors"
 
 module Dry
   module Configurable
@@ -105,7 +105,7 @@ module Dry
         super unless setting
 
         if setting.writer?(meth)
-          raise FrozenConfig, 'Cannot modify frozen config' if frozen?
+          raise FrozenConfig, "Cannot modify frozen config" if frozen?
 
           _settings << setting.with(input: args[0])
         else
@@ -115,7 +115,7 @@ module Dry
 
       # @api private
       def resolve(meth)
-        _resolved.fetch(meth) { _resolved[meth] = meth.to_s.tr('=', '').to_sym }
+        _resolved.fetch(meth) { _resolved[meth] = meth.to_s.tr("=", "").to_sym }
       end
 
       # @api private

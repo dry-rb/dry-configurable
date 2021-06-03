@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'set'
+require "set"
 
-require 'dry/configurable/constants'
-require 'dry/configurable/dsl'
-require 'dry/configurable/methods'
-require 'dry/configurable/settings'
+require "dry/configurable/constants"
+require "dry/configurable/dsl"
+require "dry/configurable/methods"
+require "dry/configurable/settings"
 
 module Dry
   module Configurable
@@ -18,7 +18,7 @@ module Dry
 
         parent_settings = (respond_to?(:config) ? config._settings : _settings)
 
-        klass.instance_variable_set('@_settings', parent_settings)
+        klass.instance_variable_set("@_settings", parent_settings)
       end
 
       # Add a setting to the configuration
