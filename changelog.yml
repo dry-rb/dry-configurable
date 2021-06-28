@@ -1,4 +1,17 @@
 ---
+- version: unreleased
+  summary:
+  date:
+  fixed:
+    - 'Fix `ArgumentError` for classes including `Dry::Configurable` whose
+      `initializer` has required kwargs. (#113 by @timriley)'
+    - 'Remove implicit `to_hash` conversion from `Config`. (#114 by @timriley)'
+  added:
+  changed:
+    - 'Deprecate constructor as a block. Providing `constructor:` kwarg is now
+      the only accepted way. (#111 by @waiting-for-dev & @timriley)'
+    - 'Use `default:` kwarg instead of second positional argument for the
+      default value. (#112 by @waiting-for-dev & @timriley)'
 - version: 0.12.1
   summary:
   date: '2021-02-15'
