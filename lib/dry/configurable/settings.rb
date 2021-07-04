@@ -24,7 +24,10 @@ module Dry
       end
 
       def replace(settings)
-        raise ArgumentError, "settings must be a Dry::Configurable::Settings" unless settings.is_a? Dry::Configurable::Settings
+        unless settings.is_a? Dry::Configurable::Settings
+          raise ArgumentError, "settings must be a Dry::Configurable::Settings"
+        end
+        
         settings.each do |setting|
           self << setting
         end
