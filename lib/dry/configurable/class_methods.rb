@@ -76,7 +76,7 @@ module Dry
 
       # @api private
       def __config_dsl__
-        @dsl ||= DSL.new
+        @__config_dsl__ ||= DSL.new
       end
 
       # @api private
