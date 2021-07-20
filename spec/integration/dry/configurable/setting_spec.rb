@@ -185,14 +185,14 @@ RSpec.describe Dry::Configurable, ".setting" do
 
     include_context "configurable behavior"
 
-    context "can be configured with another class's settings" do 
-      let(:other_klass) do 
-        Class.new do 
+    context "can be configured with another class's settings" do
+      let(:other_klass) do
+        Class.new do
           extend Dry::Configurable
         end
       end
 
-      it "replaces with each" do 
+      it "replaces with each" do
         klass.setting :hello, "world"
         klass._settings.each do |setting|
           other_klass._settings << setting.dup
@@ -200,24 +200,24 @@ RSpec.describe Dry::Configurable, ".setting" do
         expect(other_klass.config.hello).to eql("world")
       end
 
-      it "replaces with replace" do 
-        klass.setting :hello, "world" 
+      it "replaces with replace" do
+        klass.setting :hello, "world"
         other_klass._settings.replace(klass._settings.dup)
         expect(other_klass.config.hello).to eql("world")
       end
 
-      it "deep replace" do 
+      it "deep replace" do
         klass.setting :database do
           setting :dsn, "localhost"
         end
 
         other_klass._settings.replace(klass._settings.dup)
-        expect(other_klass.config.database.dsn).to eql('localhost')
+        expect(other_klass.config.database.dsn).to eql("localhost")
       end
 
-      it "throws an error if the settings aren't Dry::Configurable::Settings" do 
+      it "throws an error if the settings aren't Dry::Configurable::Settings" do
         klass.setting :hello, "world"
-        expect{ other_klass._settings.replace(klass) }.to raise_error do |error|
+        expect { other_klass._settings.replace(klass) }.to raise_error do |error|
           expect(error.class).to be(ArgumentError)
         end
       end
