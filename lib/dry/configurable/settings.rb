@@ -34,11 +34,15 @@ module Dry
       end
 
       def merge(settings)
+        unless settings.is_a? Dry::Configurable::Settings
+          raise ArgumentError, "settings must be a Dry::Configurable::Settings"
+        end
         settings.each do |setting|
           merge_setting(setting)
         end
       end
 
+      # @api private
       def merge_setting(setting)
         if key?(setting.name)
           elements[setting.name].merge(setting)
