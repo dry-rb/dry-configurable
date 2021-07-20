@@ -33,6 +33,20 @@ module Dry
         end
       end
 
+      def merge(settings)
+        settings.each do |setting|
+          merge_setting(setting)
+        end
+      end
+
+      def merge_setting(setting)
+        if key?(setting.name)
+          elements[setting.name].merge(setting)
+        else
+          self << setting
+        end
+      end
+
       # @api private
       def <<(setting)
         elements[setting.name] = setting

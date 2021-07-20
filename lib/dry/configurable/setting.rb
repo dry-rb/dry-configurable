@@ -69,6 +69,11 @@ module Dry
         evaluate if input_defined?
       end
 
+      def merge(setting)
+        input.merge(setting.input) if input_defined?
+        evaluate
+      end
+
       # @api private
       def input_defined?
         !input.equal?(Undefined)

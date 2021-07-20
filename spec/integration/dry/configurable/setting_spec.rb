@@ -192,6 +192,30 @@ RSpec.describe Dry::Configurable, ".setting" do
         end
       end
 
+      it "should deep merge" do
+        klass.setting :database do
+          setting :type, "postgresql"
+          setting :host, "remote"
+          setting :port, 12_345
+          setting :deep do
+            setting :one, 1
+            setting :two, 2
+          end
+        end
+
+        other_klass.setting :database do
+          setting :host, "localhost"
+          setting :port
+          setting :deep, 3
+        end
+
+        other_klass._settings.merge(klass._settings.dup)
+        expect(other_klass.config.database.host).to eql("localhost")
+        expect(other_klass.config.database.port).to eql(nil)
+        expect(other_klass.config.database.type).to eql("postgresql")
+        expect(other_klass.config.database.deep).to eql(3)
+      end
+
       it "replaces with each" do
         klass.setting :hello, "world"
         klass._settings.each do |setting|
