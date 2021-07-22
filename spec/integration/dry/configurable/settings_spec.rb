@@ -78,6 +78,17 @@ RSpec.describe Dry::Configurable::Settings do
         expect(other_klass.config.database.dsn).to eql("localhost")
       end
 
+      it "overrides deep fields" do
+        klass.setting :database do
+          setting :dsn, "localhost"
+        end
+        other_klass.setting :database do
+          setting :dsn, "remote"
+        end
+        other_klass._settings.merge!(klass._settings)
+        expect(other_klass.config.database.dsn).to eql("localhost")
+      end
+
       it "throws an error if the settings aren't Dry::Configurable::Settings" do
         klass.setting :hello, "world"
         expect { other_klass._settings.merge!(klass) }.to raise_error do |error|
