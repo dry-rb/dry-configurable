@@ -185,68 +185,6 @@ RSpec.describe Dry::Configurable, ".setting" do
 
     include_context "configurable behavior"
 
-    context "can be configured with another class's settings" do
-      let(:other_klass) do
-        Class.new do
-          extend Dry::Configurable
-        end
-      end
-
-      it "should deep merge" do
-        klass.setting :database do
-          setting :type, "postgresql"
-          setting :host, "remote"
-          setting :port, 12_345
-          setting :deep do
-            setting :one, 1
-            setting :two, 2
-          end
-        end
-
-        other_klass.setting :database do
-          setting :host, "localhost"
-          setting :port
-          setting :deep, 3
-        end
-
-        other_klass._settings.merge(klass._settings.dup)
-        expect(other_klass.config.database.host).to eql("localhost")
-        expect(other_klass.config.database.port).to eql(nil)
-        expect(other_klass.config.database.type).to eql("postgresql")
-        expect(other_klass.config.database.deep).to eql(3)
-      end
-
-      it "replaces with each" do
-        klass.setting :hello, "world"
-        klass._settings.each do |setting|
-          other_klass._settings << setting.dup
-        end
-        expect(other_klass.config.hello).to eql("world")
-      end
-
-      it "replaces with replace" do
-        klass.setting :hello, "world"
-        other_klass._settings.replace(klass._settings.dup)
-        expect(other_klass.config.hello).to eql("world")
-      end
-
-      it "deep replace" do
-        klass.setting :database do
-          setting :dsn, "localhost"
-        end
-
-        other_klass._settings.replace(klass._settings.dup)
-        expect(other_klass.config.database.dsn).to eql("localhost")
-      end
-
-      it "throws an error if the settings aren't Dry::Configurable::Settings" do
-        klass.setting :hello, "world"
-        expect { other_klass._settings.replace(klass) }.to raise_error do |error|
-          expect(error.class).to be(ArgumentError)
-        end
-      end
-    end
-
     context "with a subclass" do
       let(:subclass) do
         Class.new(klass)

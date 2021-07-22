@@ -42,6 +42,11 @@ module Dry
       class Nested < Setting
         CONSTRUCTOR = Config.method(:new)
 
+        def merge(setting)
+          settings = input.merge(setting.input)
+          Nested.new(name, input: settings, **options)
+        end
+
         # @api private
         def pristine
           with(input: input.pristine)
@@ -67,11 +72,6 @@ module Dry
         @options = options
 
         evaluate if input_defined?
-      end
-
-      def merge(setting)
-        input.merge(setting.input) if input_defined?
-        evaluate
       end
 
       # @api private

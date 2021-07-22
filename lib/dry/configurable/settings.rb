@@ -23,32 +23,17 @@ module Dry
         initialize_elements(elements)
       end
 
-      def replace(settings)
-        unless settings.is_a? Dry::Configurable::Settings
-          raise ArgumentError, "settings must be a Dry::Configurable::Settings"
-        end
-
-        settings.each do |setting|
+      def merge!(settings)
+        merge(settings).each do |setting|
           self << setting
         end
       end
 
       def merge(settings)
-        unless settings.is_a? Dry::Configurable::Settings
-          raise ArgumentError, "settings must be a Dry::Configurable::Settings"
-        end
+        ensure_arguments(settings)
 
-        settings.each do |setting|
-          merge_setting(setting)
-        end
-      end
-
-      # @api private
-      def merge_setting(setting)
-        if key?(setting.name)
-          elements[setting.name].merge(setting)
-        else
-          self << setting
+        settings.dup.inject(dup) do |memo, setting|
+          memo << merge_setting(setting)
         end
       end
 
@@ -84,6 +69,20 @@ module Dry
       end
 
       private
+
+      def merge_setting(setting)
+        if elements[setting.name].is_a? Setting::Nested
+          elements[setting.name].merge(setting)
+        else
+          setting
+        end
+      end
+
+      def ensure_arguments(settings)
+        unless settings.is_a? Dry::Configurable::Settings
+          raise ArgumentError, "settings must be a Dry::Configurable::Settings"
+        end
+      end
 
       # @api private
       def initialize_copy(source)
