@@ -44,7 +44,7 @@ module Dry
 
         def merge(setting)
           settings = input.merge(setting.input)
-          Nested.new(name, input: settings, **options)
+          Nested.new(name, input: settings, **setting.options)
         end
 
         # @api private
