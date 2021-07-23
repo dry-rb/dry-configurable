@@ -71,7 +71,7 @@ module Dry
       private
 
       def merge_setting(setting)
-        if elements[setting.name].is_a? Setting::Nested
+        if elements[setting.name].is_a?(Setting::Nested) && setting.is_a?(Setting::Nested)
           elements[setting.name].merge(setting)
         else
           setting
