@@ -96,7 +96,7 @@ RSpec.describe Dry::Configurable::Settings do
         expect(other_klass.config.database.dsn).to eql("localhost")
       end
 
-      it "shouldn't blow up when merging a non nested setting to a nested setting" do 
+      it "shouldn't blow up when merging a non nested setting to a nested setting" do
         klass.setting :database, "hello"
         other_klass.setting :database do
           setting :dsn, "localhost"
