@@ -63,6 +63,14 @@ RSpec.describe Dry::Configurable::Settings do
         end
       end
 
+      it "should override a block" do
+        klass.setting(:hello, "bar") { |w| w.chars.join("_") }
+        other_klass.setting(:hello, "fuzz") { |w| w.chars.join("-") }
+        expect(other_klass.config.hello).to eql("f-u-z-z")
+        other_klass._settings.merge!(klass._settings)
+        expect(other_klass.config.hello).to eql("b_a_r")
+      end
+
       it "replaces undefined fields" do
         klass.setting :hello, "world"
         other_klass._settings.merge!(klass._settings)
@@ -73,7 +81,6 @@ RSpec.describe Dry::Configurable::Settings do
         klass.setting :database do
           setting :dsn, "localhost"
         end
-
         other_klass._settings.merge!(klass._settings)
         expect(other_klass.config.database.dsn).to eql("localhost")
       end
@@ -85,6 +92,18 @@ RSpec.describe Dry::Configurable::Settings do
         other_klass.setting :database do
           setting :dsn, "remote"
         end
+        other_klass._settings.merge!(klass._settings)
+        expect(other_klass.config.database.dsn).to eql("localhost")
+      end
+
+      it "should work when the config accessor has already be invoked" do
+        klass.setting :database do
+          setting :dsn, "localhost"
+        end
+        other_klass.setting :database do
+          setting :dsn, "remote"
+        end
+        expect(other_klass.config.database.dsn).to eql("remote")
         other_klass._settings.merge!(klass._settings)
         expect(other_klass.config.database.dsn).to eql("localhost")
       end
