@@ -23,6 +23,14 @@ module Dry
         initialize_elements(elements)
       end
 
+      def replace(settings)
+        ensure_arguments(settings)
+
+        settings.dup.each do |setting|
+          self << setting
+        end
+      end
+
       def merge!(settings)
         merge(settings).each do |setting|
           self << setting

@@ -10,6 +10,29 @@ RSpec.describe Dry::Configurable::Settings do
       end
     end
 
+    context "with replace" do
+      let(:other_klass) do
+        Class.new do
+          extend Dry::Configurable
+        end
+      end
+
+      it "should replace nested fields" do
+        klass.setting :database do
+          setting :host, "localhost"
+        end
+
+        other_klass.setting :database do
+          setting :type, "postgresql"
+        end
+        other_klass._settings.replace(klass._settings)
+        expect(other_klass.config.database.host).to eql("localhost")
+        expect { other_klass.config.database.type }.to raise_error do |error|
+          expect(error.class).to eql(NoMethodError)
+        end
+      end
+    end
+
     context "with merge" do
       let(:other_klass) do
         Class.new do
