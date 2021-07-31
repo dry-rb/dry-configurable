@@ -29,7 +29,7 @@ RSpec.describe Dry::Configurable::DSL do
     expect(setting.name).to be(:user)
     expect(setting.value).to eql("root")
     logger.rewind
-    expect(logger.string).to match(/#{FileUtils.pwd}.*default value as positional argument to settings is deprecated/)
+    expect(logger.string).to match(/default value as positional argument to settings is deprecated/)
   end
 
   it "compiles a setting with a reader set" do
@@ -71,7 +71,7 @@ RSpec.describe Dry::Configurable::DSL do
     expect(setting.name).to be(:dsn)
     expect(setting.value).to eql("jdbc:sqlite")
     logger.rewind
-    expect(logger.string).to match(/#{FileUtils.pwd}.*constructor as a block is deprecated/)
+    expect(logger.string).to match(/constructor as a block is deprecated/)
   end
 
   it "compiles a nested list of settings" do
