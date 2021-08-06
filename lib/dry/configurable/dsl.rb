@@ -27,10 +27,10 @@ module Dry
         instance_exec(&block) if block
       end
 
-      # Register a new setting node and compile it into a setting object
+      # Registers a new setting node and compile it into a setting object
       #
       # @see ClassMethods.setting
-      # @api public
+      # @api private
       # @return Setting
       def setting(name, default = Undefined, **options, &block)
         unless VALID_NAME.match?(name.to_s)
