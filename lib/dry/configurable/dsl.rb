@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "dry/configurable/constants"
+require "dry/configurable/flags"
 require "dry/configurable/setting"
 require "dry/configurable/settings"
 require "dry/configurable/compiler"
@@ -32,18 +33,21 @@ module Dry
       # @see ClassMethods.setting
       # @api private
       # @return Setting
-      def setting(name, default = Undefined, **options, &block) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
+      def setting(name, default = Undefined, **options, &block) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
         unless VALID_NAME.match?(name.to_s)
           raise ArgumentError, "#{name} is not a valid setting name"
         end
 
         if default != Undefined
-          Dry::Core::Deprecations.announce(
-            "default value as positional argument to settings",
-            "Provide a `default:` keyword argument instead",
-            tag: "dry-configurable",
-            uplevel: 2
-          )
+          if Dry::Configurable.warn_on_setting_positional_default
+            Dry::Core::Deprecations.announce(
+              "default value as positional argument to settings",
+              "Provide a `default:` keyword argument instead",
+              tag: "dry-configurable",
+              uplevel: 2
+            )
+          end
+
           options = options.merge(default: default)
         end
 
@@ -101,23 +105,28 @@ module Dry
           # Additionally, the deprecation messages will make the new behavior obvious, and
           # encourage the users to upgrade their setting definitions.
 
-          Dry::Core::Deprecations.announce(
-            "default value as positional argument to settings",
-            "Provide a `default:` keyword argument instead",
-            tag: "dry-configurable",
-            uplevel: 2
-          )
+          if Dry::Configurable.warn_on_setting_positional_default
+            Dry::Core::Deprecations.announce(
+              "default value as positional argument to settings",
+              "Provide a `default:` keyword argument instead",
+              tag: "dry-configurable",
+              uplevel: 2
+            )
+          end
 
           options = {default: invalid_opts}
         end
 
         if block && !block.arity.zero?
-          Dry::Core::Deprecations.announce(
-            "passing a constructor as a block",
-            "Provide a `constructor:` keyword argument instead",
-            tag: "dry-configurable",
-            uplevel: 2
-          )
+          if Dry::Configurable.warn_on_setting_constructor_block
+            Dry::Core::Deprecations.announce(
+              "passing a constructor as a block",
+              "Provide a `constructor:` keyword argument instead",
+              tag: "dry-configurable",
+              uplevel: 2
+            )
+          end
+
           options = options.merge(constructor: block)
           block = nil
         end
