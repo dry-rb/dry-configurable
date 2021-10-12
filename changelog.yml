@@ -9,8 +9,8 @@
       Added flags to determine whether to warn on the API usage deprecated in this release (see "Changed" section below). Set these to `false` to suppress the warnings. (#124 by @timriley)
 
         ```ruby
-        Dry::Configurable.warn_on_setting_constructor_block = false
-        Dry::Configurable.warn_on_setting_positional_default = false
+        Dry::Configurable.warn_on_setting_constructor_block false
+        Dry::Configurable.warn_on_setting_positional_default false
         ```
   changed:
     - |-
