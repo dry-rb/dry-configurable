@@ -42,6 +42,11 @@ module Dry
       class Nested < Setting
         CONSTRUCTOR = Config.method(:new)
 
+        def merge(setting)
+          settings = input.merge(setting.input)
+          Nested.new(name, input: settings, **setting.options)
+        end
+
         # @api private
         def pristine
           with(input: input.pristine)
