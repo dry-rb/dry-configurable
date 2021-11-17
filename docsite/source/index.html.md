@@ -53,3 +53,23 @@ App.pool
 App.uploader.bucket
 # => 'dev'
 ```
+
+`dry-configurable` also can be used to pass a configuration block like you may have seen in
+other gems. 
+
+Example:
+
+```ruby
+class App
+  extend Dry::Configurable
+  setting :database
+end
+
+App.config.database # => nil
+
+App.configure do |config|
+  config.database = "postgres"
+end
+
+App.config.database # => "postgres"
+```
