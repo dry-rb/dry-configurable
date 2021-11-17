@@ -54,7 +54,7 @@ App.uploader.bucket
 # => 'dev'
 ```
 
-`dry-configurable` also can be used to pass a configuration block like you may have seen in
+`dry-configurable` can also be used to pass a configuration block like you may have seen in
 other gems. 
 
 Example:
