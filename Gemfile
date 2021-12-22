@@ -11,6 +11,6 @@ group :benchmarks do
 end
 
 group :tools do
-  gem 'hotch'
+  gem 'hotch', platform: :mri
   gem 'pry-byebug', platform: :mri
 end
