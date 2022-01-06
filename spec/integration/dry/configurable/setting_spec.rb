@@ -328,8 +328,8 @@ RSpec.describe Dry::Configurable, ".setting" do
         klass.setting :env
 
         klass.setting :db do
-          setting :user, "root"
-          setting :pass, "secret"
+          setting :user, default: "root"
+          setting :pass, default: "secret"
         end
       end
 
