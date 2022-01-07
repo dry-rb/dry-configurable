@@ -147,7 +147,7 @@ RSpec.describe Dry::Configurable, ".setting" do
 
     context "with a ruby keyword" do
       before do
-        klass.setting :if, true
+        klass.setting :if, default: true
       end
 
       it "works" do
@@ -205,7 +205,7 @@ RSpec.describe Dry::Configurable, ".setting" do
       it "allows defining more settings" do
         klass.setting :db, default: "sqlite"
 
-        subclass.setting :username, "root"
+        subclass.setting :username, default: "root"
         subclass.setting :password
 
         subclass.config.password = "secret"
@@ -308,13 +308,13 @@ RSpec.describe Dry::Configurable, ".setting" do
     end
 
     it "defines a constructor that sets the config" do
-      klass.setting :db, "sqlite"
+      klass.setting :db, default: "sqlite"
 
       expect(object.config.db).to eql("sqlite")
     end
 
     it "creates distinct setting values across instances" do
-      klass.setting(:path, "test", constructor: ->(m) { Pathname(m) })
+      klass.setting(:path, default: "test", constructor: ->(m) { Pathname(m) })
 
       new_object = klass.new
 
@@ -365,7 +365,7 @@ RSpec.describe Dry::Configurable, ".setting" do
     end
 
     it "can be configured" do
-      klass.setting :db, "sqlite"
+      klass.setting :db, default: "sqlite"
 
       object.configure do |config|
         config.db = "mariadb"
@@ -375,7 +375,7 @@ RSpec.describe Dry::Configurable, ".setting" do
     end
 
     it "can be finalized" do
-      klass.setting :db, "sqlite"
+      klass.setting :db, default: "sqlite"
 
       object.finalize!
       # becomes a no-op
@@ -389,7 +389,7 @@ RSpec.describe Dry::Configurable, ".setting" do
 
     it "defines a reader shortcut for nested config" do
       klass.setting :dsn, reader: true do
-        setting :pool, 5
+        setting :pool, default: 5
       end
 
       expect(object.dsn.pool).to be(5)
@@ -398,10 +398,10 @@ RSpec.describe Dry::Configurable, ".setting" do
     context "Test Interface" do
       describe "reset_config" do
         it "resets configuration to default values" do
-          klass.setting :dsn, nil
+          klass.setting :dsn, default: nil
 
           klass.setting :pool do
-            setting :size, nil
+            setting :size, default: nil
           end
 
           object.enable_test_interface
