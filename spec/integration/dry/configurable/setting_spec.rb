@@ -45,12 +45,31 @@ RSpec.describe Dry::Configurable, ".setting" do
     end
 
     context "with a default value" do
-      before do
-        klass.setting :db, default: "sqlite"
+      context "string" do
+        before do
+          klass.setting :db, default: "sqlite"
+        end
+
+        it "presets the default value" do
+          expect(object.config.db).to eql("sqlite")
+        end
       end
 
-      it "presets the value with the default" do
-        expect(object.config.db).to eql("sqlite")
+      context "hash" do
+        it "returns the default value" do
+          klass.setting :db_config, default: {user: "root", password: ""}
+
+          expect(object.config.db_config).to eql(user: "root", password: "")
+        end
+
+        it "copies the original hash object" do
+          hash = {user: "root", password: ""}
+
+          klass.setting :db_config, default: hash
+
+          expect(object.config.db_config).to_not be(hash)
+          expect(object.config.db_config).to eql(hash)
+        end
       end
     end
 
@@ -166,21 +185,13 @@ RSpec.describe Dry::Configurable, ".setting" do
 
     include_context "configurable behavior"
 
-    context "class-level configurable behavior" do
-      specify "settings defined after accessing config are still available in the config" do
-        klass.setting :before, default: "defined before"
-        klass.config
-        klass.setting :after, default: "defined after"
+    specify "settings defined after accessing config are still available in the config" do
+      klass.setting :before, default: "defined before"
+      klass.config
+      klass.setting :after, default: "defined after"
 
-        expect(klass.config.before).to eq "defined before"
-        expect(klass.config.after).to eq "defined after"
-      end
-
-      specify "default values use their original objects" do
-        hash = {user: "root", password: ""}
-        klass.setting :db_config, default: hash
-        expect(object.config.db_config).to be(hash)
-      end
+      expect(klass.config.before).to eq "defined before"
+      expect(klass.config.after).to eq "defined after"
     end
 
     context "with a subclass" do

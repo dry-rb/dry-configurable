@@ -62,9 +62,17 @@ module Dry
       def initialize(name, input: Undefined, default: Undefined, **options)
         @name = name
         @writer_name = :"#{name}="
+        @options = options
+
+        # Setting collections (see `Settings`) are shared between the configurable class
+        # and its `config` object, so for cloneable individual settings, we duplicate
+        # their _values_ as early as possible to ensure no impact from unintended mutation
         @input = input
         @default = default
-        @options = options
+        if cloneable?
+          @input = input.dup
+          @default = default.dup
+        end
 
         evaluate if input_defined?
       end
