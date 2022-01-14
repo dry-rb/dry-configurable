@@ -1,4 +1,14 @@
 ---
+- version: 0.14.0
+  summary:
+  date: '2022-01-14'
+  changed:
+    - |-
+      Settings defined after an access to `config` will still be made available on that `config`. (#130 by @timriley)
+    - |-
+      Cloneable settings are cloned immediately upon assignment. (#130 by @timriley)
+    - |-
+      Changes to config values in parent classes after subclasses have already been created will not be propogated to those subclasses. Subclasses created _after_ config values have been changed in the parent _will_ receive those config values. (#130 by @timriley)
 - version: 0.13.0
   summary:
   date: '2021-09-12'
