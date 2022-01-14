@@ -23,7 +23,7 @@ module Dry
 
       # @api private
       def initialize(settings)
-        @_settings = settings.dup
+        @_settings = settings
         @_resolved = Concurrent::Map.new
       end
 

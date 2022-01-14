@@ -185,6 +185,15 @@ RSpec.describe Dry::Configurable, ".setting" do
 
     include_context "configurable behavior"
 
+    specify "settings defined after accessing config are still available in the config" do
+      klass.setting :before, default: "defined before"
+      klass.config
+      klass.setting :after, default: "defined after"
+
+      expect(klass.config.before).to eq "defined before"
+      expect(klass.config.after).to eq "defined after"
+    end
+
     context "with a subclass" do
       let(:subclass) do
         Class.new(klass)
@@ -225,12 +234,22 @@ RSpec.describe Dry::Configurable, ".setting" do
         expect(subclass.settings).to eql(Set[:db])
       end
 
-      it "configured parent copies config to the child" do
+      specify "configuring the parent before subclassing copies the config to the child" do
         klass.setting :db
 
         object.config.db = "mariadb"
 
         expect(subclass.config.db).to eql("mariadb")
+      end
+
+      specify "configuring the parent after subclassing does not copy the config to the child" do
+        klass.setting :db
+
+        subclass = Class.new(klass)
+
+        object.config.db = "mariadb"
+
+        expect(subclass.config.db).to be nil
       end
 
       it "not configured parent does not set child config" do
@@ -321,6 +340,22 @@ RSpec.describe Dry::Configurable, ".setting" do
       expect(object.config.path).to eq Pathname("test")
       expect(new_object.config.path).to eq Pathname("test")
       expect(object.config.path).not_to be(new_object.config.path)
+    end
+
+    it "makes only settings defined before instantiation available" do
+      klass.setting :before, default: "defined before"
+
+      object_1 = klass.new
+
+      klass.setting :after, default: "defined after"
+
+      object_2 = klass.new
+
+      expect(object_1.config.before).to eq "defined before"
+      expect(object_1.config).not_to respond_to(:after)
+
+      expect(object_2.config.before).to eq "defined before"
+      expect(object_2.config.after).to eq "defined after"
     end
 
     shared_examples "copying" do
