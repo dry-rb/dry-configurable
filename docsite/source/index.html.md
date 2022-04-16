@@ -29,12 +29,13 @@ class App
   # Defaults to nil if no default value is given
   setting :adapter
   # Pre-process values
-  setting(:path, 'test') { |value| Pathname(value) }
+  setting :path, default: 'test',
+                 constructor: -> { |value| Pathname(value) }
   # Passing the reader option as true will create attr_reader method for the class
-  setting :pool, 5, reader: true
+  setting :pool, default: 5, reader: true
   # Passing the reader attributes works with nested configuration
   setting :uploader, reader: true do
-    setting :bucket, 'dev'
+    setting :bucket, default: 'dev'
   end
 end
 
