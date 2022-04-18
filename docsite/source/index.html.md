@@ -31,7 +31,7 @@ class App
   # Construct values
   setting :path, default: 'test', constructor: proc { |value| Pathname(value) }
   # Passing the reader option as true will create attr_reader method for the class
-  setting :pool, 5, reader: true
+  setting :pool, default: 5, reader: true
   # Passing the reader attributes works with nested configuration
   setting :uploader, reader: true do
     setting :bucket, default: 'dev'
