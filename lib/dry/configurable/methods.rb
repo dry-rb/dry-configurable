@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'dry/configurable/errors'
+require "dry/configurable/errors"
 
 module Dry
   module Configurable
@@ -10,7 +10,7 @@ module Dry
     module Methods
       # @api public
       def configure(&block)
-        raise FrozenConfig, 'Cannot modify frozen config' if frozen?
+        raise FrozenConfig, "Cannot modify frozen config" if frozen?
 
         yield(config) if block
         self

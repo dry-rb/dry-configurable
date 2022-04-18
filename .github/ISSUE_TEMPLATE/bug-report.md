@@ -2,28 +2,24 @@
 name: "\U0001F41B Bug report"
 about: See CONTRIBUTING.md for more information
 title: ''
-labels: bug
+labels: bug, help wanted
 assignees: ''
 
 ---
 
-**Before you submit this: WE ONLY ACCEPT BUG REPORTS AND FEATURE REQUESTS**
-
-For more information see `CONTRIBUTING.md`.
-
-**Describe the bug**
+## Describe the bug
 
 A clear and concise description of what the bug is.
 
-**To Reproduce**
+## To Reproduce
 
-Provide detailed steps to reproduce, an executable script would be best.
+Provide detailed steps to reproduce, **an executable script would be best**.
 
-**Expected behavior**
+## Expected behavior
 
 A clear and concise description of what you expected to happen.
 
-**Your environment**
+## My environment
 
 - Affects my production application: **YES/NO**
 - Ruby version: ...

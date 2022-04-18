@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'set'
+require "set"
 
-require 'dry/configurable/constants'
-require 'dry/configurable/dsl'
-require 'dry/configurable/methods'
-require 'dry/configurable/settings'
+require "dry/configurable/constants"
+require "dry/configurable/dsl"
+require "dry/configurable/methods"
+require "dry/configurable/settings"
 
 module Dry
   module Configurable
@@ -13,30 +13,31 @@ module Dry
       include Methods
 
       # @api private
-      def inherited(klass)
+      def inherited(subclass)
         super
 
-        parent_settings = (respond_to?(:config) ? config.settings : _settings)
-
-        klass.instance_variable_set('@_settings', parent_settings)
+        subclass.instance_variable_set("@_settings", _settings.dup)
+        subclass.instance_variable_set("@_config", config.dup) if respond_to?(:config)
       end
 
       # Add a setting to the configuration
       #
-      # @param [Mixed] key
+      # @param [Mixed] name
       #   The accessor key for the configuration value
       # @param [Mixed] default
-      #   The default config value
-      #
+      #   Default value for the setting
+      # @param [#call] constructor
+      #   Transformation given value will go through
+      # @param [Boolean] reader
+      #   Whether a reader accessor must be created
       # @yield
-      #   If a block is given, it will be evaluated in the context of
-      #   a new configuration class, and bound as the default value
+      #   A block can be given to add nested settings.
       #
       # @return [Dry::Configurable::Config]
       #
       # @api public
-      def setting(*args, &block)
-        setting = __config_dsl__.setting(*args, &block)
+      def setting(*args, **options, &block)
+        setting = __config_dsl__.setting(*args, **options, &block)
 
         _settings << setting
 
@@ -69,12 +70,17 @@ module Dry
       #
       # @api public
       def config
+        # The _settings provided to the Config remain shared between the class and the
+        # Config. This allows settings defined _after_ accessing the config to become
+        # available in subsequent accesses to the config. The config is duped when
+        # subclassing to ensure it remains distinct between subclasses and parent classes
+        # (see `.inherited` above).
         @config ||= Config.new(_settings)
       end
 
       # @api private
       def __config_dsl__
-        @dsl ||= DSL.new
+        @__config_dsl__ ||= DSL.new
       end
 
       # @api private

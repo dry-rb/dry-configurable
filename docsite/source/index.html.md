@@ -24,13 +24,12 @@ class App
   # Pass a block for nested configuration (works to any depth)
   setting :database do
     # Can pass a default value
-    setting :dsn, 'sqlite:memory'
+    setting :dsn, default: 'sqlite:memory'
   end
   # Defaults to nil if no default value is given
   setting :adapter
-  # Pre-process values
-  setting :path, default: 'test',
-                 constructor: -> { |value| Pathname(value) }
+  # Construct values
+  setting :path, default: 'test', constructor: proc { |value| Pathname(value) }
   # Passing the reader option as true will create attr_reader method for the class
   setting :pool, default: 5, reader: true
   # Passing the reader attributes works with nested configuration

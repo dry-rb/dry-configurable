@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'concurrent/map'
+require "concurrent/map"
 
-require 'dry/equalizer'
+require "dry/core/equalizer"
 
-require 'dry/configurable/constants'
-require 'dry/configurable/errors'
+require "dry/configurable/constants"
+require "dry/configurable/errors"
 
 module Dry
   module Configurable
@@ -16,15 +16,15 @@ module Dry
       include Dry::Equalizer(:values)
 
       # @api private
-      attr_reader :settings
+      attr_reader :_settings
 
       # @api private
-      attr_reader :resolved
+      attr_reader :_resolved
 
       # @api private
       def initialize(settings)
-        @settings = settings.dup
-        @resolved = Concurrent::Map.new
+        @_settings = settings
+        @_resolved = Concurrent::Map.new
       end
 
       # Get config value by a key
@@ -33,9 +33,10 @@ module Dry
       #
       # @return Config value
       def [](name)
-        raise ArgumentError, "+#{name}+ is not a setting name" unless settings.key?(name)
+        name = name.to_sym
+        raise ArgumentError, "+#{name}+ is not a setting name" unless _settings.key?(name)
 
-        settings[name].value
+        _settings[name].value
       end
 
       # Set config value.
@@ -49,7 +50,7 @@ module Dry
 
       # Update config with new values
       #
-      # @param [Hash] A hash with new values
+      # @param values [Hash] A hash with new values
       #
       # @return [Config]
       #
@@ -63,6 +64,7 @@ module Dry
             self[key] = value
           end
         end
+        self
       end
 
       # Dump config into a hash
@@ -71,42 +73,41 @@ module Dry
       #
       # @api public
       def values
-        settings
+        _settings
           .map { |setting| [setting.name, setting.value] }
           .map { |key, value| [key, value.is_a?(self.class) ? value.to_h : value] }
           .to_h
       end
       alias_method :to_h, :values
-      alias_method :to_hash, :values
 
       # @api private
       def finalize!
-        settings.freeze
+        _settings.freeze
         freeze
       end
 
       # @api private
       def pristine
-        self.class.new(settings.pristine)
+        self.class.new(_settings.pristine)
       end
 
       # @api private
       def respond_to_missing?(meth, include_private = false)
-        super || settings.key?(resolve(meth))
+        super || _settings.key?(resolve(meth))
       end
 
       private
 
       # @api private
       def method_missing(meth, *args)
-        setting = settings[resolve(meth)]
+        setting = _settings[resolve(meth)]
 
         super unless setting
 
         if setting.writer?(meth)
-          raise FrozenConfig, 'Cannot modify frozen config' if frozen?
+          raise FrozenConfig, "Cannot modify frozen config" if frozen?
 
-          settings << setting.with(input: args[0])
+          _settings << setting.with(input: args[0])
         else
           setting.value
         end
@@ -114,13 +115,13 @@ module Dry
 
       # @api private
       def resolve(meth)
-        resolved.fetch(meth) { resolved[meth] = meth.to_s.tr('=', '').to_sym }
+        _resolved.fetch(meth) { _resolved[meth] = meth.to_s.tr("=", "").to_sym }
       end
 
       # @api private
       def initialize_copy(source)
         super
-        @settings = source.settings.dup
+        @_settings = source._settings.dup
       end
     end
   end

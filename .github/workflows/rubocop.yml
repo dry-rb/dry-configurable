@@ -1,0 +1,46 @@
+name: "RuboCop"
+on:
+  push:
+    branches:
+      - "main"
+      - "master"
+    paths:
+      - "**/*.rb"
+      - "**/*.rake"
+      - "Rakefile"
+      - "Gemfile*"
+      - ".rubocop.yml"
+  pull_request:
+    branches:
+      - "main"
+      - "master"
+    types:
+      - "opened"
+      - "synchronize"
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    name: ${{ matrix.type }}
+    strategy:
+      fail-fast: false
+      matrix:
+        type: ["Style", "Layout", "Naming", "Lint", "Metrics", "Security"]
+    steps:
+    - name: Clone
+      uses: actions/checkout@v2
+    - name: Get git diff
+      id: get_diff
+      uses: technote-space/get-diff-action@v4
+      with:
+        PATTERNS: |
+          **/*.rb
+          **/*.rake
+          Gemfile
+          Rakefile
+    - name: Check ${{ matrix.type }}
+      uses: action-hero/actions/rubocop@main
+      if: ${{ env.GIT_DIFF != '' }}
+      with:
+        diff: ${{ env.GIT_DIFF }}
+        type: ${{ matrix.type }}

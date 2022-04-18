@@ -1,17 +1,17 @@
-# this file is managed by dry-rb/devtools project
+# frozen_string_literal: true
 
-git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
+# This file is synced from dry-rb/template-gem repo
+
+gem "rake", ">= 12.3.3"
 
 group :test do
-  # 0.18.x breaks codacy result parser
-  gem 'simplecov', '0.17.1', require: false, platforms: :ruby
+  gem "simplecov", require: false, platforms: :ruby
+  gem "simplecov-cobertura", require: false, platforms: :ruby
+  gem "rexml", require: false
 
-  gem 'codacy-coverage', require: false, platforms: :ruby
-
-  gem 'warning' if RUBY_VERSION >= '2.4.0'
+  gem "warning"
 end
 
 group :tools do
-  # this is the same version that we use on codacy
-  gem 'rubocop', '0.71.0'
+  gem "rubocop", "~> 1.27.0"
 end

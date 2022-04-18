@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'set'
+require "set"
 
-require 'dry/equalizer'
+require "dry/core/equalizer"
 
-require 'dry/configurable/constants'
-require 'dry/configurable/config'
+require "dry/configurable/constants"
+require "dry/configurable/config"
 
 module Dry
   module Configurable
@@ -13,13 +13,13 @@ module Dry
     #
     # @api private
     class Setting
-      include Dry::Equalizer(:name, :value, :options)
+      include Dry::Equalizer(:name, :value, :options, inspect: false)
 
-      OPTIONS = %i[input default reader constructor settings].freeze
+      OPTIONS = %i[input default reader constructor cloneable settings].freeze
 
       DEFAULT_CONSTRUCTOR = -> v { v }.freeze
 
-      CLONABLE_VALUE_TYPES = [Array, Hash, Set, Config].freeze
+      CLONEABLE_VALUE_TYPES = [Array, Hash, Set, Config].freeze
 
       # @api private
       attr_reader :name
@@ -32,9 +32,6 @@ module Dry
 
       # @api private
       attr_reader :default
-
-      # @api private
-      attr_reader :value
 
       # @api private
       attr_reader :options
@@ -57,13 +54,42 @@ module Dry
       end
 
       # @api private
+      def self.cloneable_value?(value)
+        CLONEABLE_VALUE_TYPES.any? { |type| value.is_a?(type) }
+      end
+
+      # @api private
       def initialize(name, input: Undefined, default: Undefined, **options)
         @name = name
         @writer_name = :"#{name}="
-        @input = input.equal?(Undefined) ? default : input
-        @default = default
         @options = options
-        set!
+
+        # Setting collections (see `Settings`) are shared between the configurable class
+        # and its `config` object, so for cloneable individual settings, we duplicate
+        # their _values_ as early as possible to ensure no impact from unintended mutation
+        @input = input
+        @default = default
+        if cloneable?
+          @input = input.dup
+          @default = default.dup
+        end
+
+        evaluate if input_defined?
+      end
+
+      # @api private
+      def input_defined?
+        !input.equal?(Undefined)
+      end
+
+      # @api private
+      def value
+        @value ||= evaluate
+      end
+
+      # @api private
+      def evaluated?
+        instance_variable_defined?(:@value)
       end
 
       # @api private
@@ -97,8 +123,16 @@ module Dry
       end
 
       # @api private
-      def clonable_value?
-        CLONABLE_VALUE_TYPES.any? { |type| value.is_a?(type) }
+      def cloneable?
+        if options.key?(:cloneable)
+          # Return cloneable option if explicitly set
+          options[:cloneable]
+        else
+          # Otherwise, infer cloneable from any of the input, default, or value
+          Setting.cloneable_value?(input) || Setting.cloneable_value?(default) || (
+            evaluated? && Setting.cloneable_value?(value)
+          )
+        end
       end
 
       private
@@ -106,13 +140,19 @@ module Dry
       # @api private
       def initialize_copy(source)
         super
-        @value = source.value.dup if source.clonable_value?
+
         @options = source.options.dup
+
+        if source.cloneable?
+          @input = source.input.dup
+          @default = source.default.dup
+          @value = source.value.dup if source.evaluated?
+        end
       end
 
       # @api private
-      def set!
-        @value = constructor[input.equal?(Undefined) ? nil : input]
+      def evaluate
+        @value = constructor[Undefined.coalesce(input, default, nil)]
       end
     end
   end

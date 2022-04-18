@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
-require 'concurrent/array'
+require "concurrent/array"
 
-require 'dry/configurable/constants'
-require 'dry/configurable/class_methods'
-require 'dry/configurable/instance_methods'
-require 'dry/configurable/config'
-require 'dry/configurable/setting'
+require "dry/configurable/constants"
+require "dry/configurable/class_methods"
+require "dry/configurable/instance_methods"
+require "dry/configurable/config"
+require "dry/configurable/setting"
+require "dry/configurable/errors"
 
 module Dry
   # A simple configuration mixin
@@ -51,10 +52,13 @@ module Dry
 
     # @api private
     def self.included(klass)
+      raise AlreadyIncluded if klass.include?(InstanceMethods)
+
       super
       klass.class_eval do
         extend(ClassMethods)
         include(InstanceMethods)
+        prepend(Initializer)
 
         class << self
           undef :config

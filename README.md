@@ -1,3 +1,4 @@
+<!--- this file is synced from dry-rb/template-gem project -->
 [gem]: https://rubygems.org/gems/dry-configurable
 [actions]: https://github.com/dry-rb/dry-configurable/actions
 [codacy]: https://www.codacy.com/gh/dry-rb/dry-configurable
@@ -10,19 +11,19 @@
 [![CI Status](https://github.com/dry-rb/dry-configurable/workflows/ci/badge.svg)][actions]
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/0276a97990e04eb0ac722b3e7f3620b5)][codacy]
 [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/0276a97990e04eb0ac722b3e7f3620b5)][codacy]
-[![Inline docs](http://inch-ci.org/github/dry-rb/dry-configurable.svg?branch=master)][inchpages]
+[![Inline docs](http://inch-ci.org/github/dry-rb/dry-configurable.svg?branch=main)][inchpages]
 
 ## Links
 
-* [User documentation](http://dry-rb.org/gems/dry-configurable)
+* [User documentation](https://dry-rb.org/gems/dry-configurable)
 * [API documentation](http://rubydoc.info/gems/dry-configurable)
 
 ## Supported Ruby versions
 
 This library officially supports the following Ruby versions:
 
-* MRI >= `2.4`
-* jruby >= `9.2`
+* MRI `>= 2.7.0`
+* jruby `>= 9.3` (postponed until 2.7 is supported)
 
 ## License
 
