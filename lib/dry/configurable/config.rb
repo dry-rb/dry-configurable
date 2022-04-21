@@ -57,8 +57,11 @@ module Dry
       # @api public
       def update(values)
         values.each do |key, value|
-          case value
-          when Hash
+          if self[key].is_a?(self.class)
+            unless value.is_a?(Hash)
+              raise ArgumentError, "#{value.inspect} is not a valid setting value"
+            end
+
             self[key].update(value)
           else
             self[key] = value
