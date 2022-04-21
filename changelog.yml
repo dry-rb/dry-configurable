@@ -1,4 +1,35 @@
 ---
+- version: 0.15.0
+  summary:
+  date: '2022-04-21'
+  changed:
+    - |-
+      The `finalize!` method (as class or instance method, depending on whether you extend or include `Dry::Configurable` respectively) now accepts a boolean `freeze_values:` argument, which if true, will recursively freeze all config values in addition to the `config` itself. (#105 by @ojab)
+
+        ```ruby
+        class MyConfigurable
+          include Dry::Configurable
+
+          setting :db, default: "postgre"
+        end
+
+        my_obj = MyConfigurable.new
+        my_obj.finalize!(freeze_values: true)
+        my_obj.config.db << "sql" # Will raise FrozenError
+        ```
+    - |-
+      `Dry::Configurable::Config#update` will accept any values implicitly convertible to hash via `#to_hash`, and will set hashes as values for non-nested settings (#131 by @ojab, #133 by @timriley)
+
+        ```ruby
+        class MyConfigurable
+          extend Dry::Configurable
+
+          setting :sslcert, constructor: ->(v) { v&.values_at(:pem, :pass)&.join }
+        end
+
+        MyConfigurable.config.update(sslcert: {pem: "cert", pass: "qwerty"})
+        MyConfigurable.config.sslcert # => "certqwerty"
+        ```
 - version: 0.14.0
   summary:
   date: '2022-01-14'
