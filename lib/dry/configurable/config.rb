@@ -50,7 +50,7 @@ module Dry
 
       # Update config with new values
       #
-      # @param values [Hash] A hash with new values
+      # @param values [Hash, #to_hash] A hash with new values
       #
       # @return [Config]
       #
@@ -58,11 +58,11 @@ module Dry
       def update(values)
         values.each do |key, value|
           if self[key].is_a?(self.class)
-            unless value.is_a?(Hash)
+            unless value.respond_to?(:to_hash)
               raise ArgumentError, "#{value.inspect} is not a valid setting value"
             end
 
-            self[key].update(value)
+            self[key].update(value.to_hash)
           else
             self[key] = value
           end
