@@ -81,8 +81,8 @@ module Dry
       alias_method :to_h, :values
 
       # @api private
-      def finalize!
-        _settings.freeze
+      def finalize!(freeze_values: false)
+        _settings.finalize!(freeze_values: freeze_values)
         freeze
       end
 
