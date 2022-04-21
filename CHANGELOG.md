@@ -18,7 +18,7 @@
   my_obj.finalize!(freeze_values: true)
   my_obj.config.db << "sql" # Will raise FrozenError
   ```
-- `Dry::Configurable::Config#update` will accept any values implicitly convertible to hash via `#to_hash`, and will set hashes as values for non-nested settings (#131 by @ojab, #133 by @timriley)
+- `Dry::Configurable::Config#update` will set hashes as values for non-nested settings (#131 by @ojab)
 
   ```ruby
   class MyConfigurable
@@ -30,6 +30,7 @@
   MyConfigurable.config.update(sslcert: {pem: "cert", pass: "qwerty"})
   MyConfigurable.config.sslcert # => "certqwerty"
   ```
+- `Dry::Configurable::Config#update` will accept any values implicitly convertible to hash via `#to_hash` (#133 by @timriley)
 
 [Compare v0.14.0...v0.15.0](https://github.com/dry-rb/dry-configurable/compare/v0.14.0...v0.15.0)
 
