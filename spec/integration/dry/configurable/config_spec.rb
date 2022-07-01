@@ -35,6 +35,27 @@ RSpec.describe Dry::Configurable::Config do
       expect(klass.config.db.user).to eql("jane")
       expect(klass.config.db.pass).to eql("supersecret")
     end
+
+    it "runs constructors" do
+      klass.setting :db do
+        setting :user, default: "root", constructor: ->(v) { v.upcase }
+        setting :sslcert, constructor: ->(v) { v&.values_at(:pem, :pass)&.join }
+      end
+
+      klass.config.update(db: {user: "jane", sslcert: {pem: "cert", pass: "qwerty"}})
+
+      expect(klass.config.db.user).to eql("JANE")
+      expect(klass.config.db.sslcert).to eql("certqwerty")
+    end
+
+    it "raises ArgumentError when setting value is not a Hash" do
+      klass.setting :db do
+        setting :user
+      end
+
+      expect { klass.config.update(db: "string") }
+        .to raise_error(ArgumentError, '"string" is not a valid setting value')
+    end
   end
 
   describe "#to_h" do

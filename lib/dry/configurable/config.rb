@@ -23,7 +23,7 @@ module Dry
 
       # @api private
       def initialize(settings)
-        @_settings = settings.dup
+        @_settings = settings
         @_resolved = Concurrent::Map.new
       end
 
@@ -50,16 +50,19 @@ module Dry
 
       # Update config with new values
       #
-      # @param values [Hash] A hash with new values
+      # @param values [Hash, #to_hash] A hash with new values
       #
       # @return [Config]
       #
       # @api public
       def update(values)
         values.each do |key, value|
-          case value
-          when Hash
-            self[key].update(value)
+          if self[key].is_a?(self.class)
+            unless value.respond_to?(:to_hash)
+              raise ArgumentError, "#{value.inspect} is not a valid setting value"
+            end
+
+            self[key].update(value.to_hash)
           else
             self[key] = value
           end
@@ -81,8 +84,8 @@ module Dry
       alias_method :to_h, :values
 
       # @api private
-      def finalize!
-        _settings.freeze
+      def finalize!(freeze_values: false)
+        _settings.finalize!(freeze_values: freeze_values)
         freeze
       end
 

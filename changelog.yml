@@ -1,17 +1,74 @@
 ---
-- version: unreleased
+- version: 0.15.0
   summary:
-  date:
-  fixed:
-    - 'Fix `ArgumentError` for classes including `Dry::Configurable` whose
-      `initializer` has required kwargs. (#113 by @timriley)'
-    - 'Remove implicit `to_hash` conversion from `Config`. (#114 by @timriley)'
-  added:
+  date: '2022-04-21'
   changed:
-    - 'Deprecate constructor as a block. Providing `constructor:` kwarg is now
-      the only accepted way. (#111 by @waiting-for-dev & @timriley)'
-    - 'Use `default:` kwarg instead of second positional argument for the
-      default value. (#112 by @waiting-for-dev & @timriley)'
+    - |-
+      The `finalize!` method (as class or instance method, depending on whether you extend or include `Dry::Configurable` respectively) now accepts a boolean `freeze_values:` argument, which if true, will recursively freeze all config values in addition to the `config` itself. (#105 by @ojab)
+
+        ```ruby
+        class MyConfigurable
+          include Dry::Configurable
+
+          setting :db, default: "postgre"
+        end
+
+        my_obj = MyConfigurable.new
+        my_obj.finalize!(freeze_values: true)
+        my_obj.config.db << "sql" # Will raise FrozenError
+        ```
+    - |-
+      `Dry::Configurable::Config#update` will set hashes as values for non-nested settings (#131 by @ojab)
+
+        ```ruby
+        class MyConfigurable
+          extend Dry::Configurable
+
+          setting :sslcert, constructor: ->(v) { v&.values_at(:pem, :pass)&.join }
+        end
+
+        MyConfigurable.config.update(sslcert: {pem: "cert", pass: "qwerty"})
+        MyConfigurable.config.sslcert # => "certqwerty"
+        ```
+    - |-
+      `Dry::Configurable::Config#update` will accept any values implicitly convertible to hash via `#to_hash` (#133 by @timriley)
+- version: 0.14.0
+  summary:
+  date: '2022-01-14'
+  changed:
+    - |-
+      Settings defined after an access to `config` will still be made available on that `config`. (#130 by @timriley)
+    - |-
+      Cloneable settings are cloned immediately upon assignment. (#130 by @timriley)
+    - |-
+      Changes to config values in parent classes after subclasses have already been created will not be propogated to those subclasses. Subclasses created _after_ config values have been changed in the parent _will_ receive those config values. (#130 by @timriley)
+- version: 0.13.0
+  summary:
+  date: '2021-09-12'
+  fixed:
+    - Fixed `ArgumentError` for classes including `Dry::Configurable` whose `initializer` has required kwargs. (#113 by @timriley)
+  added:
+    - |-
+      Added flags to determine whether to warn on the API usage deprecated in this release (see "Changed" section below). Set these to `false` to suppress the warnings. (#124 by @timriley)
+
+        ```ruby
+        Dry::Configurable.warn_on_setting_constructor_block false
+        Dry::Configurable.warn_on_setting_positional_default false
+        ```
+  changed:
+    - |-
+      Deprecated the setting constructor provided as a block. Provide it via the `constructor:` keyword argument instead. (#111 by @waiting-for-dev & @timriley)
+
+        ```ruby
+        setting :path, constructor: -> path { Pathname(path) }
+        ```
+    - |-
+      Deprecated the setting default provided as the second positional argument. Provide it via the `default:` keyword argument instead. (#112 and #121 by @waiting-for-dev & @timriley)
+
+        ```ruby
+        setting :path, default: "some/default/path"
+        ```
+    - '[BREAKING] Removed implicit `to_hash` conversion from `Config`. (#114 by @timriley)'
 - version: 0.12.1
   summary:
   date: '2021-02-15'

@@ -62,9 +62,17 @@ module Dry
       def initialize(name, input: Undefined, default: Undefined, **options)
         @name = name
         @writer_name = :"#{name}="
+        @options = options
+
+        # Setting collections (see `Settings`) are shared between the configurable class
+        # and its `config` object, so for cloneable individual settings, we duplicate
+        # their _values_ as early as possible to ensure no impact from unintended mutation
         @input = input
         @default = default
-        @options = options
+        if cloneable?
+          @input = input.dup
+          @default = default.dup
+        end
 
         evaluate if input_defined?
       end
@@ -76,8 +84,12 @@ module Dry
 
       # @api private
       def value
-        @value ||= evaluate
+        return @value if evaluated?
+
+        @value = constructor[Undefined.coalesce(input, default, nil)]
       end
+      alias_method :evaluate, :value
+      private :evaluate
 
       # @api private
       def evaluated?
@@ -92,6 +104,16 @@ module Dry
       # @api private
       def pristine
         with(input: Undefined)
+      end
+
+      # @api private
+      def finalize!(freeze_values: false)
+        if value.is_a?(Config)
+          value.finalize!(freeze_values: freeze_values)
+        elsif freeze_values
+          value.freeze
+        end
+        freeze
       end
 
       # @api private
@@ -140,11 +162,6 @@ module Dry
           @default = source.default.dup
           @value = source.value.dup if source.evaluated?
         end
-      end
-
-      # @api private
-      def evaluate
-        @value = constructor[Undefined.coalesce(input, default, nil)]
       end
     end
   end

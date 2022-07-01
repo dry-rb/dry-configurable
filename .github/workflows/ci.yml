@@ -15,7 +15,7 @@ on:
       - "project.yml"
   pull_request:
     branches:
-      - master
+      - main
   create:
 
 jobs:
@@ -26,18 +26,18 @@ jobs:
       fail-fast: false
       matrix:
         ruby:
+        - "3.1"
         - "3.0"
         - "2.7"
-        - "2.6"
         include:
-          - ruby: "3.0"
+          - ruby: "3.1"
             coverage: "true"
     env:
       COVERAGE: ${{matrix.coverage}}
       COVERAGE_TOKEN: ${{secrets.CODACY_PROJECT_TOKEN}}
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       - name: Install package dependencies
         run: "[ -e $APT_DEPS ] || sudo apt-get install -y --no-install-recommends $APT_DEPS"
       - name: Set up Ruby
@@ -47,12 +47,6 @@ jobs:
           bundler-cache: true
       - name: Run all tests
         run: bundle exec rake
-      - name: Run codacy-coverage-reporter
-        uses: codacy/codacy-coverage-reporter-action@master
-        if: env.COVERAGE == 'true' && env.COVERAGE_TOKEN != ''
-        with:
-          project-token: ${{secrets.CODACY_PROJECT_TOKEN}}
-          coverage-reports: coverage/coverage.xml
   release:
     runs-on: ubuntu-latest
     if: contains(github.ref, 'tags') && github.event_name == 'create'
@@ -61,13 +55,13 @@ jobs:
       GITHUB_LOGIN: dry-bot
       GITHUB_TOKEN: ${{secrets.GH_PAT}}
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Install package dependencies
         run: "[ -e $APT_DEPS ] || sudo apt-get install -y --no-install-recommends $APT_DEPS"
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.6
+          ruby-version: 2.7
       - name: Install dependencies
         run: gem install ossy --no-document
       - name: Trigger release workflow

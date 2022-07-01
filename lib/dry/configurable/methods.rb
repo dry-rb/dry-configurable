@@ -21,10 +21,8 @@ module Dry
       # @return [Dry::Configurable::Config]
       #
       # @api public
-      def finalize!
-        return self if config.frozen?
-
-        config.finalize!
+      def finalize!(freeze_values: false)
+        config.finalize!(freeze_values: freeze_values)
         self
       end
     end

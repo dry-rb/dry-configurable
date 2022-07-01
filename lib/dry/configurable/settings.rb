@@ -54,6 +54,12 @@ module Dry
         self.class.new(map(&:pristine))
       end
 
+      # @api private
+      def finalize!(freeze_values: false)
+        each { |element| element.finalize!(freeze_values: freeze_values) }
+        freeze
+      end
+
       private
 
       # @api private

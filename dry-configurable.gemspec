@@ -22,11 +22,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.metadata["allowed_push_host"] = "https://rubygems.org"
-  spec.metadata["changelog_uri"]     = "https://github.com/dry-rb/dry-configurable/blob/master/CHANGELOG.md"
+  spec.metadata["changelog_uri"]     = "https://github.com/dry-rb/dry-configurable/blob/main/CHANGELOG.md"
   spec.metadata["source_code_uri"]   = "https://github.com/dry-rb/dry-configurable"
   spec.metadata["bug_tracker_uri"]   = "https://github.com/dry-rb/dry-configurable/issues"
 
-  spec.required_ruby_version = ">= 2.6.0"
+  spec.required_ruby_version = ">= 2.7.0"
 
   # to update dependencies edit project.yml
   spec.add_runtime_dependency "concurrent-ruby", "~> 1.0"

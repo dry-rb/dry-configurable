@@ -13,12 +13,11 @@ module Dry
       include Methods
 
       # @api private
-      def inherited(klass)
+      def inherited(subclass)
         super
 
-        parent_settings = (respond_to?(:config) ? config._settings : _settings)
-
-        klass.instance_variable_set("@_settings", parent_settings)
+        subclass.instance_variable_set("@_settings", _settings.dup)
+        subclass.instance_variable_set("@_config", config.dup) if respond_to?(:config)
       end
 
       # Add a setting to the configuration
@@ -71,12 +70,17 @@ module Dry
       #
       # @api public
       def config
+        # The _settings provided to the Config remain shared between the class and the
+        # Config. This allows settings defined _after_ accessing the config to become
+        # available in subsequent accesses to the config. The config is duped when
+        # subclassing to ensure it remains distinct between subclasses and parent classes
+        # (see `.inherited` above).
         @config ||= Config.new(_settings)
       end
 
       # @api private
       def __config_dsl__
-        @dsl ||= DSL.new
+        @__config_dsl__ ||= DSL.new
       end
 
       # @api private

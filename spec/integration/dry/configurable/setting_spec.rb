@@ -147,7 +147,7 @@ RSpec.describe Dry::Configurable, ".setting" do
 
     context "with a ruby keyword" do
       before do
-        klass.setting :if, true
+        klass.setting :if, default: true
       end
 
       it "works" do
@@ -185,6 +185,15 @@ RSpec.describe Dry::Configurable, ".setting" do
 
     include_context "configurable behavior"
 
+    specify "settings defined after accessing config are still available in the config" do
+      klass.setting :before, default: "defined before"
+      klass.config
+      klass.setting :after, default: "defined after"
+
+      expect(klass.config.before).to eq "defined before"
+      expect(klass.config.after).to eq "defined after"
+    end
+
     context "with a subclass" do
       let(:subclass) do
         Class.new(klass)
@@ -205,7 +214,7 @@ RSpec.describe Dry::Configurable, ".setting" do
       it "allows defining more settings" do
         klass.setting :db, default: "sqlite"
 
-        subclass.setting :username, "root"
+        subclass.setting :username, default: "root"
         subclass.setting :password
 
         subclass.config.password = "secret"
@@ -225,12 +234,22 @@ RSpec.describe Dry::Configurable, ".setting" do
         expect(subclass.settings).to eql(Set[:db])
       end
 
-      it "configured parent copies config to the child" do
+      specify "configuring the parent before subclassing copies the config to the child" do
         klass.setting :db
 
         object.config.db = "mariadb"
 
         expect(subclass.config.db).to eql("mariadb")
+      end
+
+      specify "configuring the parent after subclassing does not copy the config to the child" do
+        klass.setting :db
+
+        subclass = Class.new(klass)
+
+        object.config.db = "mariadb"
+
+        expect(subclass.config.db).to be nil
       end
 
       it "not configured parent does not set child config" do
@@ -308,13 +327,13 @@ RSpec.describe Dry::Configurable, ".setting" do
     end
 
     it "defines a constructor that sets the config" do
-      klass.setting :db, "sqlite"
+      klass.setting :db, default: "sqlite"
 
       expect(object.config.db).to eql("sqlite")
     end
 
     it "creates distinct setting values across instances" do
-      klass.setting(:path, "test", constructor: ->(m) { Pathname(m) })
+      klass.setting(:path, default: "test", constructor: ->(m) { Pathname(m) })
 
       new_object = klass.new
 
@@ -323,13 +342,29 @@ RSpec.describe Dry::Configurable, ".setting" do
       expect(object.config.path).not_to be(new_object.config.path)
     end
 
+    it "makes only settings defined before instantiation available" do
+      klass.setting :before, default: "defined before"
+
+      object_1 = klass.new
+
+      klass.setting :after, default: "defined after"
+
+      object_2 = klass.new
+
+      expect(object_1.config.before).to eq "defined before"
+      expect(object_1.config).not_to respond_to(:after)
+
+      expect(object_2.config.before).to eq "defined before"
+      expect(object_2.config.after).to eq "defined after"
+    end
+
     shared_examples "copying" do
       before do
         klass.setting :env
 
         klass.setting :db do
-          setting :user, "root"
-          setting :pass, "secret"
+          setting :user, default: "root".dup
+          setting :pass, default: "secret"
         end
       end
 
@@ -365,7 +400,7 @@ RSpec.describe Dry::Configurable, ".setting" do
     end
 
     it "can be configured" do
-      klass.setting :db, "sqlite"
+      klass.setting :db, default: "sqlite"
 
       object.configure do |config|
         config.db = "mariadb"
@@ -375,13 +410,35 @@ RSpec.describe Dry::Configurable, ".setting" do
     end
 
     it "can be finalized" do
-      klass.setting :db, "sqlite"
+      klass.setting :kafka, default: "kafka://127.0.0.1:9092"
 
       object.finalize!
       # becomes a no-op
       object.finalize!
 
       expect(object).to be_frozen
+      expect(object.config.db).to be_frozen
+      expect(object.config.db.user).not_to be_frozen
+
+      object.config.db.user << "foo"
+      expect(object.config.db.user).to eq("rootfoo")
+
+      # does not allow configure block anymore
+      expect { object.configure {} }.to raise_error(Dry::Configurable::FrozenConfig)
+    end
+
+    it "can be finalized with freezing values" do
+      klass.setting :kafka, "kafka://127.0.0.1:9092"
+
+      object.finalize!(freeze_values: true)
+      # becomes a no-op
+      object.finalize!(freeze_values: true)
+
+      expect(object).to be_frozen
+      expect(object.config.db).to be_frozen
+      expect(object.config.db.user).to be_frozen
+
+      expect { object.config.db.user << "foo" }.to raise_error(FrozenError)
 
       # does not allow configure block anymore
       expect { object.configure {} }.to raise_error(Dry::Configurable::FrozenConfig)
@@ -389,7 +446,7 @@ RSpec.describe Dry::Configurable, ".setting" do
 
     it "defines a reader shortcut for nested config" do
       klass.setting :dsn, reader: true do
-        setting :pool, 5
+        setting :pool, default: 5
       end
 
       expect(object.dsn.pool).to be(5)
@@ -398,10 +455,10 @@ RSpec.describe Dry::Configurable, ".setting" do
     context "Test Interface" do
       describe "reset_config" do
         it "resets configuration to default values" do
-          klass.setting :dsn, nil
+          klass.setting :dsn, default: nil
 
           klass.setting :pool do
-            setting :size, nil
+            setting :size, default: nil
           end
 
           object.enable_test_interface
