@@ -4,9 +4,6 @@ require "concurrent/map"
 
 require "dry/core/equalizer"
 
-require "dry/configurable/constants"
-require "dry/configurable/errors"
-
 module Dry
   module Configurable
     # Config exposes setting values through a convenient API

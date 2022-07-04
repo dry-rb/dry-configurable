@@ -1,13 +1,10 @@
 # frozen_string_literal: true
 
-require "concurrent/array"
+require "zeitwerk"
 
-require "dry/configurable/constants"
-require "dry/configurable/class_methods"
-require "dry/configurable/instance_methods"
-require "dry/configurable/config"
-require "dry/configurable/setting"
+require "dry/core/constants"
 require "dry/configurable/errors"
+require "dry/configurable/flags"
 
 module Dry
   # A simple configuration mixin
@@ -44,6 +41,18 @@ module Dry
   #
   # @api public
   module Configurable
+    include Dry::Core::Constants
+
+    def self.loader
+      @loader ||= Zeitwerk::Loader.new.tap do |loader|
+        root = File.expand_path("..", __dir__)
+        loader.tag = "dry-configurable"
+        loader.inflector = Zeitwerk::GemInflector.new("#{root}/dry-configurable.rb")
+        loader.push_dir(root)
+        loader.ignore("#{root}/dry-configurable.rb")
+      end
+    end
+
     # @api private
     def self.extended(klass)
       super
@@ -66,5 +75,7 @@ module Dry
         end
       end
     end
+
+    loader.setup
   end
 end

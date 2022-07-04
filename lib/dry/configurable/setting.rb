@@ -4,9 +4,6 @@ require "set"
 
 require "dry/core/equalizer"
 
-require "dry/configurable/constants"
-require "dry/configurable/config"
-
 module Dry
   module Configurable
     # This class represents a setting and is used internally.

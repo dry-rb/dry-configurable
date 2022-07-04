@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "dry/configurable/errors"
-
 module Dry
   module Configurable
     # Common API for both classes and instances

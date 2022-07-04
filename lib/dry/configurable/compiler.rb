@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require "dry/configurable/setting"
-require "dry/configurable/settings"
-
 module Dry
   module Configurable
     # Setting compiler used internally by the DSL

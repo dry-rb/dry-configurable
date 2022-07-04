@@ -2,11 +2,6 @@
 
 require "set"
 
-require "dry/configurable/constants"
-require "dry/configurable/dsl"
-require "dry/configurable/methods"
-require "dry/configurable/settings"
-
 module Dry
   module Configurable
     module ClassMethods
