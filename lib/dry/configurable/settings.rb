@@ -3,7 +3,6 @@
 require "concurrent/map"
 
 require "dry/core/equalizer"
-require "dry/configurable/constants"
 
 module Dry
   module Configurable
