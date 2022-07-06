@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "dry/core/class_attributes"
-
 module Dry
   module Configurable
     extend Core::ClassAttributes
