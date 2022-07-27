@@ -428,7 +428,7 @@ RSpec.describe Dry::Configurable, ".setting" do
     end
 
     it "can be finalized with freezing values" do
-      klass.setting :kafka, "kafka://127.0.0.1:9092"
+      klass.setting :kafka, default: "kafka://127.0.0.1:9092"
 
       object.finalize!(freeze_values: true)
       # becomes a no-op

@@ -19,7 +19,7 @@ RSpec.describe Dry::Configurable::DSL do
 
     example.run
   ensure
-    Dry::Core::Deprecations.set_logger!(STDOUT)
+    Dry::Core::Deprecations.set_logger!
   end
 
   it "compiles a setting with no options" do
