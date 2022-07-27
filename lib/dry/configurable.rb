@@ -4,6 +4,7 @@ require "zeitwerk"
 
 require "dry/core"
 
+require "dry/configurable/constants"
 require "dry/configurable/errors"
 require "dry/configurable/flags"
 
@@ -50,7 +51,10 @@ module Dry
         loader.tag = "dry-configurable"
         loader.inflector = Zeitwerk::GemInflector.new("#{root}/dry-configurable.rb")
         loader.push_dir(root)
-        loader.ignore("#{root}/dry-configurable.rb")
+        loader.ignore(
+          "#{root}/dry-configurable.rb",
+          "#{root}/dry/configurable/{constants,errors,flags,version}.rb"
+        )
         loader.inflector.inflect("dsl" => "DSL")
       end
     end
