@@ -2,8 +2,6 @@
 
 require "concurrent/map"
 
-require "dry/core/equalizer"
-
 module Dry
   module Configurable
     # A settings map
