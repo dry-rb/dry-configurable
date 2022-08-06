@@ -9,6 +9,11 @@ require "dry/configurable/errors"
 require "dry/configurable/flags"
 
 module Dry
+  # @api public
+  def self.Configurable(**options)
+    Configurable::Extension.new(**options)
+  end
+
   # A simple configuration mixin
   #
   # @example class-level configuration
@@ -60,24 +65,13 @@ module Dry
     # @api private
     def self.extended(klass)
       super
-      klass.extend(ClassMethods)
+      klass.extend(Extension.new)
     end
 
     # @api private
     def self.included(klass)
-      raise AlreadyIncluded if klass.include?(InstanceMethods)
-
       super
-      klass.class_eval do
-        extend(ClassMethods)
-        include(InstanceMethods)
-        prepend(Initializer)
-
-        class << self
-          undef :config
-          undef :configure
-        end
-      end
+      klass.include(Extension.new)
     end
 
     loader.setup

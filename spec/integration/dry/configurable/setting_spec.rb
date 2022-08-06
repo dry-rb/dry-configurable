@@ -293,6 +293,23 @@ RSpec.describe Dry::Configurable, ".setting" do
 
         expect(klass.dsn.pool).to be(5)
       end
+
+      context "with a custom config class" do
+        it "uses the custom config class" do
+          Test::Config = Class.new(Dry::Configurable::Config)
+
+          klass = Class.new do
+            extend Dry::Configurable(config_class: Test::Config)
+
+            setting :dsn, reader: true do
+              setting :pool, default: 5
+            end
+          end
+
+          expect(klass.config).to be_instance_of(Test::Config)
+          expect(klass.dsn.pool).to be(5)
+        end
+      end
     end
   end
 
@@ -450,6 +467,25 @@ RSpec.describe Dry::Configurable, ".setting" do
       end
 
       expect(object.dsn.pool).to be(5)
+    end
+
+    context "with a custom config class" do
+      it "uses the custom config class" do
+        Test::Config = Class.new(Dry::Configurable::Config)
+
+        klass = Class.new do
+          include Dry::Configurable(config_class: Test::Config)
+
+          setting :dsn, reader: true do
+            setting :pool, default: 5
+          end
+        end
+
+        object = klass.new
+
+        expect(object.config).to be_instance_of(Test::Config)
+        expect(object.dsn.pool).to be(5)
+      end
     end
 
     context "Test Interface" do
