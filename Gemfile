@@ -10,6 +10,9 @@ gem "dry-core", github: "dry-rb/dry-core", branch: "main"
 
 group :benchmarks do
   gem "benchmark-ips"
+  gem "benchmark-memory"
+
+  gem "hanami-utils"
 end
 
 group :tools do
