@@ -8,27 +8,27 @@ module Dry
     #
     # @api private
     class Settings
-      include Dry::Equalizer(:elements)
+      include Dry::Equalizer(:settings)
 
       include Enumerable
 
       # @api private
-      attr_reader :elements
+      attr_reader :settings
 
       # @api private
-      def initialize(elements = EMPTY_ARRAY)
-        initialize_elements(elements)
+      def initialize(settings = EMPTY_ARRAY)
+        @settings = settings.each_with_object(Concurrent::Map.new) { |s, m| m[s.name] = s }
       end
 
       # @api private
       def <<(setting)
-        elements[setting.name] = setting
+        settings[setting.name] = setting
         self
       end
 
       # @api private
       def [](name)
-        elements[name]
+        settings[name]
       end
 
       # @api private
@@ -38,37 +38,18 @@ module Dry
 
       # @api private
       def keys
-        elements.keys
+        settings.keys
       end
 
       # @api private
       def each(&block)
-        elements.values.each(&block)
-      end
-
-      # @api private
-      def pristine
-        self.class.new(map(&:pristine))
-      end
-
-      # @api private
-      def finalize!(freeze_values: false)
-        each { |element| element.finalize!(freeze_values: freeze_values) }
-        freeze
+        settings.values.each(&block)
       end
 
       private
 
-      # @api private
       def initialize_copy(source)
-        initialize_elements(source.map(&:dup))
-      end
-
-      # @api private
-      def initialize_elements(elements)
-        @elements = elements.each_with_object(Concurrent::Map.new) { |s, m|
-          m[s.name] = s
-        }
+        @settings = source.settings.dup
       end
     end
   end

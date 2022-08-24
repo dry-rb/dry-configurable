@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "concurrent/map"
+require "dry/core/constants"
 
 module Dry
   module Configurable
@@ -14,12 +14,17 @@ module Dry
       attr_reader :_settings
 
       # @api private
-      attr_reader :_resolved
+      attr_reader :_values
 
       # @api private
-      def initialize(settings)
+      def initialize(settings, values: {})
         @_settings = settings
-        @_resolved = Concurrent::Map.new
+        @_values = values
+      end
+
+      # @api private
+      def dup_for_settings(settings)
+        self.class.new(settings, values: dup_values)
       end
 
       # Get config value by a key
@@ -29,9 +34,12 @@ module Dry
       # @return Config value
       def [](name)
         name = name.to_sym
-        raise ArgumentError, "+#{name}+ is not a setting name" unless _settings.key?(name)
 
-        _settings[name].value
+        unless (setting = _settings[name])
+          raise ArgumentError, "+#{name}+ is not a setting name"
+        end
+
+        _values.fetch(name) { _values[name] = setting.to_value }
       end
 
       # Set config value.
@@ -40,7 +48,15 @@ module Dry
       # @param [String,Symbol] name
       # @param [Object] value
       def []=(name, value)
-        public_send(:"#{name}=", value)
+        raise FrozenConfig, "Cannot modify frozen config" if frozen?
+
+        name = name.to_sym
+
+        unless (setting = _settings[name])
+          raise ArgumentError, "+#{name}+ is not a setting name"
+        end
+
+        _values[name] = setting.constructor.(value)
       end
 
       # Update config with new values
@@ -65,61 +81,80 @@ module Dry
         self
       end
 
-      # Dump config into a hash
+      # Returns the current config values.
+      #
+      # Nested configs remain in their {Config} instances.
       #
       # @return [Hash]
       #
       # @api public
       def values
-        _settings
-          .map { |setting| [setting.name, setting.value] }
-          .map { |key, value| [key, value.is_a?(self.class) ? value.to_h : value] }
-          .to_h
+        # Ensure all settings are represented in values
+        _settings.each { |setting| self[setting.name] unless _values.key?(setting.name) }
+
+        _values
       end
-      alias_method :to_h, :values
+
+      # Returns config values as a hash, with nested values also converted from {Config} instances
+      # into hashes.
+      #
+      # @return [Hash]
+      #
+      # @api public
+      def to_h
+        values.map { |key, value| [key, value.is_a?(self.class) ? value.to_h : value] }.to_h
+      end
 
       # @api private
       def finalize!(freeze_values: false)
-        _settings.finalize!(freeze_values: freeze_values)
+        values.each_value do |value|
+          if value.is_a?(self.class)
+            value.finalize!(freeze_values: freeze_values)
+          elsif freeze_values
+            value.freeze
+          end
+        end
+
         freeze
       end
 
       # @api private
       def pristine
-        self.class.new(_settings.pristine)
-      end
-
-      # @api private
-      def respond_to_missing?(meth, include_private = false)
-        super || _settings.key?(resolve(meth))
+        self.class.new(_settings)
       end
 
       private
 
-      # @api private
-      def method_missing(meth, *args)
-        setting = _settings[resolve(meth)]
+      def method_missing(name, *args)
+        setting_name = setting_name_from_method(name)
+        setting = _settings[setting_name]
 
         super unless setting
 
-        if setting.writer?(meth)
-          raise FrozenConfig, "Cannot modify frozen config" if frozen?
-
-          _settings << setting.with(input: args[0])
+        if name.end_with?("=")
+          self[setting_name] = args[0]
         else
-          setting.value
+          self[setting_name]
         end
       end
 
-      # @api private
-      def resolve(meth)
-        _resolved.fetch(meth) { _resolved[meth] = meth.to_s.tr("=", "").to_sym }
+      def respond_to_missing?(meth, include_private = false)
+        _settings.key?(setting_name_from_method(meth)) || super
       end
 
-      # @api private
+      def setting_name_from_method(method_name)
+        method_name.to_s.tr("=", "").to_sym
+      end
+
+      def dup_values
+        _values.each_with_object({}) { |(key, val), dup_hsh|
+          dup_hsh[key] = _settings[key].cloneable? ? val.dup : val
+        }
+      end
+
       def initialize_copy(source)
         super
-        @_settings = source._settings.dup
+        @_values = source.send(:dup_values)
       end
     end
   end
