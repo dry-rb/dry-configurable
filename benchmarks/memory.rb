@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 require "benchmark/memory"
+require "dry/configurable"
+require "dry/core/class_attributes"
+require "hanami/utils/class_attribute"
 
 def inherit_configurable(times)
-  require "dry/configurable"
-
   klass = Class.new do
     extend Dry::Configurable
 
@@ -18,8 +19,6 @@ def inherit_configurable(times)
 end
 
 def inherit_configurable_nested(times)
-  require "dry/configurable"
-
   klass = Class.new do
     extend Dry::Configurable
 
@@ -35,8 +34,6 @@ def inherit_configurable_nested(times)
 end
 
 def inherit_dry_class_attributes(times)
-  require "dry/core/class_attributes"
-
   klass = Class.new do
     extend Dry::Core::ClassAttributes
 
@@ -52,8 +49,6 @@ def inherit_dry_class_attributes(times)
 end
 
 def inherit_hanami_class_attributes(times)
-  require "hanami/utils/class_attribute"
-
   klass = Class.new do
     include Hanami::Utils::ClassAttribute
 
