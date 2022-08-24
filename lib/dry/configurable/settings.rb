@@ -46,16 +46,16 @@ module Dry
         elements.values.each(&block)
       end
 
-      # @api private
-      def pristine
-        self.class.new(map(&:pristine))
-      end
+      # WIP - prob not needed if this is containing definitions only
+      # def pristine
+      #   self.class.new(map(&:pristine))
+      # end
 
-      # @api private
-      def finalize!(freeze_values: false)
-        each { |element| element.finalize!(freeze_values: freeze_values) }
-        freeze
-      end
+      # WIP - prob not needed if this is containing definitions only
+      # def finalize!(freeze_values: false)
+      #   each { |element| element.finalize!(freeze_values: freeze_values) }
+      #   freeze
+      # end
 
       private
 
