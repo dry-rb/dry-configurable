@@ -45,7 +45,8 @@ module Dry
             if setting.children
               self.class.new(setting.children)
             else
-              setting.constructor.(Dry::Core::Constants::Undefined.coalesce(setting.default, nil))
+              # setting.constructor.(Dry::Core::Constants::Undefined.coalesce(setting.default, nil))
+              setting.to_value
             end
         }
       end
@@ -108,7 +109,7 @@ module Dry
         # TODO
         values.each_value do |value|
           if value.is_a?(self.class)
-            value.finalize!
+            value.finalize!(freeze_values: freeze_values)
           elsif freeze_values
             value.freeze
           end
@@ -159,9 +160,15 @@ module Dry
         super
 
         # TODO: FIXME: I don't think we want to do this anymore for the CoW approach
-        @_settings = source._settings.dup
+        @_settings = source._settings #.dup
 
-        @_values = source._values.dup
+        # @_values = source._values.dup
+        # ^ _values or values, i.e. do we want to fully resolve values? I think _probably_ not, but double check
+        # byebug
+        # @_values = source._values.map { |k, v| [k, v.dup] }.to_h
+
+        # Yeah, I think we want to fully resolve it
+        @_values = source.values.map { |k, v| [k, v.dup] }.to_h
       end
     end
   end

@@ -86,6 +86,16 @@ module Dry
         options.fetch(:cloneable) { Setting.cloneable_value?(default) }
       end
 
+      def to_value
+        value = constructor.(Dry::Core::Constants::Undefined.coalesce(default, nil))
+
+        if options.fetch(:cloneable) { Setting.cloneable_value?(value) }
+          value.dup
+        else
+          value
+        end
+      end
+
       private
 
       # @api private

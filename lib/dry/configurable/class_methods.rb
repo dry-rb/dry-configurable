@@ -11,7 +11,7 @@ module Dry
       def inherited(subclass)
         super
 
-        subclass.instance_variable_set("@_settings", _settings.dup)
+        subclass.instance_variable_set("@_settings", _settings) #.dup)
         subclass.instance_variable_set("@config", config.dup) if respond_to?(:config)
       end
 
