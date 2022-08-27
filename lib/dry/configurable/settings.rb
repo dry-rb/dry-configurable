@@ -56,6 +56,10 @@ module Dry
       #   each { |element| element.finalize!(freeze_values: freeze_values) }
       #   freeze
       # end
+      def finalize!(freeze_values: false)
+        # TODO: work out what to do
+        freeze
+      end
 
       private
 

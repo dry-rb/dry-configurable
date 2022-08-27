@@ -37,7 +37,7 @@ module Dry
       end
 
       # @api private
-      def initialize(name, default: Undefined, children: Undefined, **options)
+      def initialize(name, default: Undefined, children: nil, **options)
         @name = name
         @writer_name = :"#{name}="
         @options = options

@@ -26,21 +26,21 @@ RSpec.describe Dry::Configurable::DSL do
     setting = dsl.setting :user
 
     expect(setting.name).to be(:user)
-    expect(setting.value).to be(nil)
   end
 
   it "compiles a setting with default" do
     setting = dsl.setting :user, default: "root"
 
     expect(setting.name).to be(:user)
-    expect(setting.value).to eql("root")
+    expect(setting.default).to eq("root")
   end
 
   it "compiles but deprecates giving a default as positional argument", :collect_deprecations do
     setting = dsl.setting :user, "root"
 
     expect(setting.name).to be(:user)
-    expect(setting.value).to eql("root")
+    expect(setting.default).to eq("root")
+    # expect(setting.value).to eql("root")
     expect(logged).to match(/default value as positional argument to settings is deprecated/)
   end
 
@@ -50,7 +50,8 @@ RSpec.describe Dry::Configurable::DSL do
     setting = dsl.setting :user, "root"
 
     expect(setting.name).to be(:user)
-    expect(setting.value).to eql("root")
+    expect(setting.default).to eq("root")
+    # expect(setting.value).to eql("root")
     expect(logged).to be_empty
 
     Dry::Configurable.warn_on_setting_positional_default true
@@ -62,7 +63,7 @@ RSpec.describe Dry::Configurable::DSL do
     setting = dsl.setting :default_options, {foo: "bar"}
 
     expect(setting.name).to be(:default_options)
-    expect(setting.value).to eq(foo: "bar")
+    expect(setting.default).to eq(foo: "bar")
     expect(logged).to match(/default value as positional argument to settings is deprecated/)
   end
 
@@ -71,7 +72,7 @@ RSpec.describe Dry::Configurable::DSL do
       setting = dsl.setting :default_options, foo: "bar"
 
       expect(setting.name).to be(:default_options)
-      expect(setting.value).to eq(foo: "bar")
+      expect(setting.default).to eq(foo: "bar")
       expect(logged).to match(/default value as positional argument to settings is deprecated/)
     end
   end
@@ -82,7 +83,7 @@ RSpec.describe Dry::Configurable::DSL do
     setting = dsl.setting :default_options, {foo: "bar"}, reader: true
 
     expect(setting.name).to be(:default_options)
-    expect(setting.value).to eq(foo: "bar")
+    expect(setting.default).to eq(foo: "bar")
     expect(logged).to match(/default value as positional argument to settings is deprecated/)
   end
 
@@ -103,7 +104,7 @@ RSpec.describe Dry::Configurable::DSL do
     setting = dsl.setting(:dsn, default: "sqlite")
 
     expect(setting.name).to be(:dsn)
-    expect(setting.value).to eql("sqlite")
+    expect(setting.default).to eql("sqlite")
   end
 
   it "compiles a setting with a default hash value" do
@@ -112,21 +113,23 @@ RSpec.describe Dry::Configurable::DSL do
     setting = dsl.setting(:dsn, default: default)
 
     expect(setting.name).to be(:dsn)
-    expect(setting.value).to eql(default)
+    expect(setting.default).to eql(default)
   end
 
   it "compiles a setting with a constructor" do
     setting = dsl.setting(:dsn, default: "sqlite", constructor: ->(value) { "jdbc:#{value}" })
 
     expect(setting.name).to be(:dsn)
-    expect(setting.value).to eql("jdbc:sqlite")
+    expect(setting.default).to eq("sqlite")
+    expect(setting.constructor.("sqlite")).to eq("jdbc:sqlite")
   end
 
   it "supports but deprecates giving a constructor as a block", :collect_deprecations do
     setting = dsl.setting(:dsn, default: "sqlite") { |value| "jdbc:#{value}" }
 
     expect(setting.name).to be(:dsn)
-    expect(setting.value).to eql("jdbc:sqlite")
+    expect(setting.default).to eq("sqlite")
+    expect(setting.constructor.("sqlite")).to eq("jdbc:sqlite")
     expect(logged).to match(/constructor as a block is deprecated/)
   end
 
@@ -136,7 +139,8 @@ RSpec.describe Dry::Configurable::DSL do
     setting = dsl.setting(:dsn, default: "sqlite") { |value| "jdbc:#{value}" }
 
     expect(setting.name).to be(:dsn)
-    expect(setting.value).to eql("jdbc:sqlite")
+    expect(setting.default).to eq("sqlite")
+    expect(setting.constructor.("sqlite")).to eq("jdbc:sqlite")
     expect(logged).to be_empty
 
     Dry::Configurable.warn_on_setting_constructor_block true
@@ -152,7 +156,12 @@ RSpec.describe Dry::Configurable::DSL do
       end
 
     expect(setting.name).to be(:db)
-    expect(setting.value.cred.user).to be(nil)
-    expect(setting.value.cred.pass).to be(nil)
+
+    # expect(setting.value.cred.user).to be(nil)
+    # expect(setting.value.cred.pass).to be(nil)
+
+    # TODO: More tests here
+    expect(setting.children.to_a.length).to eq 1
+    expect(setting.children.to_a.first.children.to_a.length).to eq 2
   end
 end

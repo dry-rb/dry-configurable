@@ -12,7 +12,7 @@ module Dry
         super
 
         subclass.instance_variable_set("@_settings", _settings.dup)
-        subclass.instance_variable_set("@_config", config.dup) if respond_to?(:config)
+        subclass.instance_variable_set("@config", config.dup) if respond_to?(:config)
       end
 
       # Add a setting to the configuration

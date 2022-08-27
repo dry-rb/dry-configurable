@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "concurrent/map"
+require "dry/core/constants"
 
 module Dry
   module Configurable
@@ -13,13 +13,12 @@ module Dry
       # @api private
       attr_reader :_settings
 
-      # @api private
-      attr_reader :_resolved
+      attr_reader :_values
 
       # @api private
       def initialize(settings)
         @_settings = settings
-        @_resolved = Concurrent::Map.new
+        @_values = {}
       end
 
       # Get config value by a key
@@ -27,11 +26,28 @@ module Dry
       # @param [String,Symbol] name
       #
       # @return Config value
+      # def [](name)
+      #   name = name.to_sym
+      #   raise ArgumentError, "+#{name}+ is not a setting name" unless _settings.key?(name)
+
+      #   _settings[name].value
+      # end
+
+      # WIP
       def [](name)
         name = name.to_sym
         raise ArgumentError, "+#{name}+ is not a setting name" unless _settings.key?(name)
 
-        _settings[name].value
+        _values.fetch(name) {
+          setting = _settings[name]
+
+          _values[name] =
+            if setting.children
+              self.class.new(setting.children)
+            else
+              setting.constructor.(Dry::Core::Constants::Undefined.coalesce(setting.default, nil))
+            end
+        }
       end
 
       # Set config value.
@@ -71,55 +87,81 @@ module Dry
       #
       # @api public
       def values
-        _settings
-          .map { |setting| [setting.name, setting.value] }
-          .map { |key, value| [key, value.is_a?(self.class) ? value.to_h : value] }
-          .to_h
+        # _settings
+        #   .map { |setting| [setting.name, setting.value] }
+        #   .map { |key, value| [key, value.is_a?(self.class) ? value.to_h : value] }
+        #   .to_h
+
+        # TODO: only do this once?
+        _settings.each { |setting|
+          self[setting.name]
+        }
+        _values
       end
       alias_method :to_h, :values
 
       # @api private
       def finalize!(freeze_values: false)
-        _settings.finalize!(freeze_values: freeze_values)
+        # FIXME: probably can't be doing this if we're sharing setting definitions
+        # _settings.finalize!(freeze_values: freeze_values)
+
+        # TODO
+        values.each_value do |value|
+          if value.is_a?(self.class)
+            value.finalize!
+          elsif freeze_values
+            value.freeze
+          end
+        end
+
         freeze
       end
 
       # @api private
+      # TODO: Do I need this????
       def pristine
-        self.class.new(_settings.pristine)
+        # self.class.new(_settings.pristine)
+        self.class.new(_settings)
       end
 
       # @api private
       def respond_to_missing?(meth, include_private = false)
-        super || _settings.key?(resolve(meth))
+        _settings.key?(setting_name_from_method(meth)) || super
       end
 
       private
 
       # @api private
-      def method_missing(meth, *args)
-        setting = _settings[resolve(meth)]
+      def method_missing(name, *args)
+        setting_name = setting_name_from_method(name)
+        setting = _settings[setting_name]
 
         super unless setting
 
-        if setting.writer?(meth)
+        if setting.writer?(name)
           raise FrozenConfig, "Cannot modify frozen config" if frozen?
 
-          _settings << setting.with(input: args[0])
+          # _settings << setting.with(input: args[0])
+          _values[setting_name] = setting.constructor.(args[0])
         else
-          setting.value
+          # setting.value
+          self[setting_name]
         end
       end
 
       # @api private
-      def resolve(meth)
-        _resolved.fetch(meth) { _resolved[meth] = meth.to_s.tr("=", "").to_sym }
+      def setting_name_from_method(method_name)
+        method_name.to_s.tr("=", "").to_sym
       end
 
       # @api private
       def initialize_copy(source)
         super
+
+        # TODO: FIXME: I don't think we want to do this anymore for the CoW approach
         @_settings = source._settings.dup
+
+        @_values = source._values.dup
       end
     end
   end
