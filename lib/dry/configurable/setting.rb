@@ -8,9 +8,9 @@ module Dry
     #
     # @api private
     class Setting
-      include Dry::Equalizer(:name, :value, :options, inspect: false)
+      include Dry::Equalizer(:name, :children, :options, inspect: false)
 
-      OPTIONS = %i[input default reader constructor cloneable settings].freeze
+      OPTIONS = %i[default reader constructor cloneable settings].freeze
 
       DEFAULT_CONSTRUCTOR = -> v { v }.freeze
 
@@ -23,30 +23,13 @@ module Dry
       attr_reader :writer_name
 
       # @api private
-      attr_reader :input
-
-      # @api private
       attr_reader :default
 
       # @api private
       attr_reader :options
 
-      # Specialized Setting which includes nested settings
-      #
       # @api private
-      class Nested < Setting
-        CONSTRUCTOR = Config.method(:new)
-
-        # @api private
-        def pristine
-          with(input: input.pristine)
-        end
-
-        # @api private
-        def constructor
-          CONSTRUCTOR
-        end
-      end
+      attr_reader :children
 
       # @api private
       def self.cloneable_value?(value)
@@ -54,66 +37,27 @@ module Dry
       end
 
       # @api private
-      def initialize(name, input: Undefined, default: Undefined, **options)
+      def initialize(name, default: Undefined, children: nil, **options)
         @name = name
         @writer_name = :"#{name}="
         @options = options
-
-        # Setting collections (see `Settings`) are shared between the configurable class
-        # and its `config` object, so for cloneable individual settings, we duplicate
-        # their _values_ as early as possible to ensure no impact from unintended mutation
-        @input = input
         @default = default
-        if cloneable?
-          @input = input.dup
-          @default = default.dup
-        end
-
-        evaluate if input_defined?
-      end
-
-      # @api private
-      def input_defined?
-        !input.equal?(Undefined)
-      end
-
-      # @api private
-      def value
-        return @value if evaluated?
-
-        @value = constructor[Undefined.coalesce(input, default, nil)]
-      end
-      alias_method :evaluate, :value
-      private :evaluate
-
-      # @api private
-      def evaluated?
-        instance_variable_defined?(:@value)
+        @children = children
       end
 
       # @api private
       def nested(settings)
-        Nested.new(name, input: settings, **options)
+        # WIP: better way to handle this? in compiler maybe?
+        #
+        # Because when children are present, it'll mean other behaviors might need to change too,
+        # and we're not doing that right now
+        self.class.new(name, children: settings, **options)
       end
 
       # @api private
-      def pristine
-        with(input: Undefined)
-      end
-
-      # @api private
-      def finalize!(freeze_values: false)
-        if value.is_a?(Config)
-          value.finalize!(freeze_values: freeze_values)
-        elsif freeze_values
-          value.freeze
-        end
+      # TODO: this probably needs to move elsewhere
+      def finalize!(*)
         freeze
-      end
-
-      # @api private
-      def with(new_opts)
-        self.class.new(name, input: input, default: default, **options, **new_opts)
       end
 
       # @api private
@@ -132,15 +76,18 @@ module Dry
       end
 
       # @api private
+      # WIP needed?
       def cloneable?
-        if options.key?(:cloneable)
-          # Return cloneable option if explicitly set
-          options[:cloneable]
+        options.fetch(:cloneable) { Setting.cloneable_value?(default) }
+      end
+
+      def to_value
+        value = constructor.(Dry::Core::Constants::Undefined.coalesce(default, nil))
+
+        if options.fetch(:cloneable) { Setting.cloneable_value?(value) }
+          value.dup
         else
-          # Otherwise, infer cloneable from any of the input, default, or value
-          Setting.cloneable_value?(input) || Setting.cloneable_value?(default) || (
-            evaluated? && Setting.cloneable_value?(value)
-          )
+          value
         end
       end
 
@@ -151,11 +98,10 @@ module Dry
         super
 
         @options = source.options.dup
+        @children = source.children.dup
 
         if source.cloneable?
-          @input = source.input.dup
           @default = source.default.dup
-          @value = source.value.dup if source.evaluated?
         end
       end
     end
