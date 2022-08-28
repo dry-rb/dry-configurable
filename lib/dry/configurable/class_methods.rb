@@ -31,12 +31,13 @@ module Dry
       # @return [Dry::Configurable::Config]
       #
       # @api public
-      def setting(*args, **options, &block)
-        setting = __config_dsl__.setting(*args, **options, &block)
+      def setting(name, *args, **options, &block)
+        setting = __config_dsl__.setting(name, *args, **options, &block)
 
+        # WIP
         _settings << setting
 
-        __config_reader__.define(setting.name) if setting.reader?
+        __config_reader__.define(name) if options[:reader]
 
         self
       end
@@ -56,7 +57,11 @@ module Dry
       #
       # @api public
       def _settings
-        @_settings ||= Settings.new
+        # @_settings ||= Settings.new
+
+        # TODO: WIP: Assign `self` to settings somehow, so we can know what it "belongs to" (for
+        # copy on write later)
+        @_settings ||= Class.new(Settings)
       end
 
       # Return configuration
@@ -75,7 +80,7 @@ module Dry
 
       # @api private
       def __config_dsl__
-        @__config_dsl__ ||= DSL.new
+        @__config_dsl__ ||= DSL.new(_settings)
       end
 
       # @api private

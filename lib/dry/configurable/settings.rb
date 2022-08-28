@@ -7,73 +7,126 @@ module Dry
     # A settings map
     #
     # @api private
+
+    # This would actually better be called "Config" in the structure I'm trying here
     class Settings
-      include Dry::Equalizer(:elements)
 
-      include Enumerable
+      DEFAULT_CONSTRUCTOR = :itself.to_proc.freeze
 
-      # @api private
-      attr_reader :elements
+      # include Dry::Equalizer(:elements)
 
-      # @api private
-      def initialize(elements = EMPTY_ARRAY)
-        initialize_elements(elements)
+      # include Enumerable
+
+      def self.setting_names
+        @setting_names ||= []
       end
 
-      # @api private
-      def <<(setting)
-        elements[setting.name] = setting
-        self
+      def self.nested_settings
+        @nested_settings ||= {}
       end
 
-      # @api private
-      def [](name)
-        elements[name]
+      # Options:
+      #
+      # default
+      # reader
+      # constructor
+      # cloneable
+      #
+      # children??
+
+      def self.define_setting(name, **options)
+        setting_names << name
+
+        constructor = options[:constructor] || DEFAULT_CONSTRUCTOR
+
+        default_value = constructor.call(
+          Dry::Core::Constants::Undefined.coalesce(options[:default], nil)
+        )
+
+        define_method(name) do
+          if instance_variable_defined?(:"@#{name}")
+            instance_variable_get(:"@#{name}")
+          else
+            # TODO: should actually be set in #initialize somehow?
+            # Or should this instance_variable_set?
+
+            # default_value
+
+            instance_variable_set(:"@#{name}", default_value)
+          end
+        end
+
+        define_method("#{name}=") do |value|
+          instance_variable_set(:"@#{name}", constructor.call(value))
+        end
       end
 
-      # @api private
-      def key?(name)
-        keys.include?(name)
+      def self.define_nested(name, klass)
+        nested_settings[name] = klass
       end
 
-      # @api private
-      def keys
-        elements.keys
-      end
-
-      # @api private
-      def each(&block)
-        elements.values.each(&block)
-      end
-
-      # WIP - prob not needed if this is containing definitions only
-      # def pristine
-      #   self.class.new(map(&:pristine))
+      # def self.define_nested(name)
+      #   define_method(name) do
+      #     if instance_variable_defined?(:"@#{name}")
+      #       instance_variable_get(:"@#{name}")
+      #     else
+      #       instance_variable_set(:"@#{name}", nested_class.new)
+      #     end
+      #   end
       # end
 
-      # WIP - prob not needed if this is containing definitions only
-      # def finalize!(freeze_values: false)
-      #   each { |element| element.finalize!(freeze_values: freeze_values) }
-      #   freeze
+      # def self.define_nested(name)
+      #   nested_class = Class.new(Settings)
+
+      #   define_method(name) do
+      #     if instance_variable_defined?(:"@#{name}")
+      #       instance_variable_get(:"@#{name}")
+      #     else
+      #       instance_variable_set(:"@#{name}", nested_class.new)
+      #     end
+      #   end
       # end
-      def finalize!(freeze_values: false)
-        # TODO: work out what to do
-        freeze
+
+      # What would nested look like?
+
+      def database
+        @database = Settings.new
       end
 
-      private
+
+      # # @api private
+      # attr_reader :elements
+
+      # # @api private
+      # def initialize(elements = EMPTY_ARRAY)
+      #   initialize_elements(elements)
+      # end
 
       # @api private
-      def initialize_copy(source)
-        initialize_elements(source.map(&:dup))
-      end
+      # def <<(setting)
+      #   elements[setting.name] = setting
+      #   self
+      # end
 
       # @api private
-      def initialize_elements(elements)
-        @elements = elements.each_with_object(Concurrent::Map.new) { |s, m|
-          m[s.name] = s
-        }
-      end
+      # def [](name)
+      #   elements[name]
+      # end
+
+      # @api private
+      # def key?(name)
+      #   keys.include?(name)
+      # end
+
+      # @api private
+      # def keys
+      #   elements.keys
+      # end
+
+      # @api private
+      # def each(&block)
+      #   elements.values.each(&block)
+      # end
     end
   end
 end

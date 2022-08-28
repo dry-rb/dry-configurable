@@ -10,7 +10,7 @@ module Dry
     class Setting
       include Dry::Equalizer(:name, :children, :options, inspect: false)
 
-      OPTIONS = %i[default reader constructor cloneable settings].freeze
+      OPTIONS = %i[default reader constructor cloneable].freeze
 
       DEFAULT_CONSTRUCTOR = -> v { v }.freeze
 
@@ -63,11 +63,6 @@ module Dry
       # @api private
       def constructor
         options[:constructor] || DEFAULT_CONSTRUCTOR
-      end
-
-      # @api private
-      def reader?
-        options[:reader].equal?(true)
       end
 
       # @api private

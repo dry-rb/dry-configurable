@@ -8,6 +8,8 @@ module Dry
     class DSL
       VALID_NAME = /\A[a-z_]\w*\z/i.freeze
 
+      attr_reader :settings_class
+
       # @api private
       attr_reader :compiler
 
@@ -15,7 +17,8 @@ module Dry
       attr_reader :ast
 
       # @api private
-      def initialize(&block)
+      def initialize(settings_class, &block)
+        @settings_class = settings_class
         @compiler = Compiler.new
         @ast = []
         instance_exec(&block) if block
@@ -129,12 +132,13 @@ module Dry
         node = [:setting, [name.to_sym, options]]
 
         if block
+          # TODO: create new settings class here
           ast << [:nested, [node, DSL.new(&block).ast]]
         else
           ast << node
         end
 
-        compiler.visit(ast.last)
+        compiler.visit(ast.last, settings_class)
       end
 
       private

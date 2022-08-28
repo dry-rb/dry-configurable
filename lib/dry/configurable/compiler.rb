@@ -6,30 +6,48 @@ module Dry
     #
     # @api private
     class Compiler
-      def call(ast)
-        Settings.new.tap do |settings|
-          ast.each do |node|
-            settings << visit(node)
-          end
+      # FIXME: This isn't called from anywhere???? (Oh, it's called from inside visit_nested)
+      def call(ast, settings_class = Class.new(Settings))
+        # Settings.new.tap do |settings|
+        #   ast.each do |node|
+        #     settings << visit(node)
+        #   end
+        # end
+
+        ast.each do |node|
+          visit(node, settings_class)
         end
+
+        settings_class
       end
 
       # @api private
-      def visit(node)
+      def visit(node, settings_class = Class.new(Settings))
         type, rest = node
-        public_send(:"visit_#{type}", rest)
+        public_send(:"visit_#{type}", rest, settings_class)
       end
 
       # @api private
-      def visit_setting(node)
+      def visit_setting(node, settings_class)
         name, opts = node
-        Setting.new(name, **opts)
+        # Setting.new(name, **opts)
+        settings_class.define_setting(name, **opts)
       end
 
       # @api private
-      def visit_nested(node)
+      def visit_nested(node, settings_class)
+        # [:setting, [name.to_sym, options]], DSL.new(&block).ast]
         parent, children = node
-        visit(parent).nested(call(children))
+
+        # visit(settings_class, parent).nested(call(children))
+
+        nested_class = call(children)
+
+        # parent = [:setting, [name.to_sym, options]]
+        parent_type, parent_rest = parent
+        parent_rest.last[:default] = nested_class.new
+
+        visit([parent_type, parent_rest], settings_class)
       end
     end
   end
