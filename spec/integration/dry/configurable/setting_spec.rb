@@ -224,14 +224,14 @@ RSpec.describe Dry::Configurable, ".setting" do
         expect(subclass.config.password).to eql("secret")
       end
 
-      it "adding parent setting does not affect child" do
+      it "adding a setting to the parent class also makes it available to an already created child class" do
         klass.setting :db, default: "sqlite"
 
         expect(subclass.settings).to eql(Set[:db])
 
         klass.setting :other
 
-        expect(subclass.settings).to eql(Set[:db])
+        expect(subclass.settings).to eql(Set[:db, :other])
       end
 
       specify "configuring the parent before subclassing copies the config to the child" do

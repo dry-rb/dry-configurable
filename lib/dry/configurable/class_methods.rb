@@ -47,7 +47,7 @@ module Dry
       #
       # @api public
       def settings
-        @settings ||= Set[*_settings.map(&:name)]
+        Set[*_settings.map(&:name)]
       end
 
       # Return declared settings
