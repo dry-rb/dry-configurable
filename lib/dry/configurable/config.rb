@@ -16,9 +16,13 @@ module Dry
       attr_reader :_values
 
       # @api private
-      def initialize(settings)
+      def initialize(settings, values: {})
         @_settings = settings
-        @_values = {}
+        @_values = values
+      end
+
+      def copy_for_settings(new_settings)
+        self.class.new(new_settings, values: @_values)
       end
 
       # Get config value by a key

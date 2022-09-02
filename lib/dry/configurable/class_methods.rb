@@ -34,6 +34,12 @@ module Dry
       def setting(*args, **options, &block)
         setting = __config_dsl__.setting(*args, **options, &block)
 
+        # "copy on write"
+        unless _settings.target.eql?(self)
+          @_settings = _settings.copy_for_target(self)
+          @config = config.copy_for_settings(_settings)
+        end
+
         _settings << setting
 
         __config_reader__.define(setting.name) if setting.reader?
@@ -56,7 +62,7 @@ module Dry
       #
       # @api public
       def _settings
-        @_settings ||= Settings.new
+        @_settings ||= Settings.new(target: self)
       end
 
       # Return configuration

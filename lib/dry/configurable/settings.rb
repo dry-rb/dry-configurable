@@ -16,8 +16,16 @@ module Dry
       attr_reader :elements
 
       # @api private
-      def initialize(elements = EMPTY_ARRAY)
+      attr_reader :target
+
+      # @api private
+      def initialize(elements = EMPTY_ARRAY, target: nil) # FIXME: this shouldn't be optional, but I wanted unit tests to pass for now
         initialize_elements(elements)
+        @target = target
+      end
+
+      def copy_for_target(new_target)
+        self.class.new(elements.values, target: new_target)
       end
 
       # @api private

@@ -199,7 +199,7 @@ RSpec.describe Dry::Configurable, ".setting" do
         Class.new(klass)
       end
 
-      it "maintains mutated value in a child config" do
+      it "maintains a value mutated in the superclass in the subclass config" do
         klass.setting :db do
           setting :ports, default: Set[123]
         end
@@ -211,7 +211,7 @@ RSpec.describe Dry::Configurable, ".setting" do
         expect(subclass.config.db.ports).to eql(Set[123, 312])
       end
 
-      it "allows defining more settings" do
+      it "allows defining more settings in the subclass" do
         klass.setting :db, default: "sqlite"
 
         subclass.setting :username, default: "root"
@@ -222,6 +222,9 @@ RSpec.describe Dry::Configurable, ".setting" do
         expect(subclass.config.db).to eql("sqlite")
         expect(subclass.config.username).to eql("root")
         expect(subclass.config.password).to eql("secret")
+
+        expect(klass.config).not_to respond_to(:username)
+        expect(klass.config).not_to respond_to(:password)
       end
 
       it "adding a setting to the parent class also makes it available to an already created child class" do
