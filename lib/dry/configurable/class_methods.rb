@@ -11,7 +11,11 @@ module Dry
       def inherited(subclass)
         super
 
-        subclass.instance_variable_set("@_settings", _settings) #.dup)
+        # subclass.instance_variable_set("@_settings", _settings) #.dup)
+
+
+
+        # wtf is `respond_to` actually doing here?
         subclass.instance_variable_set("@config", config.dup) if respond_to?(:config)
       end
 
@@ -35,10 +39,10 @@ module Dry
         setting = __config_dsl__.setting(*args, **options, &block)
 
         # "copy on write"
-        unless _settings.target.eql?(self)
-          @_settings = _settings.copy_for_target(self)
-          @config = config.copy_for_settings(_settings)
-        end
+        # unless _settings.target.eql?(self)
+        #   @_settings = _settings.copy_for_target(self)
+        #   @config = config.copy_for_settings(_settings)
+        # end
 
         _settings << setting
 
@@ -52,8 +56,17 @@ module Dry
       # @return [Set<Symbol>]
       #
       # @api public
+      # def settings
+      #   Set[*_settings.map(&:name)]
+      # end
       def settings
-        Set[*_settings.map(&:name)]
+        # WIP: be rspec spec/integration/dry/configurable/setting_spec.rb:283
+        # WIP: stuck on inheritance - how do make it so the settings (settings mods) are inherited?
+
+        # Set[*_settings.keys]
+
+        # WIP: OK, this should _probably_ work off config class
+        Set[*config.class.keys]
       end
 
       # Return declared settings
@@ -62,7 +75,13 @@ module Dry
       #
       # @api public
       def _settings
-        @_settings ||= Settings.new(target: self)
+        @_settings ||= SettingsNew.new.tap do |settings_mod|
+          config_class.extend_settings(settings_mod)
+        end
+      end
+
+      def config_class
+        @config_class ||= Class.new(ConfigNew)
       end
 
       # Return configuration
@@ -71,12 +90,7 @@ module Dry
       #
       # @api public
       def config
-        # The _settings provided to the Config remain shared between the class and the
-        # Config. This allows settings defined _after_ accessing the config to become
-        # available in subsequent accesses to the config. The config is duped when
-        # subclassing to ensure it remains distinct between subclasses and parent classes
-        # (see `.inherited` above).
-        @config ||= Config.new(_settings)
+        @config ||= config_class.new
       end
 
       # @api private
