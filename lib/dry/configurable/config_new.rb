@@ -39,7 +39,13 @@ module Dry
       end
 
       def [](name)
-        @attributes[name]
+        # FIXME: this has to go through the generated reader to work... which doesn't feel right, and WON'T work for attributes with conflicting names
+        public_send(name)
+        # @attributes[name]
+      end
+
+      def []=(name, value)
+        public_send(:"#{name}=", value)
       end
 
       def values

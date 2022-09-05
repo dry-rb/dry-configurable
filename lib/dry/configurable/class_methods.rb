@@ -66,6 +66,8 @@ module Dry
         # Set[*_settings.keys]
 
         # WIP: OK, this should _probably_ work off config class
+        #
+        # Though it might be better if we could refer to `config.class` internally here as `settings`
         Set[*config.class.keys]
       end
 

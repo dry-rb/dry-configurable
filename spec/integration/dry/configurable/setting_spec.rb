@@ -141,8 +141,6 @@ RSpec.describe Dry::Configurable, ".setting" do
       it "defines a reader shortcut when there is default" do
         klass.setting :db, default: "sqlite", reader: true
 
-        # byebug
-
         expect(object.db).to eql("sqlite")
       end
     end

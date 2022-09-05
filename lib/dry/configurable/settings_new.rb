@@ -70,17 +70,25 @@ module Dry
         @instance_mod.define_method(setting.name) do
           # FIXME? Ugh.
           if setting.children
-            children_config = Class.new(ConfigNew)
-            children_mod = settings_mod_klass.new.tap do |mod|
-              setting.children.each do |child_setting|
-                mod << child_setting
-              end
-            end
-            children_config.extend(children_mod)
 
-            @attributes[setting.name] = children_config.new
+            # FIXME: This feels like the totally wrong place for this -- extract it to a "Builder" somewhere?
+            @attributes.fetch(setting.name) {
+              children_config = Class.new(ConfigNew) # <- what happens to ConfigNew's class variables at this point?
+              children_mod = settings_mod_klass.new.tap do |mod|
+                setting.children.each do |child_setting|
+                  mod << child_setting
+                end
+              end
+              children_config.extend_settings(children_mod)
+
+              @attributes[setting.name] = children_config.new
+            }
+
           else
-            @attributes.fetch(setting.name) { setting.constructor[setting.default] }
+            @attributes.fetch(setting.name) {
+              # setting.constructor[setting.default]
+              setting.constructor.(Dry::Core::Constants::Undefined.coalesce(setting.default, nil))
+            }
           end
         end
 
