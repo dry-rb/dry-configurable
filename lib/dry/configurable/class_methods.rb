@@ -87,7 +87,7 @@ module Dry
           # Oops, this was leaking the settings everywhere, since our configs all now inherit
           # directly from ConfigNew
           #
-          config.class.extend_settings(settings_mod)
+          config.class.extend_settings(settings_mod) if respond_to?(:config) # WIP <- here we added this for the instance-level stuff
           # byebug
 
           # config.singleton_class.extend_settings(settings_mod)

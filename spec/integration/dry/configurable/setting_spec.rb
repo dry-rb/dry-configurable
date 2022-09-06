@@ -301,7 +301,7 @@ RSpec.describe Dry::Configurable, ".setting" do
     end
   end
 
-  xcontext "when included" do
+  context "when included" do
     subject(:object) do
       klass.new
     end
@@ -347,7 +347,7 @@ RSpec.describe Dry::Configurable, ".setting" do
       expect(object.config.path).not_to be(new_object.config.path)
     end
 
-    it "makes only settings defined before instantiation available" do
+    it "makes settings defined after instantiation also available" do
       klass.setting :before, default: "defined before"
 
       object_1 = klass.new
@@ -357,7 +357,7 @@ RSpec.describe Dry::Configurable, ".setting" do
       object_2 = klass.new
 
       expect(object_1.config.before).to eq "defined before"
-      expect(object_1.config).not_to respond_to(:after)
+      expect(object_1.config).to respond_to(:after)
 
       expect(object_2.config.before).to eq "defined before"
       expect(object_2.config.after).to eq "defined after"
