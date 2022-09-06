@@ -16,7 +16,9 @@ module Dry
 
 
         # wtf is `respond_to` actually doing here?
-        subclass.instance_variable_set("@config", config.dup) if respond_to?(:config)
+        # subclass.instance_variable_set("@config", config.dup) if respond_to?(:config)
+
+        subclass.instance_variable_set(:"@config", build_inherited_config(config)) if respond_to?(:config)
       end
 
       # Add a setting to the configuration
@@ -45,6 +47,8 @@ module Dry
         # end
 
         _settings << setting
+
+        # byebug if setting.name == :password
 
         __config_reader__.define(setting.name) if setting.reader?
 
@@ -78,13 +82,21 @@ module Dry
       # @api public
       def _settings
         @_settings ||= SettingsNew.new.tap do |settings_mod|
-          config_class.extend_settings(settings_mod)
+          # config_class.extend_settings(settings_mod)
+
+          # Oops, this was leaking the settings everywhere, since our configs all now inherit
+          # directly from ConfigNew
+          #
+          config.class.extend_settings(settings_mod)
+          # byebug
+
+          # config.singleton_class.extend_settings(settings_mod)
         end
       end
 
-      def config_class
-        @config_class ||= Class.new(ConfigNew)
-      end
+      # def config_class
+      #   @config_class ||= Class.new(ConfigNew)
+      # end
 
       # Return configuration
       #
@@ -92,7 +104,23 @@ module Dry
       #
       # @api public
       def config
-        @config ||= config_class.new
+        # @config ||= config_class.new
+        @config ||= Class.new(ConfigNew).new
+      end
+
+      def build_inherited_config(parent_config)
+        Class.new(ConfigNew)
+          .tap { |klass|
+            parent_config.class.settings_modules.each do |settings_mod|
+              klass.extend_settings(settings_mod)
+            end
+          }
+          .then { |klass|
+            # TODO: tidy
+            config = klass.new
+            config.instance_variable_set(:@attributes, parent_config.instance_variable_get(:@attributes).dup)
+            config
+          }
       end
 
       # @api private

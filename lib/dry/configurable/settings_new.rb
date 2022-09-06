@@ -17,9 +17,9 @@ module Dry
         @instance_mod = Module.new
       end
 
-      def inspect
-        "#<SettingsNew #{elements.map(&:name).inspect}>"
-      end
+      # def inspect
+      #   "#<SettingsNew #{elements.map(&:name).inspect}>"
+      # end
 
       def extended(klass)
         super
@@ -29,7 +29,6 @@ module Dry
 
       def <<(setting)
         elements[setting.name] = setting
-
 
         # TODO: the accessor could do stuff with the constructor and default
         define_accessor(setting)
@@ -87,7 +86,9 @@ module Dry
           else
             @attributes.fetch(setting.name) {
               # setting.constructor[setting.default]
-              setting.constructor.(Dry::Core::Constants::Undefined.coalesce(setting.default, nil))
+              # setting.constructor.(Dry::Core::Constants::Undefined.coalesce(setting.default, nil))
+              @attributes[setting.name] = setting.to_value
+              # FIXME: ^ setting.to_value __probably__ not the way we want to do this? Or maybe it is!
             }
           end
         end
