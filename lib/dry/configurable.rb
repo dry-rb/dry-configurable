@@ -68,6 +68,7 @@ module Dry
       raise AlreadyIncluded if klass.include?(InstanceMethods)
 
       super
+
       klass.class_eval do
         extend(ClassMethods)
         include(InstanceMethods)

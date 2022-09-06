@@ -48,8 +48,38 @@ module Dry
         public_send(:"#{name}=", value)
       end
 
+      # def values
+      #   @attributes.to_h
+      # end
+
       def values
-        @attributes.to_h
+        # _settings
+        #   .map { |setting| [setting.name, setting.value] }
+        #   .map { |key, value| [key, value.is_a?(self.class) ? value.to_h : value] }
+        #   .to_h
+
+        # TODO: only do this once?
+        self.class.keys.each { |setting_name|
+          self[setting_name]
+        }
+        @attributes
+      end
+      alias_method :to_h, :values
+
+      def finalize!(freeze_values: false)
+        values.each_value do |value|
+          if value.is_a?(ConfigNew) # can't use self.class here anymore
+            value.finalize!(freeze_values: freeze_values)
+          elsif freeze_values
+            value.freeze
+          end
+        end
+
+        freeze
+      end
+
+      def pristine
+        self.class.new
       end
     end
   end
