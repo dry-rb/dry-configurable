@@ -116,7 +116,10 @@ module Dry
           .then { |klass|
             # TODO: tidy
             config = klass.new
-            config.instance_variable_set(:@attributes, parent_config.instance_variable_get(:@attributes).dup)
+
+            # This was actually a problem, since it wasn't deeply dup'ing
+            # config.instance_variable_set(:@attributes, parent_config.instance_variable_get(:@attributes).dup)
+            config.instance_variable_set(:@attributes, parent_config.values.map { |k, v| [k, v.dup] }.to_h)
             config
           }
       end

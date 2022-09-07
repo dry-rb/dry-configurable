@@ -35,17 +35,37 @@ module Dry
       end
 
       def initialize_copy(source)
-        @attributes = source.instance_variable_get(:@attributes).dup
+        # @attributes = source.instance_variable_get(:@attributes).dup
+        @attributes = source.values.map { |k, v| [k, v.dup] }.to_h
       end
 
       def [](name)
+        raise ArgumentError, "+#{name}+ is not a setting name" unless self.class.keys.include?(name)
+
         # FIXME: this has to go through the generated reader to work... which doesn't feel right, and WON'T work for attributes with conflicting names
         public_send(name)
         # @attributes[name]
       end
 
       def []=(name, value)
+        raise ArgumentError, "+#{name}+ is not a setting name" unless self.class.keys.include?(name)
+
         public_send(:"#{name}=", value)
+      end
+
+      def update(values)
+        values.each do |key, value|
+          if self[key].is_a?(ConfigNew)
+            unless value.respond_to?(:to_hash)
+              raise ArgumentError, "#{value.inspect} is not a valid setting value"
+            end
+
+            self[key].update(value.to_hash)
+          else
+            self[key] = value
+          end
+        end
+        self
       end
 
       # def values

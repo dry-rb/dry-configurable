@@ -3,7 +3,7 @@
 require "pathname"
 require "set"
 
-RSpec.describe Dry::Configurable::Config do
+RSpec.describe Dry::Configurable::ConfigNew do
   subject(:config) do
     klass.config
   end

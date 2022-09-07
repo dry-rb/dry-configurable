@@ -27,7 +27,7 @@ RSpec.describe Dry::Configurable, ".included" do
     end
 
     it "ensures `#config` returns instance of Dry::Configurable::Config" do
-      expect(configurable_klass.new.config).to be_a(Dry::Configurable::Config)
+      expect(configurable_klass.new.config).to be_a(Dry::Configurable::ConfigNew)
     end
   end
 
@@ -54,7 +54,7 @@ RSpec.describe Dry::Configurable, ".included" do
       end
 
       it "passes the arguments through" do
-        expect(configurable_klass.new("a", b: "c").config).to be_a(Dry::Configurable::Config)
+        expect(configurable_klass.new("a", b: "c").config).to be_a(Dry::Configurable::ConfigNew)
       end
     end
   end
