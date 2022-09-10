@@ -74,20 +74,6 @@ module Dry
           cloneable? ? value.dup : value
         end
       end
-
-      private
-
-      # @api private
-      def initialize_copy(source)
-        super
-
-        @options = source.options.dup
-        @children = source.children.dup
-
-        if source.cloneable?
-          @default = source.default.dup
-        end
-      end
     end
   end
 end
