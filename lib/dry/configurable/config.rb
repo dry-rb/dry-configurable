@@ -128,11 +128,6 @@ module Dry
         self.class.new(_settings)
       end
 
-      # @api private
-      def respond_to_missing?(meth, include_private = false)
-        _settings.key?(setting_name_from_method(meth)) || super
-      end
-
       private
 
       # @api private
@@ -151,6 +146,11 @@ module Dry
           # setting.value
           self[setting_name]
         end
+      end
+
+      # @api private
+      def respond_to_missing?(meth, include_private = false)
+        _settings.key?(setting_name_from_method(meth)) || super
       end
 
       # @api private
