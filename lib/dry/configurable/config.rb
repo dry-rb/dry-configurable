@@ -28,10 +28,6 @@ module Dry
         )
       end
 
-      def copy_for_settings(new_settings)
-        self.class.new(new_settings, values: @_values)
-      end
-
       # Get config value by a key
       #
       # @param [String,Symbol] name
