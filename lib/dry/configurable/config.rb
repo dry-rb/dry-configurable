@@ -21,9 +21,9 @@ module Dry
         @_values = values
       end
 
-      def for_configurable(host)
+      def dup_for_settings(settings)
         self.class.new(
-          host._settings,
+          settings,
           values: values.map { |k, v| [k, v.dup] }.to_h, # TODO: this should only dup the cloneable values
         )
       end
