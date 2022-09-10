@@ -108,7 +108,6 @@ module Dry
 
       private
 
-      # @api private
       def method_missing(name, *args)
         setting_name = setting_name_from_method(name)
         setting = _settings[setting_name]
@@ -122,17 +121,14 @@ module Dry
         end
       end
 
-      # @api private
       def respond_to_missing?(meth, include_private = false)
         _settings.key?(setting_name_from_method(meth)) || super
       end
 
-      # @api private
       def setting_name_from_method(method_name)
         method_name.to_s.tr("=", "").to_sym
       end
 
-      # @api private
       def dup_values
         _settings.each_with_object({}) { |setting, hsh|
           hsh[setting.name] = setting.cloneable? ? self[setting.name].dup : self[setting.name]
