@@ -33,21 +33,11 @@ module Dry
       # @param [String,Symbol] name
       #
       # @return Config value
-      # def [](name)
-      #   name = name.to_sym
-      #   raise ArgumentError, "+#{name}+ is not a setting name" unless _settings.key?(name)
-
-      #   _settings[name].value
-      # end
-
-      # WIP
       def [](name)
         name = name.to_sym
         raise ArgumentError, "+#{name}+ is not a setting name" unless (setting = _settings[name])
 
-        _values.fetch(name) {
-          _values[name] = setting.to_value
-        }
+        _values.fetch(name) { _values[name] = setting.to_value }
       end
 
       # Set config value.
@@ -56,7 +46,12 @@ module Dry
       # @param [String,Symbol] name
       # @param [Object] value
       def []=(name, value)
-        public_send(:"#{name}=", value)
+        raise FrozenConfig, "Cannot modify frozen config" if frozen?
+
+        name = name.to_sym
+        raise ArgumentError, "+#{name}+ is not a setting name" unless (setting = _settings[name])
+
+        _values[name] = setting.constructor.(value)
       end
 
       # Update config with new values
@@ -87,15 +82,9 @@ module Dry
       #
       # @api public
       def values
-        # _settings
-        #   .map { |setting| [setting.name, setting.value] }
-        #   .map { |key, value| [key, value.is_a?(self.class) ? value.to_h : value] }
-        #   .to_h
+        # Ensure all settings are represented in values
+        _settings.each { |setting| self[setting.name] unless _values.key?(setting.name) }
 
-        # TODO: only do this once?
-        _settings.each { |setting|
-          self[setting.name]
-        }
         _values
       end
       alias_method :to_h, :values
@@ -134,12 +123,8 @@ module Dry
         super unless setting
 
         if setting.writer?(name)
-          raise FrozenConfig, "Cannot modify frozen config" if frozen?
-
-          # _settings << setting.with(input: args[0])
-          _values[setting_name] = setting.constructor.(args[0])
+          self[setting_name] = args[0]
         else
-          # setting.value
           self[setting_name]
         end
       end
