@@ -41,10 +41,10 @@ module Dry
         setting = __config_dsl__.setting(*args, **options, &block)
 
         # "copy on write"
-        unless _settings.target.eql?(self)
-          @_settings = _settings.copy_for_target(self)
-          @config = config.copy_for_settings(_settings)
-        end
+        # unless _settings.target.eql?(self)
+        #   @_settings = _settings.copy_for_target(self)
+        #   @config = config.copy_for_settings(_settings)
+        # end
 
         _settings << setting
 
