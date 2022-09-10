@@ -67,8 +67,12 @@ module Dry
 
       # @api private
       def to_value
-        value = constructor.(Dry::Core::Constants::Undefined.coalesce(default, nil))
-        cloneable? ? value.dup : value
+        if children
+          Config.new(children)
+        else
+          value = constructor.(Dry::Core::Constants::Undefined.coalesce(default, nil))
+          cloneable? ? value.dup : value
+        end
       end
 
       private

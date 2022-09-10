@@ -47,17 +47,10 @@ module Dry
       # WIP
       def [](name)
         name = name.to_sym
-        raise ArgumentError, "+#{name}+ is not a setting name" unless _settings.key?(name)
+        raise ArgumentError, "+#{name}+ is not a setting name" unless (setting = _settings[name])
 
         _values.fetch(name) {
-          setting = _settings[name]
-
-          _values[name] =
-            if setting.children
-              self.class.new(setting.children)
-            else
-              setting.to_value
-            end
+          _values[name] = setting.to_value
         }
       end
 

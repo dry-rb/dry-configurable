@@ -31,7 +31,7 @@ module Dry
         parent, children = node
         name, opts = parent[1]
 
-        Setting.new(name, **opts, children: call(children))
+        Setting.new(name, **opts, children: Settings.new(call(children)))
       end
     end
   end
