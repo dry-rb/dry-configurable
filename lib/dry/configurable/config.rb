@@ -56,7 +56,6 @@ module Dry
             if setting.children
               self.class.new(setting.children)
             else
-              # setting.constructor.(Dry::Core::Constants::Undefined.coalesce(setting.default, nil))
               setting.to_value
             end
         }
