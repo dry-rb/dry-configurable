@@ -56,19 +56,8 @@ module Dry
         settings.values.each(&block)
       end
 
-      # WIP - prob not needed if this is containing definitions only
-      # def finalize!(freeze_values: false)
-      #   each { |element| element.finalize!(freeze_values: freeze_values) }
-      #   freeze
-      # end
-      def finalize!(freeze_values: false)
-        # TODO: work out what to do
-        freeze
-      end
-
       private
 
-      # @api private
       def initialize_copy(source)
         @settings = source.settings.dup
       end
