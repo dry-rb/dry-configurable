@@ -114,7 +114,7 @@ module Dry
 
         super unless setting
 
-        if setting.writer?(name)
+        if name.end_with?("=")
           self[setting_name] = args[0]
         else
           self[setting_name]

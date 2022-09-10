@@ -20,9 +20,6 @@ module Dry
       attr_reader :name
 
       # @api private
-      attr_reader :writer_name
-
-      # @api private
       attr_reader :default
 
       # @api private
@@ -39,7 +36,6 @@ module Dry
       # @api private
       def initialize(name, default: Undefined, children: nil, **options)
         @name = name
-        @writer_name = :"#{name}="
         @options = options
         @default = default
         @children = children
@@ -53,11 +49,6 @@ module Dry
       # @api private
       def reader?
         options[:reader].equal?(true)
-      end
-
-      # @api private
-      def writer?(meth)
-        writer_name.equal?(meth)
       end
 
       # @api private
