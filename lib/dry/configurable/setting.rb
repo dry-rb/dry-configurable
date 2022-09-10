@@ -46,12 +46,6 @@ module Dry
       end
 
       # @api private
-      # TODO: this probably needs to move elsewhere
-      def finalize!(*)
-        freeze
-      end
-
-      # @api private
       def constructor
         options[:constructor] || DEFAULT_CONSTRUCTOR
       end
