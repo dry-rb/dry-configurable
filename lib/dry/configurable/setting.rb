@@ -62,7 +62,7 @@ module Dry
 
       # @api private
       def cloneable?
-        options.fetch(:cloneable) { Setting.cloneable_value?(default) }
+        !!children || options.fetch(:cloneable) { Setting.cloneable_value?(default) }
       end
 
       # @api private

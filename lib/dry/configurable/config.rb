@@ -13,6 +13,7 @@ module Dry
       # @api private
       attr_reader :_settings
 
+      # @api private
       attr_reader :_values
 
       # @api private
@@ -21,11 +22,9 @@ module Dry
         @_values = values
       end
 
+      # @api private
       def dup_for_settings(settings)
-        self.class.new(
-          settings,
-          values: values.map { |k, v| [k, v.dup] }.to_h, # TODO: this should only dup the cloneable values
-        )
+        self.class.new(settings, values: dup_values)
       end
 
       # Get config value by a key
@@ -140,19 +139,15 @@ module Dry
       end
 
       # @api private
+      def dup_values
+        _settings.each_with_object({}) { |setting, hsh|
+          hsh[setting.name] = setting.cloneable? ? self[setting.name].dup : self[setting.name]
+        }
+      end
+
       def initialize_copy(source)
         super
-
-        # TODO: FIXME: I don't think we want to do this anymore for the CoW approach
-        @_settings = source._settings #.dup
-
-        # @_values = source._values.dup
-        # ^ _values or values, i.e. do we want to fully resolve values? I think _probably_ not, but double check
-        # byebug
-        # @_values = source._values.map { |k, v| [k, v.dup] }.to_h
-
-        # Yeah, I think we want to fully resolve it
-        @_values = source.values.map { |k, v| [k, v.dup] }.to_h
+        @_values = source.send(:dup_values)
       end
     end
   end
