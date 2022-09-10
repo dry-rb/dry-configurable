@@ -12,10 +12,7 @@ module Dry
     module Initializer
       # @api private
       def initialize(*)
-        # Dup settings at time of initializing to ensure setting values are specific to
-        # this instance. This does mean that any settings defined on the class _after_
-        # initialization will not be available on the instance.
-        @config = self.class.__config_build__(self.class._settings.dup)
+        @config = self.class.__config_build__(self.class._settings)
 
         super
       end
