@@ -8,35 +8,37 @@ module Dry
     #
     # @api private
     class Settings
-      include Dry::Equalizer(:elements)
+      include Dry::Equalizer(:settings)
 
       include Enumerable
 
       # @api private
-      attr_reader :elements
+      attr_reader :settings
 
       # @api private
       attr_reader :target
 
       # @api private
-      def initialize(elements = EMPTY_ARRAY, target: nil) # FIXME: this shouldn't be optional, but I wanted unit tests to pass for now
-        initialize_elements(elements)
+
+      # FIXME: target shouldn't be optional, but I wanted unit tests to pass for now
+      def initialize(settings = EMPTY_ARRAY, target: nil)
+        @settings = settings.each_with_object(Concurrent::Map.new) { |s, m| m[s.name] = s }
         @target = target
       end
 
       def copy_for_target(new_target)
-        self.class.new(elements.values, target: new_target)
+        self.class.new(settings.values, target: new_target)
       end
 
       # @api private
       def <<(setting)
-        elements[setting.name] = setting
+        settings[setting.name] = setting
         self
       end
 
       # @api private
       def [](name)
-        elements[name]
+        settings[name]
       end
 
       # @api private
@@ -46,18 +48,13 @@ module Dry
 
       # @api private
       def keys
-        elements.keys
+        settings.keys
       end
 
       # @api private
       def each(&block)
-        elements.values.each(&block)
+        settings.values.each(&block)
       end
-
-      # WIP - prob not needed if this is containing definitions only
-      # def pristine
-      #   self.class.new(map(&:pristine))
-      # end
 
       # WIP - prob not needed if this is containing definitions only
       # def finalize!(freeze_values: false)
@@ -73,14 +70,7 @@ module Dry
 
       # @api private
       def initialize_copy(source)
-        initialize_elements(source.map(&:dup))
-      end
-
-      # @api private
-      def initialize_elements(elements)
-        @elements = elements.each_with_object(Concurrent::Map.new) { |s, m|
-          m[s.name] = s
-        }
+        @settings = source.settings.dup
       end
     end
   end
