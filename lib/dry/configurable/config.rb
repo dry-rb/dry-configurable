@@ -130,8 +130,8 @@ module Dry
       end
 
       def dup_values
-        _settings.each_with_object({}) { |setting, hsh|
-          hsh[setting.name] = setting.cloneable? ? self[setting.name].dup : self[setting.name]
+        _values.each_with_object({}) { |(key, val), dup_hsh|
+          dup_hsh[key] = _settings[key].cloneable? ? val.dup : val
         }
       end
 
