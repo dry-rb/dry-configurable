@@ -16,18 +16,8 @@ module Dry
       attr_reader :settings
 
       # @api private
-      attr_reader :target
-
-      # @api private
-
-      # FIXME: target shouldn't be optional, but I wanted unit tests to pass for now
-      def initialize(settings = EMPTY_ARRAY, target: nil)
+      def initialize(settings = EMPTY_ARRAY)
         @settings = settings.each_with_object(Concurrent::Map.new) { |s, m| m[s.name] = s }
-        @target = target
-      end
-
-      def copy_for_target(new_target)
-        self.class.new(settings.values, target: new_target)
       end
 
       # @api private
