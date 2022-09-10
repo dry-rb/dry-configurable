@@ -12,7 +12,11 @@ module Dry
         super
 
         subclass.instance_variable_set("@_settings", _settings.dup)
-        subclass.instance_variable_set("@config", config.dup) if respond_to?(:config)
+
+        # Only classes extending (as opposed to including) Dry::Configurable have class-level config
+        if respond_to?(:config)
+          subclass.instance_variable_set("@config", config.for_configurable(subclass))
+        end
       end
 
       # Add a setting to the configuration
