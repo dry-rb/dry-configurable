@@ -29,7 +29,9 @@ module Dry
       # @api private
       def visit_nested(node)
         parent, children = node
-        visit(parent).nested(call(children))
+        name, opts = parent[1]
+
+        Setting.new(name, **opts, children: call(children))
       end
     end
   end

@@ -46,15 +46,6 @@ module Dry
       end
 
       # @api private
-      def nested(settings)
-        # WIP: better way to handle this? in compiler maybe?
-        #
-        # Because when children are present, it'll mean other behaviors might need to change too,
-        # and we're not doing that right now
-        self.class.new(name, children: settings, **options)
-      end
-
-      # @api private
       # TODO: this probably needs to move elsewhere
       def finalize!(*)
         freeze
