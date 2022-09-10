@@ -90,10 +90,6 @@ module Dry
 
       # @api private
       def finalize!(freeze_values: false)
-        # FIXME: probably can't be doing this if we're sharing setting definitions
-        # _settings.finalize!(freeze_values: freeze_values)
-
-        # TODO
         values.each_value do |value|
           if value.is_a?(self.class)
             value.finalize!(freeze_values: freeze_values)
@@ -106,7 +102,6 @@ module Dry
       end
 
       # @api private
-      # TODO: Do I need this????
       def pristine
         # self.class.new(_settings.pristine)
         self.class.new(_settings)
