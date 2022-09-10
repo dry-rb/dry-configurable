@@ -103,7 +103,6 @@ module Dry
 
       # @api private
       def pristine
-        # self.class.new(_settings.pristine)
         self.class.new(_settings)
       end
 
