@@ -307,7 +307,27 @@ RSpec.describe Dry::Configurable, ".setting" do
           end
 
           expect(klass.config).to be_instance_of(Test::Config)
+          expect(klass.config.dsn).to be_instance_of(Test::Config)
           expect(klass.dsn.pool).to be(5)
+        end
+
+        it "uses the custom config class in nested settings only" do
+          Test::Config = Class.new(Dry::Configurable::Config)
+
+          klass = Class.new do
+            extend Dry::Configurable
+
+            setting :database do
+              setting :dsn, config_class: Test::Config, reader: true do
+                setting :pool, default: 5
+              end
+            end
+          end
+
+          expect(klass.config).to be_instance_of(Dry::Configurable::Config)
+          expect(klass.config.database).to be_instance_of(Dry::Configurable::Config)
+          expect(klass.config.database.dsn).to be_instance_of(Test::Config)
+          expect(klass.config.database.dsn.pool).to be(5)
         end
       end
     end

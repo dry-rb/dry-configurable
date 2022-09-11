@@ -10,7 +10,7 @@ module Dry
     class Setting
       include Dry::Equalizer(:name, :value, :options, inspect: false)
 
-      OPTIONS = %i[input default reader constructor cloneable settings].freeze
+      OPTIONS = %i[input default reader constructor cloneable settings config_class].freeze
 
       DEFAULT_CONSTRUCTOR = -> v { v }.freeze
 
@@ -35,7 +35,7 @@ module Dry
       #
       # @api private
       class Nested < Setting
-        CONSTRUCTOR = Config.method(:new)
+        DEFAULT_CONSTRUCTOR = Config.method(:new)
 
         # @api private
         def pristine
@@ -44,7 +44,12 @@ module Dry
 
         # @api private
         def constructor
-          CONSTRUCTOR
+          config_class.equal?(Config) ? DEFAULT_CONSTRUCTOR : config_class.method(:new)
+        end
+
+        # @api private
+        def config_class
+          options[:config_class] || Config
         end
       end
 

@@ -86,7 +86,7 @@ module Dry
 
       # @api private
       def __config_dsl__
-        @__config_dsl__ ||= DSL.new
+        @__config_dsl__ ||= DSL.new(config_class: __config_extension__.config_class)
       end
 
       # @api private
