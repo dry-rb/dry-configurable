@@ -111,11 +111,11 @@ RSpec.describe Dry::Configurable::Config do
         end
 
         parent = Class.new(klass) do
-          config.db.ports << 312
+          configure { |config| config.db.ports << 312 }
         end
 
         child = Class.new(parent) do
-          config.db.ports << 476
+          configure { |config| config.db.ports << 476 }
         end
 
         expect(klass.config.db.ports).to eql(Set[123])

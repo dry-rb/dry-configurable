@@ -11,13 +11,21 @@ module Dry
       def inherited(subclass)
         super
 
-        new_settings = _settings.dup
+        # Orig
+        # new_settings = _settings.dup
+
+        # Xtreme
+        new_settings = _settings
 
         subclass.instance_variable_set(:"@_settings", new_settings)
 
         # Only classes extending (as opposed to including) Dry::Configurable have class-level config
         if respond_to?(:config)
+          # Orig
           subclass.instance_variable_set(:"@config", config.dup_for_settings(new_settings))
+
+          # Xtreme
+          # subclass.instance_variable_set(:"@config", config)
         end
       end
 
@@ -39,6 +47,11 @@ module Dry
       # @api public
       def setting(*args, **options, &block)
         setting = __config_dsl__.setting(*args, **options, &block)
+
+        if superclass.respond_to?(:_settings) && _settings.eql?(superclass._settings)
+          @_settings = _settings.dup
+          @config = config.dup_for_settings(_settings) if respond_to?(:config)
+        end
 
         _settings << setting
 

@@ -24,7 +24,86 @@ module Dry
 
       # @api private
       def dup_for_settings(settings)
-        self.class.new(settings, values: dup_values)
+        # Orig
+        # self.class.new(settings, values: dup_values)
+
+        # New
+        # self.class.new(settings, values: _values)
+
+        # Xtreme
+        self
+      end
+
+      # def dup_for_update
+      #   self.class.new(settings, values: _values.dup)
+      # end
+
+      def for_update
+        UpdatingConfig.new(self)
+      end
+
+      class UpdatingConfig
+        attr_reader :config
+        attr_reader :updated_values
+
+        def initialize(config)
+          @config = config
+          @updated_values = {}
+        end
+
+        def [](name)
+          updated_values[name] = config[name].dup
+        end
+
+        # TODO: It would be good if I didn't have to copy this whole implementation
+        def []=(name, value)
+          name = name.to_sym
+          raise ArgumentError, "+#{name}+ is not a setting name" unless (setting = _settings[name])
+
+          updated_values[name] = setting.constructor.(value)
+        end
+
+        private
+
+        def method_missing(name, *args)
+          return super unless config.respond_to?(name)
+
+          setting_name = setting_name_from_method(name)
+          setting = config._settings[setting_name]
+
+          if setting && name.end_with?("=")
+            self[setting_name] = args[0]
+          elsif setting
+            self[setting_name]
+          else
+            config.public_send(name, *args)
+          end
+        end
+
+        def respond_to_missing?(name, include_private = false)
+          config.respond_to?(name, include_private) || super
+        end
+
+        def setting_name_from_method(method_name)
+          method_name.to_s.tr("=", "").to_sym
+        end
+      end
+
+      def to_update
+        # Raise argument error if no block
+
+        updated = for_update
+        yield(updated)
+
+        @_values = _values.dup
+
+        updated.updated_values.each do |key, val|
+          @_values[key] = val
+        end
+
+        @_values.freeze
+
+        self
       end
 
       # Get config value by a key
