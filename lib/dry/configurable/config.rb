@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "dry/core/constants"
+require_relative "config_for_update"
 
 require "dry/core/equalizer"
 
@@ -25,8 +26,8 @@ module Dry
       end
 
       # @api private
-      def dup_for_settings(settings)
-        self.class.new(settings, values: dup_values)
+      def new_for_settings(settings)
+        self.class.new(settings, values: _values)
       end
 
       # Get config value by a key
@@ -41,46 +42,29 @@ module Dry
           raise ArgumentError, "+#{name}+ is not a setting name"
         end
 
-        _values.fetch(name) { _values[name] = setting.to_value }
+        _values.fetch(name) { _values[name] = setting.to_value } # is freeze too extreme here?
       end
 
-      # Set config value.
-      # Note that finalized configs cannot be changed.
-      #
-      # @param [String,Symbol] name
-      # @param [Object] value
-      def []=(name, value)
-        raise FrozenConfig, "Cannot modify frozen config" if frozen?
+      # @api private
+      def []=(name, *)
+        raise NoMethodError, <<~MSG
+          You must assign config values via the object yielded to `configure`, e.g.
 
-        name = name.to_sym
-
-        unless (setting = _settings[name])
-          raise ArgumentError, "+#{name}+ is not a setting name"
-        end
-
-        _values[name] = setting.constructor.(value)
-      end
-
-      # Update config with new values
-      #
-      # @param values [Hash, #to_hash] A hash with new values
-      #
-      # @return [Config]
-      #
-      # @api public
-      def update(values)
-        values.each do |key, value|
-          if self[key].is_a?(self.class)
-            unless value.respond_to?(:to_hash)
-              raise ArgumentError, "#{value.inspect} is not a valid setting value"
+            configure do |config|
+              config.#{name} = your_value
             end
+        MSG
+      end
 
-            self[key].update(value.to_hash)
-          else
-            self[key] = value
-          end
-        end
-        self
+      # @api private
+      def update(*)
+        raise NoMethodError, <<~MSG
+          You must update config via the object yielded to `configure`, e.g.
+
+            configure do |config|
+              config.update(your_values)
+            end
+        MSG
       end
 
       # Returns the current config values.
@@ -121,6 +105,34 @@ module Dry
       end
 
       # @api private
+      def configure
+        raise ArgumentError, "you need to pass a block" unless block_given?
+
+        for_update = self.for_update
+
+        yield(for_update)
+
+        return self if for_update.updated_values.none?
+
+        @_values = @_values.dup
+
+        for_update.updated_values.each do |key, val|
+          new_val = val.is_a?(ConfigForUpdate) ? val.to_config : val
+
+          next if @_values[key].eql?(new_val)
+
+          @_values[key] = new_val
+        end
+
+        self
+      end
+
+      # @api private
+      def for_update
+        ConfigForUpdate.new(self)
+      end
+
+      # @api private
       def pristine
         self.class.new(_settings)
       end
@@ -148,15 +160,9 @@ module Dry
         method_name.to_s.tr("=", "").to_sym
       end
 
-      def dup_values
-        _values.each_with_object({}) { |(key, val), dup_hsh|
-          dup_hsh[key] = _settings[key].cloneable? ? val.dup : val
-        }
-      end
-
       def initialize_copy(source)
         super
-        @_values = source.__send__(:dup_values)
+        @_values = source._values.dup
       end
     end
   end

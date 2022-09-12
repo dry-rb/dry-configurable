@@ -8,9 +8,13 @@ module Dry
     module Methods
       # @api public
       def configure(&block)
-        raise FrozenConfig, "Cannot modify frozen config" if frozen?
+        raise FrozenError, "can't modify config on frozen #{self}" if frozen?
 
-        yield(config) if block
+        raise ArgumentError, "you need to pass a block" unless block_given?
+
+        new_config = config.dup.tap { |c| c.configure(&block) }
+        @config = new_config unless new_config == @config
+
         self
       end
 

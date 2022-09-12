@@ -14,11 +14,65 @@ RSpec.describe Dry::Configurable::Config do
     end
   end
 
+  it "is the same object in subclasses that have not been configured" do
+    klass.setting :db
+
+    subclass = Class.new(klass)
+
+    expect(subclass.config).to be klass.config
+  end
+
+  describe "#configure" do
+    it "copies the config from a parent class when called the first time" do
+      klass.setting :db
+
+      subclass = Class.new(klass)
+
+      expect(subclass.config).to be klass.config
+
+      subclass.configure { |c| c.db = "sqlite" }
+
+      expect(subclass.config).not_to be klass.config
+      expect(subclass.config.db).to eq "sqlite"
+    end
+
+    it "does not copy the config from the parent class if no values are changed" do
+      klass.setting :db
+
+      subclass = Class.new(klass)
+
+      expect(subclass.config).to be klass.config
+
+      subclass.configure { |c| c.db } # rubocop:disable Style/SymbolProc
+
+      expect(subclass.config).to be klass.config
+    end
+
+    it "preserves a custom config_class when configuring in subclass" do
+      config_class = Class.new(Dry::Configurable::Config)
+
+      klass = Class.new {
+        extend Dry::Configurable(config_class: config_class)
+
+        setting :db
+      }
+
+      subclass = Class.new(klass)
+
+      expect(subclass.config).to be_an_instance_of config_class
+
+      subclass.configure { |c| c.db = "sqlite" }
+
+      expect(subclass.config.db).to eq "sqlite"
+      expect(subclass.config).to be_an_instance_of config_class
+    end
+  end
+
   describe "#update" do
     it "sets new config values in a flat config" do
       klass.setting :db
 
-      config = klass.config.update(db: "sqlite")
+      klass.configure { |c| c.update(db: "sqlite") }
 
       expect(klass.config).to be(config)
       expect(config.db).to eql("sqlite")
@@ -30,10 +84,25 @@ RSpec.describe Dry::Configurable::Config do
         setting :pass, default: "secret"
       end
 
-      klass.config.update(db: {user: "jane", pass: "supersecret"})
+      klass.configure { |c| c.update(db: {user: "jane", pass: "supersecret"}) }
 
       expect(klass.config.db.user).to eql("jane")
       expect(klass.config.db.pass).to eql("supersecret")
+    end
+
+    it "preserves the config class of the nested config" do
+      config_class = Class.new(Dry::Configurable::Config)
+
+      klass.setting :db, config_class: config_class do
+        setting :user, default: "root"
+        setting :pass, default: "secret"
+      end
+
+      klass.configure { |c| c.update(db: {user: "jane", pass: "supersecret"}) }
+
+      expect(klass.config.db.user).to eql("jane")
+      expect(klass.config.db.pass).to eql("supersecret")
+      expect(klass.config.db).to be_an_instance_of(config_class)
     end
 
     it "runs constructors" do
@@ -42,7 +111,7 @@ RSpec.describe Dry::Configurable::Config do
         setting :sslcert, constructor: ->(v) { v&.values_at(:pem, :pass)&.join }
       end
 
-      klass.config.update(db: {user: "jane", sslcert: {pem: "cert", pass: "qwerty"}})
+      klass.configure { |c| c.update(db: {user: "jane", sslcert: {pem: "cert", pass: "qwerty"}}) }
 
       expect(klass.config.db.user).to eql("JANE")
       expect(klass.config.db.sslcert).to eql("certqwerty")
@@ -53,7 +122,7 @@ RSpec.describe Dry::Configurable::Config do
         setting :user
       end
 
-      expect { klass.config.update(db: "string") }
+      expect { klass.configure { |c| c.update(db: "string") } }
         .to raise_error(ArgumentError, '"string" is not a valid setting value')
     end
   end
@@ -132,11 +201,11 @@ RSpec.describe Dry::Configurable::Config do
         end
 
         parent = Class.new(klass) do
-          config.db.ports << 312
+          configure { |config| config.db.ports << 312 }
         end
 
         child = Class.new(parent) do
-          config.db.ports << 476
+          configure { |config| config.db.ports << 476 }
         end
 
         expect(klass.config.db.ports).to eql(Set[123])

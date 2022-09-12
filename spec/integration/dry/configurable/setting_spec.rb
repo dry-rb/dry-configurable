@@ -14,17 +14,17 @@ RSpec.describe Dry::Configurable, ".setting" do
       end
 
       it "allows configuring a setting using a writer" do
-        object.config.db = "sqlite"
+        object.configure { |c| c.db = "sqlite" }
 
         expect(object.config.db).to eql("sqlite")
       end
 
       it "allows configuring a setting using a square-bracket writer" do
-        object.config[:db] = "sqlite"
+        object.configure { |c| c[:db] = "sqlite" }
 
         expect(object.config.db).to eql("sqlite")
 
-        object.config[:db] = "mariadb"
+        object.configure { |c| c[:db] = "mariadb" }
 
         expect(object.config.db).to eql("mariadb")
       end
@@ -89,8 +89,10 @@ RSpec.describe Dry::Configurable, ".setting" do
         expect(object.config.db.cred.user).to be(nil)
         expect(object.config.db.cred.pass).to be(nil)
 
-        object.config.db.cred.user = "root"
-        object.config.db.cred.pass = "secret"
+        object.configure do |c|
+          c.db.cred.user = "root"
+          c.db.cred.pass = "secret"
+        end
 
         expect(object.config.db.cred.user).to eql("root")
         expect(object.config.db.cred.pass).to eql("secret")
@@ -126,7 +128,7 @@ RSpec.describe Dry::Configurable, ".setting" do
         klass.setting(:failable, constructor: ->(value) { value&.to_sym })
 
         expect {
-          object.config.failable = 12
+          object.configure { |c| c.failable = 12 }
         }.to raise_error(NoMethodError, /undefined method `to_sym'/)
       end
     end
@@ -204,7 +206,7 @@ RSpec.describe Dry::Configurable, ".setting" do
           setting :ports, default: Set[123]
         end
 
-        klass.config.db.ports << 312
+        klass.configure { |c| c.db.ports << 312 }
 
         subclass = Class.new(klass)
 
@@ -217,7 +219,7 @@ RSpec.describe Dry::Configurable, ".setting" do
         subclass.setting :username, default: "root"
         subclass.setting :password
 
-        subclass.config.password = "secret"
+        subclass.configure { |c| c.password = "secret" }
 
         expect(subclass.config.db).to eql("sqlite")
         expect(subclass.config.username).to eql("root")
@@ -227,20 +229,33 @@ RSpec.describe Dry::Configurable, ".setting" do
         expect(klass.config).not_to respond_to(:password)
       end
 
-      it "adding parent setting does not affect child" do
-        klass.setting :db, default: "sqlite"
+      describe "adding parent settings to parent after already being subclassed" do
+        it "adds the settings to the subclass" do
+          klass.setting :db, default: "sqlite"
 
-        expect(subclass.settings).to eql(Set[:db])
+          expect(subclass.settings).to eql(Set[:db])
 
-        klass.setting :other
+          klass.setting :other
 
-        expect(subclass.settings).to eql(Set[:db])
+          expect(subclass.settings).to eql(Set[:db, :other])
+        end
+
+        it "does not add the settings to the subclass if the subclass has already added its own settings" do
+          klass.setting :db, default: "sqlite"
+
+          expect(subclass.settings).to eql(Set[:db])
+
+          subclass.setting :sub_other
+          klass.setting :other
+
+          expect(subclass.settings).to eql(Set[:db, :sub_other])
+        end
       end
 
       specify "configuring the parent before subclassing copies the config to the child" do
         klass.setting :db
 
-        object.config.db = "mariadb"
+        object.configure { |c| c.db = "mariadb" }
 
         expect(subclass.config.db).to eql("mariadb")
       end
@@ -250,7 +265,7 @@ RSpec.describe Dry::Configurable, ".setting" do
 
         subclass = Class.new(klass)
 
-        object.config.db = "mariadb"
+        object.configure { |c| c.db = "mariadb" }
 
         expect(subclass.config.db).to be nil
       end
@@ -352,7 +367,7 @@ RSpec.describe Dry::Configurable, ".setting" do
     it "creates config detached from the class settings" do
       klass.setting :db, default: "sqlite"
 
-      object.config.db = "mariadb"
+      object.configure { |c| c.db = "mariadb" }
 
       expect(object.config.db).to eql("mariadb")
       expect(klass.new.config.db).to eql("sqlite")
@@ -417,8 +432,10 @@ RSpec.describe Dry::Configurable, ".setting" do
         expect(object.config.db.user).to eql("root")
         expect(clone.config.db.user).to eql("root")
 
-        object.config.env = "production"
-        object.config.db.user = "jane"
+        object.configure do |c|
+          c.env = "production"
+          c.db.user = "jane"
+        end
 
         expect(object.config.env).to eql("production")
 
@@ -464,7 +481,7 @@ RSpec.describe Dry::Configurable, ".setting" do
       expect(object.config.db.user).to eq("rootfoo")
 
       # does not allow configure block anymore
-      expect { object.configure {} }.to raise_error(Dry::Configurable::FrozenConfig)
+      expect { object.configure {} }.to raise_error(FrozenError)
     end
 
     it "can be finalized with freezing values" do
@@ -481,7 +498,7 @@ RSpec.describe Dry::Configurable, ".setting" do
       expect { object.config.db.user << "foo" }.to raise_error(FrozenError)
 
       # does not allow configure block anymore
-      expect { object.configure {} }.to raise_error(Dry::Configurable::FrozenConfig)
+      expect { object.configure {} }.to raise_error(FrozenError)
     end
 
     it "defines a reader shortcut for nested config" do
@@ -522,8 +539,10 @@ RSpec.describe Dry::Configurable, ".setting" do
 
           object.enable_test_interface
 
-          object.config.dsn = "sqlite:memory"
-          object.config.pool.size = 5
+          object.configure do |c|
+            c.dsn = "sqlite:memory"
+            c.pool.size = 5
+          end
 
           object.reset_config
 
