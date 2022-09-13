@@ -2,7 +2,8 @@
 - version: unreleased
   summary: 
   date: 
-  fixed: 
+  fixed:
+  - 'Remove exec bit from version.rb (via #139) (@Fryguy)'
   added:
   - 'Support for custom config classes via `config_class` option (via #136) (@solnic)'
   changed:
