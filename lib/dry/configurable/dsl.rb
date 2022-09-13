@@ -15,9 +15,13 @@ module Dry
       attr_reader :ast
 
       # @api private
-      def initialize(&block)
+      attr_reader :options
+
+      # @api private
+      def initialize(**options, &block)
         @compiler = Compiler.new
         @ast = []
+        @options = options
         instance_exec(&block) if block
       end
 
@@ -126,7 +130,7 @@ module Dry
 
         ensure_valid_options(options)
 
-        node = [:setting, [name.to_sym, options]]
+        node = [:setting, [name.to_sym, {config_class: config_class, **options}]]
 
         if block
           ast << [:nested, [node, DSL.new(&block).ast]]
@@ -135,6 +139,11 @@ module Dry
         end
 
         compiler.visit(ast.last)
+      end
+
+      # @api private
+      def config_class
+        options[:config_class]
       end
 
       private

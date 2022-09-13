@@ -20,4 +20,13 @@ require "dry/configurable/test_interface"
 RSpec.configure do |config|
   config.disable_monkey_patching!
   config.filter_run_when_matching :focus
+
+  config.around do |example|
+    module Test
+    end
+
+    example.run
+
+    Object.__send__(:remove_const, :Test)
+  end
 end

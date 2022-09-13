@@ -11,8 +11,9 @@ module Dry
       def inherited(subclass)
         super
 
-        subclass.instance_variable_set("@_settings", _settings.dup)
-        subclass.instance_variable_set("@_config", config.dup) if respond_to?(:config)
+        subclass.instance_variable_set(:@__config_extension__, __config_extension__)
+        subclass.instance_variable_set(:@_settings, _settings.dup)
+        subclass.instance_variable_set(:@_config, config.dup) if respond_to?(:config)
       end
 
       # Add a setting to the configuration
@@ -70,12 +71,22 @@ module Dry
         # available in subsequent accesses to the config. The config is duped when
         # subclassing to ensure it remains distinct between subclasses and parent classes
         # (see `.inherited` above).
-        @config ||= Config.new(_settings)
+        @config ||= __config_build__
+      end
+
+      # @api private
+      def __config_build__(settings = _settings)
+        __config_extension__.config_class.new(settings)
+      end
+
+      # @api private
+      def __config_extension__
+        @__config_extension__
       end
 
       # @api private
       def __config_dsl__
-        @__config_dsl__ ||= DSL.new
+        @__config_dsl__ ||= DSL.new(config_class: __config_extension__.config_class)
       end
 
       # @api private
