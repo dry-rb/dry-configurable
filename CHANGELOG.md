@@ -7,6 +7,10 @@
 
 - Support for custom config classes via `config_class` option (via #136) (@solnic)
 
+### Fixed
+
+- Remove exec bit from version.rb (via #139) (@Fryguy)
+
 ### Changed
 
 - Use Zeitwerk to speed up load time (via #135) (@solnic)
