@@ -3,7 +3,8 @@
   summary: 
   date: 
   fixed: 
-  added: 
+  added:
+  - 'Support for custom config classes via `config_class` option (via #136) (@solnic)'
   changed:
   - 'Use Zeitwerk to speed up load time (via #135) (@solnic)'
 - version: 0.15.0
