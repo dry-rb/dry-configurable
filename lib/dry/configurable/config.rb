@@ -102,7 +102,7 @@ module Dry
       #
       # @api public
       def to_h
-        values.map { |key, value| [key, value.is_a?(self.class) ? value.to_h : value] }.to_h
+        values.to_h { |key, value| [key, value.is_a?(self.class) ? value.to_h : value] }
       end
 
       # @api private
@@ -154,7 +154,7 @@ module Dry
 
       def initialize_copy(source)
         super
-        @_values = source.send(:dup_values)
+        @_values = source.__send__(:dup_values)
       end
     end
   end

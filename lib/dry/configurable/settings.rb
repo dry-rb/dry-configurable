@@ -41,7 +41,7 @@ module Dry
 
       # @api private
       def each(&block)
-        settings.values.each(&block)
+        settings.each_value(&block)
       end
 
       private

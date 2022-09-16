@@ -34,11 +34,11 @@ module Dry
       end
 
       # @api private
-      def initialize(name, default: Undefined, children: nil, **options)
+      def initialize(name, default: Undefined, children: EMPTY_ARRAY, **options)
         @name = name
-        @options = options
         @default = default
         @children = children
+        @options = options
       end
 
       # @api private
@@ -53,12 +53,12 @@ module Dry
 
       # @api private
       def cloneable?
-        !!children || options.fetch(:cloneable) { Setting.cloneable_value?(default) }
+        children.any? || options.fetch(:cloneable) { Setting.cloneable_value?(default) }
       end
 
       # @api private
       def to_value
-        if children
+        if children.any?
           (options[:config_class] || Config).new(children)
         else
           value = constructor.(Dry::Core::Constants::Undefined.coalesce(default, nil))
