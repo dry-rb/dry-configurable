@@ -8,16 +8,12 @@ module Dry
     class DSL
       VALID_NAME = /\A[a-z_]\w*\z/i.freeze
 
-      # @api private
       attr_reader :compiler
 
-      # @api private
       attr_reader :ast
 
-      # @api private
       attr_reader :options
 
-      # @api private
       def initialize(**options, &block)
         @compiler = Compiler.new
         @ast = []
@@ -141,7 +137,6 @@ module Dry
         compiler.visit(ast.last)
       end
 
-      # @api private
       def config_class
         options[:config_class]
       end

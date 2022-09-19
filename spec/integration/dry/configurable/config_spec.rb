@@ -67,13 +67,19 @@ RSpec.describe Dry::Configurable::Config do
       end
     end
 
-    it "is used for equality" do
-      expect(klass.config).to eql(klass.config.dup)
+    it "returns the values as a hash" do
+      expect(klass.config.to_h).to eq(
+        db: {
+          user: "root",
+          pass: "secret",
+          ports: Set[123, 321]
+        }
+      )
     end
   end
 
   describe "#dup" do
-    context "with a class" do
+    context "with an object" do
       it "returns a deep-copy" do
         klass = Class.new do
           include Dry::Configurable
@@ -99,9 +105,25 @@ RSpec.describe Dry::Configurable::Config do
 
         expect(klass.new.config.db.ports).to eql(Set[123])
       end
+
+      it "returns an equal copy" do
+        klass = Class.new do
+          include Dry::Configurable
+
+          setting :db do
+            setting :user, default: "root"
+            setting :pass, default: "secret"
+            setting :ports, default: Set[123]
+          end
+        end
+
+        object = klass.new
+
+        expect(object.config.dup).to eql(object.config)
+      end
     end
 
-    context "with an object" do
+    context "with a class" do
       it "returns a deep-copy" do
         klass.setting :db do
           setting :user, default: "root"
@@ -124,6 +146,20 @@ RSpec.describe Dry::Configurable::Config do
 
         expect(parent.config.dup.db.ports).to eql(Set[123, 312])
         expect(child.config.dup.db.ports).to eql(Set[123, 312, 476])
+      end
+
+      it "returns an equal copy" do
+        klass = Class.new do
+          extend Dry::Configurable
+
+          setting :db do
+            setting :user, default: "root"
+            setting :pass, default: "secret"
+            setting :ports, default: Set[123]
+          end
+        end
+
+        expect(klass.config.dup).to eql(klass.config)
       end
     end
   end

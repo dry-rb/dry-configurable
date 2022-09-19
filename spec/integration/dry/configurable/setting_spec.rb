@@ -199,7 +199,7 @@ RSpec.describe Dry::Configurable, ".setting" do
         Class.new(klass)
       end
 
-      it "maintains mutated value in a child config" do
+      it "maintains a value mutated in the superclass in the subclass config" do
         klass.setting :db do
           setting :ports, default: Set[123]
         end
@@ -211,7 +211,7 @@ RSpec.describe Dry::Configurable, ".setting" do
         expect(subclass.config.db.ports).to eql(Set[123, 312])
       end
 
-      it "allows defining more settings" do
+      it "allows defining more settings in the subclass" do
         klass.setting :db, default: "sqlite"
 
         subclass.setting :username, default: "root"
@@ -222,6 +222,9 @@ RSpec.describe Dry::Configurable, ".setting" do
         expect(subclass.config.db).to eql("sqlite")
         expect(subclass.config.username).to eql("root")
         expect(subclass.config.password).to eql("secret")
+
+        expect(klass.config).not_to respond_to(:username)
+        expect(klass.config).not_to respond_to(:password)
       end
 
       it "adding parent setting does not affect child" do
@@ -379,7 +382,7 @@ RSpec.describe Dry::Configurable, ".setting" do
       expect(object.config.path).not_to be(new_object.config.path)
     end
 
-    it "makes only settings defined before instantiation available" do
+    it "makes settings defined after instantiation available" do
       klass.setting :before, default: "defined before"
 
       object_1 = klass.new
@@ -389,7 +392,7 @@ RSpec.describe Dry::Configurable, ".setting" do
       object_2 = klass.new
 
       expect(object_1.config.before).to eq "defined before"
-      expect(object_1.config).not_to respond_to(:after)
+      expect(object_1.config.after).to eq "defined after"
 
       expect(object_2.config.before).to eq "defined before"
       expect(object_2.config.after).to eq "defined after"

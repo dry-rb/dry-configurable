@@ -12,8 +12,16 @@ module Dry
         super
 
         subclass.instance_variable_set(:@__config_extension__, __config_extension__)
-        subclass.instance_variable_set(:@_settings, _settings.dup)
-        subclass.instance_variable_set(:@_config, config.dup) if respond_to?(:config)
+
+        new_settings = _settings.dup
+        subclass.instance_variable_set(:@_settings, new_settings)
+
+        # Only classes **extending** Dry::Configurable have class-level config. When
+        # Dry::Configurable is **included**, the class-level config method is undefined because it
+        # resides at the instance-level instead (see `Configurable.included`).
+        if respond_to?(:config)
+          subclass.instance_variable_set(:@config, config.dup_for_settings(new_settings))
+        end
       end
 
       # Add a setting to the configuration
@@ -48,7 +56,7 @@ module Dry
       #
       # @api public
       def settings
-        @settings ||= Set[*_settings.map(&:name)]
+        Set[*_settings.map(&:name)]
       end
 
       # Return declared settings
@@ -66,11 +74,6 @@ module Dry
       #
       # @api public
       def config
-        # The _settings provided to the Config remain shared between the class and the
-        # Config. This allows settings defined _after_ accessing the config to become
-        # available in subsequent accesses to the config. The config is duped when
-        # subclassing to ensure it remains distinct between subclasses and parent classes
-        # (see `.inherited` above).
         @config ||= __config_build__
       end
 
