@@ -13,6 +13,7 @@ module Dry
       # @api private
       def initialize(*)
         @config = self.class.__config_build__(self.class._settings)
+        @_configured = true
 
         super
       end

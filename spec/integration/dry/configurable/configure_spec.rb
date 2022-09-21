@@ -2,15 +2,13 @@
 
 RSpec.describe Dry::Configurable, ".configure" do
   shared_context "configurable behavior" do
-    before do
+    it "sets the values" do
       klass.setting :db
 
       object.configure do |config|
         config.db = "postgresql"
       end
-    end
 
-    it "sets the values" do
       expect(object.config.db).to eql("postgresql")
     end
   end
@@ -101,8 +99,21 @@ RSpec.describe Dry::Configurable, ".configure" do
 
     include_context "configurable behavior"
 
-    it "defines a constructor that sets the config" do
+    it "initializes config and makes it available as an instance method" do
+      klass.setting :db, default: "postgresql"
+
       expect(object.config.db).to eql("postgresql")
+    end
+
+    it "does not reassign config after first configure" do
+      klass.setting :db
+
+      config = object.config
+
+      object.configure { |c| c.db = "mysql" }
+
+      expect(object.config).to be config
+      expect(config.db).to eq "mysql"
     end
   end
 end
