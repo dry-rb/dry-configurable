@@ -43,7 +43,6 @@ module Dry
 
       private
 
-      # @api public
       def initialize_copy(source)
         super
         @config = source.config.dup
