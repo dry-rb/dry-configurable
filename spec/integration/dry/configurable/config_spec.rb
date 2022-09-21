@@ -22,50 +22,14 @@ RSpec.describe Dry::Configurable::Config do
     expect(subclass.config).to be klass.config
   end
 
-  describe "#configure" do
-    it "copies the config from a parent class when called the first time" do
-      klass.setting :db
+  it "is copied in subclasses after being configured" do
+    klass.setting :db
 
-      subclass = Class.new(klass)
+    subclass = Class.new(klass)
 
-      expect(subclass.config).to be klass.config
+    subclass.configure { |c| c.db = "sqlite" }
 
-      subclass.configure { |c| c.db = "sqlite" }
-
-      expect(subclass.config).not_to be klass.config
-      expect(subclass.config.db).to eq "sqlite"
-    end
-
-    it "does not copy the config from the parent class if no values are changed" do
-      klass.setting :db
-
-      subclass = Class.new(klass)
-
-      expect(subclass.config).to be klass.config
-
-      subclass.configure { |c| c.db } # rubocop:disable Style/SymbolProc
-
-      expect(subclass.config).to be klass.config
-    end
-
-    it "preserves a custom config_class when configuring in subclass" do
-      config_class = Class.new(Dry::Configurable::Config)
-
-      klass = Class.new {
-        extend Dry::Configurable(config_class: config_class)
-
-        setting :db
-      }
-
-      subclass = Class.new(klass)
-
-      expect(subclass.config).to be_an_instance_of config_class
-
-      subclass.configure { |c| c.db = "sqlite" }
-
-      expect(subclass.config.db).to eq "sqlite"
-      expect(subclass.config).to be_an_instance_of config_class
-    end
+    expect(subclass.config).not_to be klass.config
   end
 
   describe "#update" do

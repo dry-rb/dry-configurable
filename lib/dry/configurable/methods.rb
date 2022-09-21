@@ -12,8 +12,17 @@ module Dry
 
         raise ArgumentError, "you need to pass a block" unless block_given?
 
-        new_config = config.dup.tap { |c| c.configure(&block) }
-        @config = new_config unless new_config == @config
+        # Create copy of config only if we're configuring for the first time (in this case, we've
+        # likely inherited it and need to make a distinct local copy).
+        to_configure = @_configured ? config : config.dup
+        to_configure.configure(&block)
+
+        # On first configure, only reassign new config if it is changed from the one we already
+        # have. If it's unchanged, save the memory and don't reassign.
+        if !@_configured && to_configure != @config
+          @config = to_configure
+          @_configured = true
+        end
 
         self
       end
