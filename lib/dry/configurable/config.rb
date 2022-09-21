@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "dry/core/constants"
-require_relative "config_for_update"
 
 require "dry/core/equalizer"
 
@@ -108,16 +107,16 @@ module Dry
       def configure
         raise ArgumentError, "you need to pass a block" unless block_given?
 
-        for_update = self.for_update
+        to_configure = self.to_configure
 
-        yield(for_update)
+        yield(to_configure)
 
-        return self if for_update.updated_values.none?
+        return self if to_configure.updated_values.none?
 
         @_values = @_values.dup
 
-        for_update.updated_values.each do |key, val|
-          new_val = val.is_a?(ConfigForUpdate) ? val.to_config : val
+        to_configure.updated_values.each do |key, val|
+          new_val = val.is_a?(Config::ToConfigure) ? val.to_config : val
 
           next if @_values[key].eql?(new_val)
 
@@ -128,8 +127,8 @@ module Dry
       end
 
       # @api private
-      def for_update
-        ConfigForUpdate.new(self)
+      def to_configure
+        Config::ToConfigure.new(self)
       end
 
       # @api private
