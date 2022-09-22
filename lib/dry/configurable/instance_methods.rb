@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require "dry/configurable/config"
-require "dry/configurable/methods"
-
 module Dry
   module Configurable
     # Initializer method which is prepended when `Dry::Configurable`
