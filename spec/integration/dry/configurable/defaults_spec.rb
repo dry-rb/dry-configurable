@@ -13,5 +13,13 @@ RSpec.describe Dry::Configurable, "default values" do
     expect(klass.config.foo).to be(Dry::Configurable::Undefined)
     expect(klass.config.bar).to be(Dry::Configurable::Undefined)
     expect(klass.config.baz).to eq "BAZ"
+
+    klass.configure do |config|
+      config.foo = "foo"
+      config.bar = "bar"
+    end
+
+    expect(klass.config.foo).to eq "foo"
+    expect(klass.config.bar).to eq "BAR"
   end
 end
