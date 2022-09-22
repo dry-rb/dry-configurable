@@ -35,7 +35,9 @@ module Dry
 
         ensure_valid_options(options)
 
-        node = [:setting, [name.to_sym, {config_class: config_class, **options}]]
+        options = {default: default, config_class: config_class, **options}
+
+        node = [:setting, [name.to_sym, options]]
 
         if block
           ast << [:nested, [node, DSL.new(&block).ast]]
@@ -48,6 +50,10 @@ module Dry
 
       def config_class
         options[:config_class]
+      end
+
+      def default
+        options[:default_undefined] ? Undefined : nil
       end
 
       private

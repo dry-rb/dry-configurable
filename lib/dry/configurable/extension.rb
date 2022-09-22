@@ -7,9 +7,13 @@ module Dry
       attr_reader :config_class
 
       # @api private
-      def initialize(config_class: Configurable::Config)
+      attr_reader :default_undefined
+
+      # @api private
+      def initialize(config_class: Configurable::Config, default_undefined: false)
         super()
         @config_class = config_class
+        @default_undefined = default_undefined
         freeze
       end
 

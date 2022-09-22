@@ -41,7 +41,7 @@ module Dry
       # @api private
       def initialize(
         name,
-        default: Undefined,
+        default:,
         constructor: DEFAULT_CONSTRUCTOR,
         children: EMPTY_ARRAY,
         **options
@@ -68,7 +68,9 @@ module Dry
         if children.any?
           (options[:config_class] || Config).new(children)
         else
-          value = constructor.(Undefined.coalesce(default, nil))
+          value = default
+          value = constructor.(value) unless value.eql?(Undefined)
+
           cloneable? ? value.dup : value
         end
       end
