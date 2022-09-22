@@ -5,7 +5,6 @@ require "zeitwerk"
 require "dry/core/constants"
 require "dry/configurable/constants"
 require "dry/configurable/errors"
-require "dry/configurable/flags"
 
 module Dry
   # @api public
@@ -55,7 +54,7 @@ module Dry
         loader.push_dir(root)
         loader.ignore(
           "#{root}/dry-configurable.rb",
-          "#{root}/dry/configurable/{constants,errors,flags,version}.rb"
+          "#{root}/dry/configurable/{constants,errors,version}.rb"
         )
         loader.inflector.inflect("dsl" => "DSL")
       end
