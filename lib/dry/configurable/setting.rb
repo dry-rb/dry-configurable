@@ -10,7 +10,7 @@ module Dry
     #
     # @api private
     class Setting
-      include Dry::Equalizer(:name, :children, :options, inspect: false)
+      include Dry::Equalizer(:name, :default, :constructor, :children, :options, inspect: false)
 
       OPTIONS = %i[default reader constructor cloneable settings config_class].freeze
 
@@ -25,10 +25,13 @@ module Dry
       attr_reader :default
 
       # @api private
-      attr_reader :options
+      attr_reader :constructor
 
       # @api private
       attr_reader :children
+
+      # @api private
+      attr_reader :options
 
       # @api private
       def self.cloneable_value?(value)
@@ -36,16 +39,18 @@ module Dry
       end
 
       # @api private
-      def initialize(name, default: Undefined, children: EMPTY_ARRAY, **options)
+      def initialize(
+        name,
+        default: Undefined,
+        constructor: DEFAULT_CONSTRUCTOR,
+        children: EMPTY_ARRAY,
+        **options
+      )
         @name = name
         @default = default
+        @constructor = constructor
         @children = children
         @options = options
-      end
-
-      # @api private
-      def constructor
-        options[:constructor] || DEFAULT_CONSTRUCTOR
       end
 
       # @api private
@@ -63,7 +68,7 @@ module Dry
         if children.any?
           (options[:config_class] || Config).new(children)
         else
-          value = constructor.(Dry::Core::Constants::Undefined.coalesce(default, nil))
+          value = constructor.(Undefined.coalesce(default, nil))
           cloneable? ? value.dup : value
         end
       end
