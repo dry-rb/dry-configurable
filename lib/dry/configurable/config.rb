@@ -41,7 +41,13 @@ module Dry
           raise ArgumentError, "+#{name}+ is not a setting name"
         end
 
-        _values.fetch(name) { _values[name] = setting.to_value } # is freeze too extreme here?
+        _values.fetch(name) {
+          # When reading values, only capture cloneable (i.e. mutable) values in local state, making
+          # it easier to determine which values have actually been changed vs just read
+          setting.to_value.tap { |value|
+            _values[name] = value if setting.cloneable?
+          }
+        }
       end
 
       # @api private
@@ -74,10 +80,7 @@ module Dry
       #
       # @api public
       def values
-        # Ensure all settings are represented in values
-        _settings.each { |setting| self[setting.name] unless _values.key?(setting.name) }
-
-        _values
+        _settings.to_h { |setting| [setting.name, self[setting.name]] }
       end
 
       # Returns config values as a hash, with nested values also converted from {Config} instances
