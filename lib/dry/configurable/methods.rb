@@ -9,6 +9,7 @@ module Dry
       # @api public
       def configure(&block)
         raise FrozenError, "can't modify config on frozen #{self}" if frozen?
+        raise FrozenError, "can't modify frozen config" if config.frozen?
 
         raise ArgumentError, "you need to pass a block" unless block_given?
 
