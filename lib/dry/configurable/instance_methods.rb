@@ -9,7 +9,9 @@ module Dry
     module Initializer
       # @api private
       def initialize(*)
-        @config = self.class.__config_build__(self.class._settings)
+        @config = self.class.__config_build__(self.class._settings).tap { |config|
+          config.extend(Config::Mutable)
+        }
         @_configured = true
 
         super
@@ -42,7 +44,9 @@ module Dry
 
       def initialize_copy(source)
         super
-        @config = source.config.dup
+        @config = source.config.dup.tap { |config|
+          config.extend(Config::Mutable)
+        }
       end
     end
   end
