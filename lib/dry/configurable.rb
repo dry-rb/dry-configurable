@@ -48,6 +48,8 @@ module Dry
   #
   # @api public
   module Configurable
+    include Dry::Core::Constants
+
     def self.loader
       @loader ||= Zeitwerk::Loader.new.tap do |loader|
         root = File.expand_path("..", __dir__)
