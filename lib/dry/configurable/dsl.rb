@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "dry/core/deprecations"
+
 module Dry
   module Configurable
     # Setting DSL used by the class API
