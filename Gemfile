@@ -6,8 +6,6 @@ eval_gemfile "Gemfile.devtools"
 
 gemspec
 
-gem "dry-core", github: "dry-rb/dry-core", branch: "main"
-
 group :benchmarks do
   gem "benchmark-ips"
   gem "benchmark-memory"
