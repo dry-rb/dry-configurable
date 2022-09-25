@@ -34,7 +34,15 @@ module Dry
       #
       # @api public
       def finalize!(freeze_values: false)
+        # TODO: need tests for this
+        unless _configured?
+          @config = config.dup
+          _configured!
+        end
+
+        # FIXME: freeze_values won't really work here? need a deep_dup?
         config.finalize!(freeze_values: freeze_values)
+
         self
       end
 

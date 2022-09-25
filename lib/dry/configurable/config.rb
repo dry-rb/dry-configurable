@@ -139,6 +139,10 @@ module Dry
         self.class.new(_settings)
       end
 
+      # TODO
+      def clone
+      end
+
       private
 
       def method_missing(name, *args)
