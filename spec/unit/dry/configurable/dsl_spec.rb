@@ -35,58 +35,6 @@ RSpec.describe Dry::Configurable::DSL do
     expect(setting.default).to eq("root")
   end
 
-  it "compiles but deprecates giving a default as positional argument", :collect_deprecations do
-    setting = dsl.setting :user, "root"
-
-    expect(setting.name).to be(:user)
-    expect(setting.default).to eq("root")
-    # expect(setting.value).to eql("root")
-    expect(logged).to match(/default value as positional argument to settings is deprecated/)
-  end
-
-  it "compiles when giving a default as positional argument, and suppresses the warning when flagged off", :collect_deprecations do
-    Dry::Configurable.warn_on_setting_positional_default false
-
-    setting = dsl.setting :user, "root"
-
-    expect(setting.name).to be(:user)
-    expect(setting.default).to eq("root")
-    # expect(setting.value).to eql("root")
-    expect(logged).to be_empty
-
-    Dry::Configurable.warn_on_setting_positional_default true
-  end
-
-  it "compiles but deprecates giving a defalt hash value as a positional argument (without any keyword args)", :collect_deprecations do
-    # This test is necessary for behavior specific to Ruby 2.6 and 2.7
-
-    setting = dsl.setting :default_options, {foo: "bar"}
-
-    expect(setting.name).to be(:default_options)
-    expect(setting.default).to eq(foo: "bar")
-    expect(logged).to match(/default value as positional argument to settings is deprecated/)
-  end
-
-  if RUBY_VERSION < "3.0"
-    it "compiles but deprecates giving a default hash value as a positional argument (with keyword args)", :collect_deprecations do
-      setting = dsl.setting :default_options, foo: "bar"
-
-      expect(setting.name).to be(:default_options)
-      expect(setting.default).to eq(foo: "bar")
-      expect(logged).to match(/default value as positional argument to settings is deprecated/)
-    end
-  end
-
-  it "compiles but deprecates giving a defalt hash value as a positional argument (with keyword args)", :collect_deprecations do
-    # This test is necessary for behavior specific to Ruby 2.6 and 2.7
-
-    setting = dsl.setting :default_options, {foo: "bar"}, reader: true
-
-    expect(setting.name).to be(:default_options)
-    expect(setting.default).to eq(foo: "bar")
-    expect(logged).to match(/default value as positional argument to settings is deprecated/)
-  end
-
   it "does not infer a default hash value when non-valid keyword arguments are mixed in with valid keyword arguments" do
     # This test is necessary for behavior specific to Ruby 2.6 and 2.7
 
@@ -122,28 +70,6 @@ RSpec.describe Dry::Configurable::DSL do
     expect(setting.name).to be(:dsn)
     expect(setting.default).to eq("sqlite")
     expect(setting.constructor.("sqlite")).to eq("jdbc:sqlite")
-  end
-
-  it "supports but deprecates giving a constructor as a block", :collect_deprecations do
-    setting = dsl.setting(:dsn, default: "sqlite") { |value| "jdbc:#{value}" }
-
-    expect(setting.name).to be(:dsn)
-    expect(setting.default).to eq("sqlite")
-    expect(setting.constructor.("sqlite")).to eq("jdbc:sqlite")
-    expect(logged).to match(/constructor as a block is deprecated/)
-  end
-
-  it "supports but deprecates giving a constructor as a block, and suppresses the warning when flagged off", :collect_deprecations do
-    Dry::Configurable.warn_on_setting_constructor_block false
-
-    setting = dsl.setting(:dsn, default: "sqlite") { |value| "jdbc:#{value}" }
-
-    expect(setting.name).to be(:dsn)
-    expect(setting.default).to eq("sqlite")
-    expect(setting.constructor.("sqlite")).to eq("jdbc:sqlite")
-    expect(logged).to be_empty
-
-    Dry::Configurable.warn_on_setting_constructor_block true
   end
 
   it "compiles a nested list of settings" do
