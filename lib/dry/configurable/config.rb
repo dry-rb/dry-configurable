@@ -41,7 +41,13 @@ module Dry
           raise ArgumentError, "+#{name}+ is not a setting name"
         end
 
-        _values.fetch(name) { _values[name] = setting.to_value }
+        _values.fetch(name) {
+          # When reading values, only capture cloneable (i.e. mutable) values in local state, making
+          # it easier to determine which values have actually been changed vs just read
+          setting.to_value.tap { |value|
+            _values[name] = value if setting.cloneable?
+          }
+        }
       end
 
       # Set config value.
@@ -83,6 +89,25 @@ module Dry
         self
       end
 
+      # Returns true if the value for the given key has been set on this config.
+      #
+      # For simple values, this returns true if the value has been explicitly assigned.
+      #
+      # For cloneable (mutable) values, since these are captured on read, returns true if the value
+      # does not compare equally to its corresdponing default value. This relies on these objects
+      # having functioning `#==` checks.
+      #
+      # @return [Bool]
+      #
+      # @api public
+      def configured?(key)
+        if _settings[key].cloneable? && _values.key?(key)
+          return _values[key] != _settings[key].to_value
+        end
+
+        _values.key?(key)
+      end
+
       # Returns the current config values.
       #
       # Nested configs remain in their {Config} instances.
@@ -91,10 +116,7 @@ module Dry
       #
       # @api public
       def values
-        # Ensure all settings are represented in values
-        _settings.each { |setting| self[setting.name] unless _values.key?(setting.name) }
-
-        _values
+        _settings.to_h { |setting| [setting.name, self[setting.name]] }
       end
 
       # Returns config values as a hash, with nested values also converted from {Config} instances

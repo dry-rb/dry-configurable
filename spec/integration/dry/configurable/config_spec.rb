@@ -14,6 +14,69 @@ RSpec.describe Dry::Configurable::Config do
     end
   end
 
+  describe "#configured?" do
+    it "returns false if the key has not been accessed" do
+      klass.setting :db
+      expect(klass.config.configured?(:db)).to be false
+    end
+
+    it "returns true if the key has been assigned" do
+      klass.setting :db
+      klass.config.db = "sqlite"
+      expect(klass.config.configured?(:db)).to be true
+    end
+
+    it "returns true when the key was assigned in a superclass" do
+      klass.setting :db
+      klass.config.db = "sqlite"
+      subclass = Class.new(klass)
+      expect(subclass.config.configured?(:db)).to be true
+    end
+
+    describe "assignable values" do
+      it "returns false if the key has been read" do
+        klass.setting :db
+        klass.config.db
+        expect(klass.config.configured?(:db)).to be false
+      end
+
+      it "returns false when the key was read in a superclass" do
+        klass.setting :db
+        klass.config.db
+        subclass = Class.new(klass)
+        expect(subclass.config.configured?(:db)).to be false
+      end
+    end
+
+    describe "cloneable values" do
+      it "returns false if the key has been read only" do
+        klass.setting :db, cloneable: true, default: []
+        klass.config.db
+        expect(klass.config.configured?(:db)).to be false
+      end
+
+      it "returns false if the key was read in a superclass" do
+        klass.setting :db, cloneable: true, default: []
+        klass.config.db
+        subclass = Class.new(klass)
+        expect(subclass.config.configured?(:db)).to be false
+      end
+
+      it "returns true if the value has been mutated" do
+        klass.setting :db, cloneable: true, default: []
+        klass.config.db << "sqlite"
+        expect(klass.config.configured?(:db)).to be true
+      end
+
+      it "returns true if the value was mutated in a superclass" do
+        klass.setting :db, cloneable: true, default: []
+        klass.config.db << "sqlite"
+        subclass = Class.new(klass)
+        expect(subclass.config.configured?(:db)).to be true
+      end
+    end
+  end
+
   describe "#update" do
     it "sets new config values in a flat config" do
       klass.setting :db
