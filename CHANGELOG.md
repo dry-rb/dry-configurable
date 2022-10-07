@@ -7,18 +7,18 @@
 
 - Support for custom config classes via `config_class:` option (#136 by @solnic)
 
-```ruby
-extend Dry::Configurable(config_class: MyConfig)
-```
+  ```ruby
+  extend Dry::Configurable(config_class: MyConfig)
+  ```
 
-Your config class should inherit from `Dry::Configurable::Config`.
+  Your config class should inherit from `Dry::Configurable::Config`.
 - Return `Dry::Core::Constants::Undefined` (instead of nil) as the value for non-configured settings via a `default_undefined: true` option (#141 by @timriley)
 
-```ruby
-extend Dry::Configurable(default_undefined: true)
-```
+  ```ruby
+  extend Dry::Configurable(default_undefined: true)
+  ```
 
-You must opt into this feature via the `default_undefined: true` option. Non-configured setting values are still `nil` by default.
+  You must opt into this feature via the `default_undefined: true` option. Non-configured setting values are still `nil` by default.
 
 ### Fixed
 
@@ -28,7 +28,7 @@ You must opt into this feature via the `default_undefined: true` option. Non-con
 
 - Improve memory usage by separating setting definitions from config values (#138 by @timriley)
 
-Your usage of dry-configurable may be impacted if you have been accessing objects from `_settings` or the internals of `Dry::Configurable::Config`. `_settings` now returns `Dry::Configurable::Setting` instances, which contain only the details from the setting's definition. Setting _values_ remain in `Dry::Configurable::Config`.
+  Your usage of dry-configurable may be impacted if you have been accessing objects from `_settings` or the internals of `Dry::Configurable::Config`. `_settings` now returns `Dry::Configurable::Setting` instances, which contain only the details from the setting's definition. Setting _values_ remain in `Dry::Configurable::Config`.
 - Use Zeitwerk to speed up load time (#135 by @solnic)
 
 [Compare v0.15.0...v0.16.0](https://github.com/dry-rb/dry-configurable/compare/v0.15.0...v0.16.0)
