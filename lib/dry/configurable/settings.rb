@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "dry/core/equalizer"
-
 module Dry
   module Configurable
     # A settings map

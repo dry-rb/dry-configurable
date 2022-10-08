@@ -2,7 +2,7 @@
 
 require "zeitwerk"
 
-require "dry/core/constants"
+require "dry/core"
 require "dry/configurable/constants"
 require "dry/configurable/errors"
 

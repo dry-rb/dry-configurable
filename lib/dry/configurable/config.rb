@@ -2,8 +2,6 @@
 
 require "dry/core/constants"
 
-require "dry/core/equalizer"
-
 module Dry
   module Configurable
     # Config exposes setting values through a convenient API

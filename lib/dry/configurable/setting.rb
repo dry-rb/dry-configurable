@@ -2,8 +2,6 @@
 
 require "set"
 
-require "dry/core/equalizer"
-
 module Dry
   module Configurable
     # This class represents a setting and is used internally.
