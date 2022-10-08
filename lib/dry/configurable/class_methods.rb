@@ -13,14 +13,15 @@ module Dry
 
         subclass.instance_variable_set(:@__config_extension__, __config_extension__)
 
-        new_settings = _settings.dup
-        subclass.instance_variable_set(:@_settings, new_settings)
+        # Share settings with subclasses until they define their own additional settings (see
+        # `.setting` below).
+        subclass.instance_variable_set(:@_settings, _settings)
 
         # Only classes **extending** Dry::Configurable have class-level config. When
         # Dry::Configurable is **included**, the class-level config method is undefined because it
         # resides at the instance-level instead (see `Configurable.included`).
         if respond_to?(:config)
-          subclass.instance_variable_set(:@config, config.dup_for_settings(new_settings))
+          subclass.instance_variable_set(:@config, config.dup)
         end
       end
 
@@ -42,6 +43,13 @@ module Dry
       # @api public
       def setting(*args, **options, &block)
         setting = __config_dsl__.setting(*args, **options, &block)
+
+        # If we're sharing settings with our superclass, create our own copy (along with a matching
+        # config copy) at the time of first new setting definition.
+        if superclass.respond_to?(:_settings) && _settings.eql?(superclass._settings)
+          @_settings = _settings.dup
+          @config = config.dup_for_settings(_settings) if respond_to?(:config)
+        end
 
         _settings << setting
 
