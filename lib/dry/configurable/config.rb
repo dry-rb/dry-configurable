@@ -14,17 +14,21 @@ module Dry
       attr_reader :_settings
 
       # @api private
+      attr_reader :_superconfig
+
+      # @api private
       attr_reader :_values
 
       # @api private
-      def initialize(settings, values: {})
+      def initialize(settings, values: {}, superconfig: nil)
         @_settings = settings
         @_values = values
+        @_superconfig = superconfig
       end
 
       # @api private
       def dup_for_settings(settings)
-        self.class.new(settings, values: dup_values)
+        self.class.new(settings, superconfig: self)
       end
 
       # Get config value by a key
@@ -40,11 +44,13 @@ module Dry
         end
 
         _values.fetch(name) {
-          # When reading values, only capture cloneable (i.e. mutable) values in local state, making
-          # it easier to determine which values have actually been changed vs just read
-          setting.to_value.tap { |value|
-            _values[name] = value if setting.cloneable?
-          }
+          value = _superconfig&.[](name) if _superconfig&._settings&.key?(name)
+          value = value.dup if value && setting.cloneable?
+          value ||= setting.to_value
+
+          _values[name] = value if setting.cloneable?
+
+          value
         }
       end
 
@@ -87,6 +93,10 @@ module Dry
         self
       end
 
+      def key?(key)
+        _values.key?(key)
+      end
+
       # Returns true if the value for the given key has been set on this config.
       #
       # For simple values, this returns true if the value has been explicitly assigned.
@@ -103,7 +113,7 @@ module Dry
           return _values[key] != _settings[key].to_value
         end
 
-        _values.key?(key)
+        _values.key?(key) || !!_superconfig&.configured?(key)
       end
 
       # Returns the current config values.

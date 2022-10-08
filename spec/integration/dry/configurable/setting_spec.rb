@@ -245,14 +245,14 @@ RSpec.describe Dry::Configurable, ".setting" do
         expect(subclass.config.db).to eql("mariadb")
       end
 
-      specify "configuring the parent after subclassing does not copy the config to the child" do
+      specify "configuring the parent after subclassing DOES copy the config to the child" do
         klass.setting :db
 
         subclass = Class.new(klass)
 
         object.config.db = "mariadb"
 
-        expect(subclass.config.db).to be nil
+        expect(subclass.config.db).to eq "mariadb"
       end
 
       it "not configured parent does not set child config" do
