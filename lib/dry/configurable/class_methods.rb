@@ -17,8 +17,8 @@ module Dry
         # `.setting` below).
         subclass.instance_variable_set(:@_settings, _settings)
 
-        # Only classes **extending** Dry::Configurable have class-level config. When
-        # Dry::Configurable is **included**, the class-level config method is undefined because it
+        # Only classes that **extend** Dry::Configurable have class-level `config`. When a class
+        # **includes** Dry::Configurable, the class-level `config` method is undefined because it
         # resides at the instance-level instead (see `Configurable.included`).
         if respond_to?(:config)
           subclass.instance_variable_set(:@config, config.dup)
