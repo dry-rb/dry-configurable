@@ -6,16 +6,35 @@ module Dry
     #
     # @api private
     class Settings
-      include Dry::Equalizer(:settings)
+      include Dry::Equalizer(:parent_settings, :settings)
 
       include Enumerable
+
+      # @return [Array<Hash>]
+      #
+      # @api private
+      attr_reader :parent_settings
 
       # @api private
       attr_reader :settings
 
       # @api private
       def initialize(settings = EMPTY_ARRAY)
+        @parent_settings = []
         @settings = settings.each_with_object({}) { |s, m| m[s.name] = s }
+      end
+
+      # @api private
+      private def initialize_copy(source)
+        @parent_settings = source.parent_settings.dup
+        @settings = source.settings.dup
+      end
+
+      # @api private
+      def dup_for_child
+        dup.tap do |child_settings|
+          child_settings.parent_settings << settings
+        end
       end
 
       # @api private
@@ -26,7 +45,7 @@ module Dry
 
       # @api private
       def [](name)
-        settings[name]
+        all_settings[name]
       end
 
       # @api private
@@ -36,18 +55,18 @@ module Dry
 
       # @api private
       def keys
-        settings.keys
+        all_settings.keys
       end
 
       # @api private
       def each(&block)
-        settings.each_value(&block)
+        all_settings.each_value(&block)
       end
 
       private
 
-      def initialize_copy(source)
-        @settings = source.settings.dup
+      def all_settings
+        {**parent_settings.reduce({}, :merge), **settings}
       end
     end
   end
