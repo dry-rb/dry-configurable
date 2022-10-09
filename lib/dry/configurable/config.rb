@@ -36,6 +36,12 @@ module Dry
       end
 
       # @api private
+      private def initialize_copy(source)
+        super
+        @_values = source.__send__(:dup_values)
+      end
+
+      # @api private
       def dup_for_settings(settings)
         dup.tap { |config| config.instance_variable_set(:@_settings, settings) }
       end
