@@ -130,7 +130,10 @@ module Dry
       #
       # @api public
       def values
-        _settings.to_h { |setting| [setting.name, self[setting.name]] }
+        # Ensure all settings are represented in values
+        _settings.each { |setting| self[setting.name] unless _values.key?(setting.name) }
+
+        _values
       end
 
       # Returns config values as a hash, with nested values also converted from {Config} instances
