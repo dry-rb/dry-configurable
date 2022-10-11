@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "dry/core/constants"
+require "set"
 
 module Dry
   module Configurable
@@ -17,14 +18,26 @@ module Dry
       attr_reader :_values
 
       # @api private
+      attr_reader :_configured
+      protected :_configured
+
+      # @api private
       def initialize(settings, values: {})
         @_settings = settings
         @_values = values
+        @_configured = Set.new
+      end
+
+      # @api private
+      private def initialize_copy(source)
+        super
+        @_values = source.__send__(:dup_values)
+        @_configured = source._configured.dup
       end
 
       # @api private
       def dup_for_settings(settings)
-        self.class.new(settings, values: dup_values)
+        dup.tap { |config| config.instance_variable_set(:@_settings, settings) }
       end
 
       # Get config value by a key
@@ -40,10 +53,11 @@ module Dry
         end
 
         _values.fetch(name) {
-          # When reading values, only capture cloneable (i.e. mutable) values in local state, making
-          # it easier to determine which values have actually been changed vs just read
+          # Mutable settings may be configured after read
+          _configured.add(name) if setting.cloneable?
+
           setting.to_value.tap { |value|
-            _values[name] = value if setting.cloneable?
+            _values[name] = value
           }
         }
       end
@@ -61,6 +75,8 @@ module Dry
         unless (setting = _settings[name])
           raise ArgumentError, "+#{name}+ is not a setting name"
         end
+
+        _configured.add(name)
 
         _values[name] = setting.constructor.(value)
       end
@@ -99,11 +115,11 @@ module Dry
       #
       # @api public
       def configured?(key)
-        if _values.key?(key) && _settings[key].cloneable?
+        if _configured.include?(key) && _settings[key].cloneable?
           return _values[key] != _settings[key].to_value
         end
 
-        _values.key?(key)
+        _configured.include?(key)
       end
 
       # Returns the current config values.
@@ -172,11 +188,6 @@ module Dry
         _values.each_with_object({}) { |(key, val), dup_hsh|
           dup_hsh[key] = _settings[key].cloneable? ? val.dup : val
         }
-      end
-
-      def initialize_copy(source)
-        super
-        @_values = source.__send__(:dup_values)
       end
     end
   end
