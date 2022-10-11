@@ -99,7 +99,7 @@ module Dry
       #
       # @api public
       def configured?(key)
-        if _settings[key].cloneable? && _values.key?(key)
+        if _values.key?(key) && _settings[key].cloneable?
           return _values[key] != _settings[key].to_value
         end
 
