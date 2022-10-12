@@ -4,9 +4,9 @@ require "set"
 
 module Dry
   module Configurable
-    # This class represents a setting and is used internally.
+    # A defined setting.
     #
-    # @api private
+    # @api public
     class Setting
       include Dry::Equalizer(:name, :default, :constructor, :children, :options, inspect: false)
 
@@ -16,22 +16,22 @@ module Dry
 
       CLONEABLE_VALUE_TYPES = [Array, Hash, Set, Config].freeze
 
-      # @api private
+      # @api public
       attr_reader :name
 
-      # @api private
+      # @api public
       attr_reader :default
 
-      # @api private
+      # @api public
       attr_reader :cloneable
 
-      # @api private
+      # @api public
       attr_reader :constructor
 
-      # @api private
+      # @api public
       attr_reader :children
 
-      # @api private
+      # @api public
       attr_reader :options
 
       # @api private
@@ -62,7 +62,7 @@ module Dry
         options[:reader].equal?(true)
       end
 
-      # @api private
+      # @api public
       def cloneable?
         cloneable
       end

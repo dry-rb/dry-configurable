@@ -13,7 +13,7 @@ module Dry
 
         subclass.instance_variable_set(:@__config_extension__, __config_extension__)
 
-        new_settings = _settings.dup
+        new_settings = settings.dup
         subclass.instance_variable_set(:@_settings, new_settings)
 
         # Only classes **extending** Dry::Configurable have class-level config. When
@@ -43,28 +43,19 @@ module Dry
       def setting(*args, **options, &block)
         setting = __config_dsl__.setting(*args, **options, &block)
 
-        _settings << setting
+        settings << setting
 
         __config_reader__.define(setting.name) if setting.reader?
 
         self
       end
 
-      # Return declared settings
-      #
-      # @return [Set<Symbol>]
-      #
-      # @api public
-      def settings
-        Set[*_settings.map(&:name)]
-      end
-
-      # Return declared settings
+      # Returns the defined settings for the class.
       #
       # @return [Settings]
       #
       # @api public
-      def _settings
+      def settings
         @_settings ||= Settings.new
       end
 
@@ -78,7 +69,7 @@ module Dry
       end
 
       # @api private
-      def __config_build__(settings = _settings)
+      def __config_build__(settings = self.settings)
         __config_extension__.config_class.new(settings)
       end
 

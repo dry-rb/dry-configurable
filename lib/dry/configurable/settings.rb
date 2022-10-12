@@ -2,7 +2,7 @@
 
 module Dry
   module Configurable
-    # A settings map
+    # A collection of defined settings on a given class.
     #
     # @api private
     class Settings
@@ -19,35 +19,46 @@ module Dry
       end
 
       # @api private
+      private def initialize_copy(source)
+        @settings = source.settings.dup
+      end
+
+      # @api private
       def <<(setting)
         settings[setting.name] = setting
         self
       end
 
-      # @api private
+      # Returns the setting for the given name, if found.
+      #
+      # @return [Setting, nil] the setting, or nil if not found
+      #
+      # @api public
       def [](name)
         settings[name]
       end
 
-      # @api private
+      # Returns true if a setting for the given name is defined.
+      #
+      # @return [Boolean]
+      #
+      # @api public
       def key?(name)
         keys.include?(name)
       end
 
-      # @api private
+      # Returns the list of defined setting names.
+      #
+      # @return [Array<Symbol>]
+      #
+      # @api public
       def keys
         settings.keys
       end
 
-      # @api private
+      # @api public
       def each(&block)
         settings.each_value(&block)
-      end
-
-      private
-
-      def initialize_copy(source)
-        @settings = source.settings.dup
       end
     end
   end
