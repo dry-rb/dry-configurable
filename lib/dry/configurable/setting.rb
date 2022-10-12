@@ -10,11 +10,11 @@ module Dry
     class Setting
       include Dry::Equalizer(:name, :default, :constructor, :children, :options, inspect: false)
 
-      OPTIONS = %i[default reader constructor cloneable settings config_class].freeze
+      OPTIONS = %i[default reader constructor mutable cloneable settings config_class].freeze
 
       DEFAULT_CONSTRUCTOR = -> v { v }.freeze
 
-      CLONEABLE_VALUE_TYPES = [Array, Hash, Set, Config].freeze
+      MUTABLE_VALUE_TYPES = [Array, Hash, Set, Config].freeze
 
       # @api public
       attr_reader :name
@@ -23,7 +23,7 @@ module Dry
       attr_reader :default
 
       # @api public
-      attr_reader :cloneable
+      attr_reader :mutable
 
       # @api public
       attr_reader :constructor
@@ -35,8 +35,8 @@ module Dry
       attr_reader :options
 
       # @api private
-      def self.cloneable_value?(value)
-        CLONEABLE_VALUE_TYPES.any? { |type| value.is_a?(type) }
+      def self.mutable_value?(value)
+        MUTABLE_VALUE_TYPES.any? { |type| value.is_a?(type) }
       end
 
       # @api private
@@ -49,8 +49,9 @@ module Dry
       )
         @name = name
         @default = default
-        @cloneable = children.any? || options.fetch(:cloneable) {
-          Setting.cloneable_value?(default)
+        @mutable = children.any? || options.fetch(:mutable) {
+          # Allow `cloneable` as an option alias for `mutable`
+          options.fetch(:cloneable) { Setting.mutable_value?(default) }
         }
         @constructor = constructor
         @children = children
@@ -63,9 +64,10 @@ module Dry
       end
 
       # @api public
-      def cloneable?
-        cloneable
+      def mutable?
+        mutable
       end
+      alias_method :cloneable?, :mutable?
 
       # @api private
       def to_value
@@ -75,7 +77,7 @@ module Dry
           value = default
           value = constructor.(value) unless value.eql?(Undefined)
 
-          cloneable? ? value.dup : value
+          mutable? ? value.dup : value
         end
       end
     end
