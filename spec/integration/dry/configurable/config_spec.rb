@@ -257,7 +257,7 @@ RSpec.describe Dry::Configurable::Config do
       finalized_config = klass.config.dup.finalize!
 
       expect(finalized_config.hash).to eq klass.config.hash
-      expect { finalized_config.hash }.to perform_faster_than { klass.config.hash }.at_least(50).times
+      expect { finalized_config.hash }.to perform_faster_than { klass.config.hash }.at_least(5).times
     end
   end
 
