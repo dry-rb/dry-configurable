@@ -19,4 +19,5 @@ end
 group :tools do
   gem "hotch", platform: :mri
   gem "pry-byebug", platform: :mri
+  gem "rspec-benchmark"
 end

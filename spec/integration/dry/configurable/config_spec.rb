@@ -239,6 +239,28 @@ RSpec.describe Dry::Configurable::Config do
     end
   end
 
+  describe "#hash" do
+    it "returns the integer hash value for the convig based on its values" do
+      klass.setting :db
+
+      expect(klass.config.hash).to be_an_instance_of(Integer)
+      expect { klass.config.db = "sqlite" }.to change { klass.config.hash }
+    end
+
+    it "is memoized when the config is finalized", :performance do
+      klass.setting :a
+      klass.setting :b
+      klass.setting :c
+      klass.setting :d
+      klass.setting :e
+
+      finalized_config = klass.config.dup.finalize!
+
+      expect(finalized_config.hash).to eq klass.config.hash
+      expect { finalized_config.hash }.to perform_faster_than { klass.config.hash }.at_least(50).times
+    end
+  end
+
   describe "#method_missing" do
     it "provides access to reader methods" do
       klass.setting :hello
