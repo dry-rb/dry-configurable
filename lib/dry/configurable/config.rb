@@ -147,6 +147,16 @@ module Dry
       end
 
       # @api private
+      alias_method :_dry_equalizer_hash, :hash
+
+      # @api public
+      def hash
+        return @__hash__ if instance_variable_defined?(:@__hash__)
+
+        _dry_equalizer_hash
+      end
+
+      # @api private
       def finalize!(freeze_values: false)
         values.each_value do |value|
           if value.is_a?(self.class)
@@ -155,6 +165,13 @@ module Dry
             value.freeze
           end
         end
+
+        # Memoize the hash for the object when finalizing (regardless of whether values themselves
+        # are to be frozen; the intention of finalization is that no further changes should be
+        # made). The benefit of freezing the hash at this point is that it saves repeated expensive
+        # computation (through Dry::Equalizer's hash implementation) if that hash is to be used
+        # later in performance-sensitive situations, such as when serving as a cache key or similar.
+        @__hash__ = _dry_equalizer_hash unless frozen?
 
         freeze
       end

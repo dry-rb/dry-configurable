@@ -2,6 +2,7 @@
 
 require_relative "support/coverage"
 require "pathname"
+require "rspec-benchmark"
 
 SPEC_ROOT = Pathname(__FILE__).dirname
 
@@ -21,6 +22,8 @@ require "dry/core/deprecations"
 RSpec.configure do |config|
   config.disable_monkey_patching!
   config.filter_run_when_matching :focus
+
+  config.include RSpec::Benchmark::Matchers
 
   config.around do |example|
     module Test
