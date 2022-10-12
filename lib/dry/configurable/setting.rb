@@ -25,6 +25,9 @@ module Dry
       attr_reader :default
 
       # @api private
+      attr_reader :cloneable
+
+      # @api private
       attr_reader :constructor
 
       # @api private
@@ -48,6 +51,9 @@ module Dry
       )
         @name = name
         @default = default
+        @cloneable = children.any? || options.fetch(:cloneable) {
+          Setting.cloneable_value?(default)
+        }
         @constructor = constructor
         @children = children
         @options = options
@@ -60,7 +66,7 @@ module Dry
 
       # @api private
       def cloneable?
-        children.any? || options.fetch(:cloneable) { Setting.cloneable_value?(default) }
+        cloneable
       end
 
       # @api private
