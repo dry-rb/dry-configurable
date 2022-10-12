@@ -186,7 +186,7 @@ module Dry
       end
 
       def respond_to_missing?(meth, include_private = false)
-        _settings.key?(setting_name_from_method(meth)) || super
+        _settings[setting_name_from_method(meth)] || super
       end
 
       def setting_name_from_method(method_name)

@@ -19,9 +19,13 @@ module Dry
       attr_reader :settings
 
       # @api private
+      attr_reader :lookup_cache
+
+      # @api private
       def initialize(settings = EMPTY_ARRAY)
         @parent_settings = []
         @settings = settings.each_with_object({}) { |s, m| m[s.name] = s }
+        @lookup_cache = {}
       end
 
       # @api private
@@ -45,22 +49,15 @@ module Dry
 
       # @api private
       def [](name)
-        all_settings[name]
-      end
-
-      # @api private
-      def key?(name)
-        keys.include?(name)
-      end
-
-      # @api private
-      def keys
-        all_settings.keys
+        lookup_cache.fetch(name) {
+          lookup_cache[name] = all_settings[name]
+        }
       end
 
       # @api private
       def each(&block)
-        all_settings.each_value(&block)
+        parent_settings.each { |parent| parent.each_value(&block) }
+        settings.each_value(&block)
       end
 
       private
