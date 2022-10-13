@@ -12,7 +12,7 @@ module Dry
     module Initializer
       # @api private
       def initialize(*)
-        @config = self.class.__config_build__(self.class._settings)
+        @config = self.class.__config_build__(self.class.settings)
 
         super
       end

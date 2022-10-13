@@ -230,11 +230,11 @@ RSpec.describe Dry::Configurable, ".setting" do
       it "adding parent setting does not affect child" do
         klass.setting :db, default: "sqlite"
 
-        expect(subclass.settings).to eql(Set[:db])
+        expect(subclass.settings.map(&:name)).to eql([:db])
 
         klass.setting :other
 
-        expect(subclass.settings).to eql(Set[:db])
+        expect(subclass.settings.map(&:name)).to eql([:db])
       end
 
       specify "configuring the parent before subclassing copies the config to the child" do
@@ -273,12 +273,12 @@ RSpec.describe Dry::Configurable, ".setting" do
           config.nested.test = "woah!"
         end
 
-        expect(klass.settings).to eql(Set[:db, :nested])
+        expect(klass.settings.map(&:name)).to eq([:db, :nested])
         expect(object.config.db).to eql("sqlite")
         expect(object.config.db).to eql("sqlite")
         expect(object.config.nested.test).to eql("hello")
 
-        expect(subclass.settings).to eql(Set[:db, :nested])
+        expect(subclass.settings.map(&:name)).to eq([:db, :nested])
         expect(subclass.config.db).to eql("postgresql")
         expect(subclass.config.nested.test).to eql("woah!")
       end
