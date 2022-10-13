@@ -2,6 +2,7 @@
 
 ## 0.16.1 2022-10-13
 
+
 ### Changed
 
 - Restored performance of config value reads (direct reader methods as well as aggregate methods like `#values` and `#to_h`) to pre-0.16.0 levels (#149 by @timriley)
