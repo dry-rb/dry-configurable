@@ -261,6 +261,61 @@ RSpec.describe Dry::Configurable::Config do
     end
   end
 
+  describe "finalize!" do
+    it "can be finalized" do
+      klass.setting :db do
+        setting :user, default: "root".dup
+      end
+
+      klass.finalize!
+      klass.finalize! # second call becomes a no op
+
+      # It freezes the config and nested config classes
+      expect(klass.config).to be_frozen
+      expect(klass.config.db).to be_frozen
+
+      # But does not freeze values by default
+      expect(klass.config.db.user).not_to be_frozen
+      klass.config.db.user << "foo"
+      expect(klass.config.db.user).to eq("rootfoo")
+
+      # It does not allow configure block anymore
+      expect { klass.configure {} }.to raise_error(Dry::Configurable::FrozenConfigError)
+    end
+
+    it "can be finalized with freezing values" do
+      klass.setting :db do
+        setting :user, default: "root".dup
+      end
+
+      klass.finalize!(freeze_values: true)
+      klass.finalize!(freeze_values: true) # second call becomes a no op
+
+      expect(klass.config).to be_frozen
+      expect(klass.config.db).to be_frozen
+
+      expect(klass.config.db.user).to be_frozen
+      expect { klass.config.db.user << "foo" }.to raise_error(FrozenError)
+
+      # does not allow configure block anymore
+      expect { klass.configure {} }.to raise_error(Dry::Configurable::FrozenConfigError)
+    end
+
+    it "returns early when finalizing a second time" do
+      klass.setting :db do
+        setting :user, default: "root".dup
+      end
+
+      klass.finalize!
+      expect(klass.config).to be_frozen
+      expect(klass.config.db.user).not_to be_frozen
+
+      # Calling the second time does not do any work
+      klass.finalize!(freeze_values: true)
+      expect(klass.config.db.user).not_to be_frozen
+    end
+  end
+
   describe "#method_missing" do
     it "provides access to reader methods" do
       klass.setting :hello
