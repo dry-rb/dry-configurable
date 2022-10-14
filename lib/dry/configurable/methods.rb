@@ -8,7 +8,7 @@ module Dry
     module Methods
       # @api public
       def configure(&block)
-        raise FrozenConfig, "Cannot modify frozen config" if frozen?
+        raise FrozenConfigError, "Cannot modify frozen config" if frozen?
 
         yield(config) if block
         self

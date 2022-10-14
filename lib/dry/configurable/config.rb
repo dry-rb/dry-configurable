@@ -68,7 +68,7 @@ module Dry
       # @param [String,Symbol] name
       # @param [Object] value
       def []=(name, value)
-        raise FrozenConfig, "Cannot modify frozen config" if frozen?
+        raise FrozenConfigError, "Cannot modify frozen config" if frozen?
 
         name = name.to_sym
 

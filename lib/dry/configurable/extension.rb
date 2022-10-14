@@ -26,7 +26,7 @@ module Dry
 
       # @api private
       def included(klass)
-        raise AlreadyIncluded if klass.include?(InstanceMethods)
+        raise AlreadyIncludedError if klass.include?(InstanceMethods)
 
         super
 

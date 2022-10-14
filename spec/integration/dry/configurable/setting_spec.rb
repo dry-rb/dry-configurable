@@ -464,7 +464,7 @@ RSpec.describe Dry::Configurable, ".setting" do
       expect(object.config.db.user).to eq("rootfoo")
 
       # does not allow configure block anymore
-      expect { object.configure {} }.to raise_error(Dry::Configurable::FrozenConfig)
+      expect { object.configure {} }.to raise_error(Dry::Configurable::FrozenConfigError)
     end
 
     it "can be finalized with freezing values" do
@@ -481,7 +481,7 @@ RSpec.describe Dry::Configurable, ".setting" do
       expect { object.config.db.user << "foo" }.to raise_error(FrozenError)
 
       # does not allow configure block anymore
-      expect { object.configure {} }.to raise_error(Dry::Configurable::FrozenConfig)
+      expect { object.configure {} }.to raise_error(Dry::Configurable::FrozenConfigError)
     end
 
     it "defines a reader shortcut for nested config" do
