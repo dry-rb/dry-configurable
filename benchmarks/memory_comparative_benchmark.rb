@@ -2,7 +2,6 @@
 
 require "benchmark/memory"
 require "dry/configurable"
-require "dry/core/class_attributes"
 require "hanami/utils/class_attribute"
 
 def inherit_configurable(times)

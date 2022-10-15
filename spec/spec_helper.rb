@@ -17,7 +17,6 @@ end
 
 require "dry/configurable"
 require "dry/configurable/test_interface"
-require "dry/core/deprecations"
 
 RSpec.configure do |config|
   config.disable_monkey_patching!
