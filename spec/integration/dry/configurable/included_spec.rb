@@ -15,7 +15,7 @@ RSpec.describe Dry::Configurable, ".included" do
     it "raises when Dry::Configurable has already been included" do
       expect {
         configurable_klass.include(Dry::Configurable)
-      }.to raise_error(Dry::Configurable::AlreadyIncluded)
+      }.to raise_error(Dry::Configurable::AlreadyIncludedError)
     end
 
     it "ensures `.config` is not defined" do

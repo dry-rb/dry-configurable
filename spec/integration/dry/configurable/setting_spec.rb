@@ -398,6 +398,14 @@ RSpec.describe Dry::Configurable, ".setting" do
       expect(object_2.config.after).to eq "defined after"
     end
 
+    it "is frozen when finalized" do
+      object.finalize!
+      object.finalize! # second call becomes a no op
+
+      expect(object).to be_frozen
+      expect(object.config).to be_frozen
+    end
+
     shared_examples "copying" do
       before do
         klass.setting :env
@@ -447,41 +455,6 @@ RSpec.describe Dry::Configurable, ".setting" do
       end
 
       expect(object.config.db).to eql("mariadb")
-    end
-
-    it "can be finalized" do
-      klass.setting :kafka, default: "kafka://127.0.0.1:9092"
-
-      object.finalize!
-      # becomes a no-op
-      object.finalize!
-
-      expect(object).to be_frozen
-      expect(object.config.db).to be_frozen
-      expect(object.config.db.user).not_to be_frozen
-
-      object.config.db.user << "foo"
-      expect(object.config.db.user).to eq("rootfoo")
-
-      # does not allow configure block anymore
-      expect { object.configure {} }.to raise_error(Dry::Configurable::FrozenConfig)
-    end
-
-    it "can be finalized with freezing values" do
-      klass.setting :kafka, default: "kafka://127.0.0.1:9092"
-
-      object.finalize!(freeze_values: true)
-      # becomes a no-op
-      object.finalize!(freeze_values: true)
-
-      expect(object).to be_frozen
-      expect(object.config.db).to be_frozen
-      expect(object.config.db.user).to be_frozen
-
-      expect { object.config.db.user << "foo" }.to raise_error(FrozenError)
-
-      # does not allow configure block anymore
-      expect { object.configure {} }.to raise_error(Dry::Configurable::FrozenConfig)
     end
 
     it "defines a reader shortcut for nested config" do

@@ -68,7 +68,7 @@ module Dry
       # @param [String,Symbol] name
       # @param [Object] value
       def []=(name, value)
-        raise FrozenConfig, "Cannot modify frozen config" if frozen?
+        raise FrozenConfigError, "Cannot modify frozen config" if frozen?
 
         name = name.to_sym
 
@@ -156,8 +156,10 @@ module Dry
         _dry_equalizer_hash
       end
 
-      # @api private
+      # @api public
       def finalize!(freeze_values: false)
+        return self if frozen?
+
         values.each_value do |value|
           if value.is_a?(self.class)
             value.finalize!(freeze_values: freeze_values)
@@ -171,7 +173,7 @@ module Dry
         # made). The benefit of freezing the hash at this point is that it saves repeated expensive
         # computation (through Dry::Equalizer's hash implementation) if that hash is to be used
         # later in performance-sensitive situations, such as when serving as a cache key or similar.
-        @__hash__ = _dry_equalizer_hash unless frozen?
+        @__hash__ = _dry_equalizer_hash
 
         freeze
       end
