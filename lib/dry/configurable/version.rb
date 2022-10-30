@@ -3,6 +3,6 @@
 module Dry
   module Configurable
     # @api public
-    VERSION = "0.16.1"
+    VERSION = "1.0.0.rc1"
   end
 end
