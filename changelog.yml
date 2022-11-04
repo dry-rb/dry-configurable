@@ -1,4 +1,8 @@
 ---
+- version: 1.0.0
+  date: 2022-11-04
+  changed:
+  - "Dependency on `dry-core` was updated to ~> 1.0 (@solnic)"
 - version: 0.16.1
   date: 2022-10-13
   changed:
