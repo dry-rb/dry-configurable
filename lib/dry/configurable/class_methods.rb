@@ -14,13 +14,13 @@ module Dry
         subclass.instance_variable_set(:@__config_extension__, __config_extension__)
 
         new_settings = settings.dup
-        subclass.instance_variable_set(:@_settings, new_settings)
+        subclass.instance_variable_set(:@__settings__, new_settings)
 
         # Only classes **extending** Dry::Configurable have class-level config. When
         # Dry::Configurable is **included**, the class-level config method is undefined because it
         # resides at the instance-level instead (see `Configurable.included`).
         if respond_to?(:config)
-          subclass.instance_variable_set(:@config, config.dup_for_settings(new_settings))
+          subclass.instance_variable_set(:@__config__, config.dup_for_settings(new_settings))
         end
       end
 
@@ -56,7 +56,7 @@ module Dry
       #
       # @api public
       def settings
-        @_settings ||= Settings.new
+        @__settings__ ||= Settings.new
       end
 
       # Return configuration
@@ -65,7 +65,7 @@ module Dry
       #
       # @api public
       def config
-        @config ||= __config_build__
+        @__config__ ||= __config_build__
       end
 
       # @api private
