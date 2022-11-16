@@ -12,7 +12,7 @@ module Dry
     module Initializer
       # @api private
       def initialize(*)
-        @config = self.class.__config_build__(self.class.settings)
+        @__config__ = self.class.__config_build__(self.class.settings)
 
         super
       end
@@ -30,7 +30,9 @@ module Dry
       # @return [Config]
       #
       # @api public
-      attr_reader :config
+      def config
+        @__config__
+      end
 
       # Finalize the config and freeze the object
       #
@@ -45,7 +47,7 @@ module Dry
       # @api public
       def initialize_copy(source)
         super
-        @config = source.config.dup
+        @__config__ = source.config.dup
       end
     end
   end

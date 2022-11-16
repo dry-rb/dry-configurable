@@ -10,7 +10,7 @@ module Dry
       #
       # @api public
       def reset_config
-        @config = config.pristine
+        @__config__ = config.pristine
       end
     end
 
