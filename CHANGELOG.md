@@ -5,7 +5,7 @@
 
 ### Changed
 
-- Renamed `@config` and `@_settings` internal instance variables to `@__config__` and `@__settings__` in order to avoid cleashes (#159 by @timriley)
+- Renamed `@config` and `@_settings` internal instance variables to `@__config__` and `@__settings__` in order to avoid clashes with user-defined instance variables (#159 by @timriley)
 
 [Compare v1.0.0...v1.0.1](https://github.com/dry-rb/dry-configurable/compare/v1.0.0...v1.0.1)
 
