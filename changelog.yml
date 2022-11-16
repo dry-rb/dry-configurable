@@ -3,7 +3,7 @@
   date: 2022-11-16
   changed:
   - |-
-    Renamed `@config` and `@_settings` internal instance variables to `@__config__` and `@__settings__` in order to avoid cleashes (#159 by @timriley)
+    Renamed `@config` and `@_settings` internal instance variables to `@__config__` and `@__settings__` in order to avoid clashes with user-defined instance variables (#159 by @timriley)
 - version: 1.0.0
   date: 2022-11-04
   changed:
