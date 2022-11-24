@@ -1,19 +1,14 @@
 <!--- this file is synced from dry-rb/template-gem project -->
 [gem]: https://rubygems.org/gems/dry-configurable
 [actions]: https://github.com/dry-rb/dry-configurable/actions
-[codacy]: https://www.codacy.com/gh/dry-rb/dry-configurable
-[chat]: https://dry-rb.zulipchat.com
-[inchpages]: http://inch-ci.org/github/dry-rb/dry-configurable
 
-# dry-configurable [![Join the chat at https://dry-rb.zulipchat.com](https://img.shields.io/badge/dry--rb-join%20chat-%23346b7a.svg)][chat]
-
-[![Gem Version](https://badge.fury.io/rb/dry-configurable.svg)][gem]
-[![CI Status](https://github.com/dry-rb/dry-configurable/workflows/ci/badge.svg)][actions]
+# dry-configurable [![Gem Version](https://badge.fury.io/rb/dry-configurable.svg)][gem] [![CI Status](https://github.com/dry-rb/dry-configurable/workflows/ci/badge.svg)][actions]
 
 ## Links
 
 * [User documentation](https://dry-rb.org/gems/dry-configurable)
 * [API documentation](http://rubydoc.info/gems/dry-configurable)
+* [Forum](https://discourse.dry-rb.org)
 
 ## Supported Ruby versions
 
