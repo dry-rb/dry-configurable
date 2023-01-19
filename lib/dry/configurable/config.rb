@@ -159,7 +159,9 @@ module Dry
       def finalize!(freeze_values: false)
         return self if frozen?
 
-        values.each_value do |value|
+        values.each do |setting_name, value|
+          define_setting_accessors(setting_name)
+
           if value.is_a?(self.class)
             value.finalize!(freeze_values: freeze_values)
           elsif freeze_values
@@ -175,6 +177,14 @@ module Dry
         @__hash__ = _dry_equalizer_hash
 
         freeze
+      end
+
+      private def define_setting_accessors(setting_name)
+        return if singleton_class.method_defined?(setting_name)
+
+        values = self.values
+        define_singleton_method(setting_name) { values[setting_name] }
+        define_singleton_method(:"#{setting_name}=") { |value| values[setting_name] = value }
       end
 
       # @api private
