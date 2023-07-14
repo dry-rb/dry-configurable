@@ -6,7 +6,7 @@ module Dry
     #
     # @api private
     class DSL
-      VALID_NAME = /\A[a-z_]\w*\z/i.freeze
+      VALID_NAME = /\A[a-z_]\w*\z/i
 
       attr_reader :compiler
 
