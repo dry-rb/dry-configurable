@@ -8,11 +8,15 @@ RSpec.describe Dry::Configurable, "default values" do
       setting :foo
       setting :bar, constructor: -> v { v.upcase }
       setting :baz, default: "baz", constructor: -> v { v.upcase }
+      setting :qux do
+        setting :quux
+      end
     end
 
     expect(klass.config.foo).to be(Dry::Configurable::Undefined)
     expect(klass.config.bar).to be(Dry::Configurable::Undefined)
     expect(klass.config.baz).to eq "BAZ"
+    expect(klass.config.qux.quux).to be(Dry::Configurable::Undefined)
 
     klass.configure do |config|
       config.foo = "foo"

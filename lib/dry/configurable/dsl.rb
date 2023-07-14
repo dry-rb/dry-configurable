@@ -38,7 +38,7 @@ module Dry
         node = [:setting, [name.to_sym, options]]
 
         if block
-          ast << [:nested, [node, DSL.new(&block).ast]]
+          ast << [:nested, [node, DSL.new(**@options, &block).ast]]
         else
           ast << node
         end
