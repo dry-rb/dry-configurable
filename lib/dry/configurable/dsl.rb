@@ -26,7 +26,7 @@ module Dry
       # @see ClassMethods.setting
       # @api private
       # @return Setting
-      def setting(name, **options, &block) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
+      def setting(name, **options, &block)
         unless VALID_NAME.match?(name.to_s)
           raise ArgumentError, "#{name} is not a valid setting name"
         end
