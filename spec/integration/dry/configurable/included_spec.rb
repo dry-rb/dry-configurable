@@ -12,12 +12,6 @@ RSpec.describe Dry::Configurable, ".included" do
         .to include(Dry::Configurable::InstanceMethods)
     end
 
-    it "raises when Dry::Configurable has already been included" do
-      expect {
-        configurable_klass.include(Dry::Configurable)
-      }.to raise_error(Dry::Configurable::AlreadyIncludedError)
-    end
-
     it "ensures `.config` is not defined" do
       expect(configurable_klass).not_to respond_to(:config)
     end
@@ -75,6 +69,44 @@ RSpec.describe Dry::Configurable, ".included" do
     it "calls finalize! in configurable class" do
       instance.finalize!
       expect(instance.finalized).to be(true)
+    end
+  end
+
+  context "with deep class hierarchy" do
+    let(:configurable_class) do
+      Class.new do
+        include Dry::Configurable
+      end
+    end
+
+    it "allows a subclass also to include Dry::Configurable" do
+      subclass = Class.new(configurable_class) do
+        include Dry::Configurable
+      end
+
+      expect(subclass.new.config).to be_a(Dry::Configurable::Config)
+    end
+
+    it "allows a subclass to reconfigure the behavior" do
+      custom_config_class = Class.new(Dry::Configurable::Config) do
+        def db
+          super + "!!"
+        end
+      end
+
+      subclass = Class.new(configurable_class) do
+        setting :db
+      end
+
+      subsubclass = Class.new(subclass) do
+        include Dry::Configurable(config_class: custom_config_class)
+      end
+
+      obj = subsubclass.new
+      expect(obj.config).to be_a(custom_config_class)
+
+      obj.config.db = "sqlite"
+      expect(obj.config.db).to eq "sqlite!!"
     end
   end
 end

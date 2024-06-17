@@ -7,7 +7,6 @@ module Dry
   module Configurable
     Error = Class.new(::StandardError)
 
-    AlreadyIncludedError = Class.new(Error)
     FrozenConfigError = Class.new(Error)
   end
 end
