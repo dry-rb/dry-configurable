@@ -90,7 +90,7 @@ RSpec.describe Dry::Configurable, ".included" do
     it "allows a subclass to reconfigure the behavior" do
       custom_config_class = Class.new(Dry::Configurable::Config) do
         def db
-          super + "!!"
+          "#{super}!!"
         end
       end
 

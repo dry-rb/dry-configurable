@@ -35,7 +35,7 @@ module Dry
 
           class << self
             undef :config if method_defined?(:config)
-            undef :configure  if method_defined?(:configure)
+            undef :configure if method_defined?(:configure)
           end
         end
 
