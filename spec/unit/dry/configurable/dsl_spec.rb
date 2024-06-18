@@ -7,21 +7,6 @@ RSpec.describe Dry::Configurable::DSL do
     Dry::Configurable::DSL.new
   end
 
-  let(:logger) { StringIO.new }
-
-  let(:logged) do
-    logger.rewind
-    logger.string
-  end
-
-  around(:each, :collect_deprecations) do |example|
-    Dry::Core::Deprecations.set_logger!(logger)
-
-    example.run
-  ensure
-    Dry::Core::Deprecations.set_logger!
-  end
-
   it "compiles a setting with no options" do
     setting = dsl.setting :user
 
