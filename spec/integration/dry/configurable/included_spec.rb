@@ -79,7 +79,7 @@ RSpec.describe Dry::Configurable, ".included" do
       end
     end
 
-    it "allows a subclass also to include Dry::Configurable" do
+    it "allows subclasses also to include Dry::Configurable" do
       subclass = Class.new(configurable_class) do
         include Dry::Configurable
       end
@@ -87,26 +87,78 @@ RSpec.describe Dry::Configurable, ".included" do
       expect(subclass.new.config).to be_a(Dry::Configurable::Config)
     end
 
-    it "allows a subclass to reconfigure the behavior" do
+    it "allows subclasses to reconfigure the behavior" do
+      custom_config_class_1 = Class.new(Dry::Configurable::Config) do
+        def db
+          "#{super}!!"
+        end
+      end
+
+      custom_config_class_2 = Class.new(Dry::Configurable::Config) do
+        def db
+          "#{super}??"
+        end
+      end
+
+      subclass_l1 = Class.new(configurable_class) do
+        setting :db
+      end
+
+      subclass_l2 = Class.new(subclass_l1) do
+        include Dry::Configurable(config_class: custom_config_class_1)
+      end
+
+      subclass_l3 = Class.new(subclass_l2)
+
+      subclass_l4 = Class.new(subclass_l3) do
+        include Dry::Configurable(config_class: custom_config_class_2)
+      end
+
+      obj = subclass_l2.new
+      obj.config.db = "sqlite"
+      expect(obj.config.db).to eq "sqlite!!"
+
+      obj = subclass_l3.new
+      obj.config.db = "postgres"
+      expect(obj.config.db).to eq "postgres!!"
+
+      obj = subclass_l4.new
+      obj.config.db = "sqlite"
+      expect(obj.config.db).to eq "sqlite??"
+    end
+
+    it "sets up config across multiple prepended initialize methods" do
       custom_config_class = Class.new(Dry::Configurable::Config) do
         def db
           "#{super}!!"
         end
       end
 
-      subclass = Class.new(configurable_class) do
+      subclass_l1 = Class.new(configurable_class) do
         setting :db
+
+        def initialize
+          super
+        end
       end
 
-      subsubclass = Class.new(subclass) do
+      subclass_l2 = Class.new(subclass_l1) do
+        def initialize
+          super
+          config.db = "l2_db"
+        end
+      end
+
+      subclass_l3 = Class.new(subclass_l2) do
         include Dry::Configurable(config_class: custom_config_class)
+
+        def initialize
+          super
+        end
       end
 
-      obj = subsubclass.new
-      expect(obj.config).to be_a(custom_config_class)
-
-      obj.config.db = "sqlite"
-      expect(obj.config.db).to eq "sqlite!!"
+      obj = subclass_l3.new
+      expect(obj.config.db).to eq "l2_db!!"
     end
   end
 end
