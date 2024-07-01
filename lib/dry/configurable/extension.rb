@@ -26,8 +26,6 @@ module Dry
 
       # @api private
       def included(klass)
-        raise AlreadyIncludedError if klass.include?(InstanceMethods)
-
         super
 
         klass.class_eval do
@@ -36,8 +34,8 @@ module Dry
           prepend(Initializer)
 
           class << self
-            undef :config
-            undef :configure
+            undef :config if method_defined?(:config)
+            undef :configure if method_defined?(:configure)
           end
         end
 
