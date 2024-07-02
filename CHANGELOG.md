@@ -6,6 +6,7 @@
 ### Changed
 
 - Allow `Dry::Configurable` mixin to be included multiple times in a class hierarchy (#164 by @timriley)      
+- Deprecate `Dry::Configurable::AlreadyIncludedError` (#164 by @timriley)
 
 [Compare v1.1.0...v1.2.0](https://github.com/dry-rb/dry-configurable/compare/v1.1.0...v1.2.0)
 
