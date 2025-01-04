@@ -17,6 +17,6 @@ group :benchmarks do
 end
 
 group :tools do
-  gem "hotch", platform: :mri
+  # gem "hotch", platform: :mri
   gem "rspec-benchmark"
 end
