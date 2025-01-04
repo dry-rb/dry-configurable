@@ -127,7 +127,7 @@ RSpec.describe Dry::Configurable, ".setting" do
 
         expect {
           object.config.failable = 12
-        }.to raise_error(NoMethodError, /undefined method `to_sym'/)
+        }.to raise_error(NoMethodError, /undefined method (`|')to_sym'/)
       end
     end
 
