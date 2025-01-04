@@ -16,19 +16,21 @@ Gem::Specification.new do |spec|
   spec.summary       = "A mixin to add configuration functionality to your classes"
   spec.description   = spec.summary
   spec.homepage      = "https://dry-rb.org/gems/dry-configurable"
-  spec.files         = Dir["CHANGELOG.md", "LICENSE", "README.md", "dry-configurable.gemspec", "lib/**/*"]
+  spec.files         = Dir["CHANGELOG.md", "LICENSE", "README.md", "dry-configurable.gemspec",
+                           "lib/**/*"]
   spec.bindir        = "bin"
   spec.executables   = []
   spec.require_paths = ["lib"]
 
-  spec.metadata["allowed_push_host"] = "https://rubygems.org"
-  spec.metadata["changelog_uri"]     = "https://github.com/dry-rb/dry-configurable/blob/main/CHANGELOG.md"
-  spec.metadata["source_code_uri"]   = "https://github.com/dry-rb/dry-configurable"
-  spec.metadata["bug_tracker_uri"]   = "https://github.com/dry-rb/dry-configurable/issues"
+  spec.metadata["allowed_push_host"]     = "https://rubygems.org"
+  spec.metadata["changelog_uri"]         = "https://github.com/dry-rb/dry-configurable/blob/main/CHANGELOG.md"
+  spec.metadata["source_code_uri"]       = "https://github.com/dry-rb/dry-configurable"
+  spec.metadata["bug_tracker_uri"]       = "https://github.com/dry-rb/dry-configurable/issues"
+  spec.metadata["rubygems_mfa_required"] = "true"
 
   spec.required_ruby_version = ">= 3.1"
 
   # to update dependencies edit project.yml
-  spec.add_runtime_dependency "dry-core", "~> 1.1"
-  spec.add_runtime_dependency "zeitwerk", "~> 2.6"
+  spec.add_dependency "dry-core", "~> 1.1"
+  spec.add_dependency "zeitwerk", "~> 2.6"
 end
