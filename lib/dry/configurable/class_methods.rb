@@ -40,8 +40,8 @@ module Dry
       # @return [Dry::Configurable::Config]
       #
       # @api public
-      def setting(*args, **options, &block)
-        setting = __config_dsl__.setting(*args, **options, &block)
+      def setting(...)
+        setting = __config_dsl__.setting(...)
 
         settings << setting
 

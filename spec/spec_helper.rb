@@ -11,7 +11,7 @@ begin
 rescue LoadError
 end
 
-Dir[Pathname(__FILE__).dirname.join("support/**/*.rb").to_s].sort.each do |file|
+Dir[Pathname(__FILE__).dirname.join("support/**/*.rb").to_s].each do |file|
   require file
 end
 

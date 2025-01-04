@@ -33,7 +33,9 @@ RSpec.describe Dry::Configurable, ".included" do
     let(:configurable_klass) do
       Class.new do
         include Dry::Configurable
-        def initialize; end
+        def initialize # rubocop:disable Style/RedundantInitialize:
+          super
+        end
       end
     end
 
@@ -43,7 +45,9 @@ RSpec.describe Dry::Configurable, ".included" do
       let(:configurable_klass) do
         Class.new do
           include Dry::Configurable
-          def initialize(a, b:); end
+          def initialize(a, b:) # rubocop:disable Lint/UnusedMethodArgument
+            super()
+          end
         end
       end
 

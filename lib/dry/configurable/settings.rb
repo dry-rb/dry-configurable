@@ -57,8 +57,8 @@ module Dry
       end
 
       # @api public
-      def each(&block)
-        settings.each_value(&block)
+      def each(&)
+        settings.each_value(&)
       end
     end
   end
