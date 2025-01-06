@@ -33,7 +33,7 @@ RSpec.describe Dry::Configurable, ".included" do
     let(:configurable_klass) do
       Class.new do
         include Dry::Configurable
-        def initialize # rubocop:disable Style/RedundantInitialize:
+        def initialize
           super
         end
       end

@@ -273,3 +273,7 @@ Naming/BinaryOperatorParameterName:
 Style/SymbolProc:
   Exclude:
     - "spec/**/*.rb"
+
+Style/RedundantInitialize:
+  Exclude:
+    - "spec/**/*.rb"
