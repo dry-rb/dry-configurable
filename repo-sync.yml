@@ -1,0 +1,17 @@
+name:
+  gem: dry-configurable
+  constant: Dry::Configurable
+github_org: dry-rb
+gemspec:
+  authors: ["Hanakai team"]
+  email: ["info@hanakai.org"]
+  summary: "A mixin to add configuration functionality to your classes"
+  homepage: "https://dry-rb.org/gems/dry-configurable"
+  required_ruby_version: ">= 3.1"
+  development_dependencies:
+    - bundler
+    - rake
+    - rspec
+  runtime_dependencies:
+    - [zeitwerk, "~> 2.6"]
+    - [dry-core, "~> 1.0"]

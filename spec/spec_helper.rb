@@ -19,9 +19,6 @@ require "dry/configurable"
 require "dry/configurable/test_interface"
 
 RSpec.configure do |config|
-  config.disable_monkey_patching!
-  config.filter_run_when_matching :focus
-
   config.include RSpec::Benchmark::Matchers
 
   config.around do |example|
