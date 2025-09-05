@@ -142,7 +142,7 @@ module Dry
       #
       # @api public
       def to_h
-        values.to_h { |key, value| [key, value.is_a?(self.class) ? value.to_h : value] }
+        values.transform_values { |value| value.is_a?(self.class) ? value.to_h : value }
       end
 
       # @api private
