@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "set"
-
 module Dry
   module Configurable
     module ClassMethods

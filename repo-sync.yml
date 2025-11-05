@@ -7,7 +7,6 @@ gemspec:
   email: ["info@hanakai.org"]
   summary: "A mixin to add configuration functionality to your classes"
   homepage: "https://dry-rb.org/gems/dry-configurable"
-  required_ruby_version: ">= 3.1"
   development_dependencies:
     - bundler
     - rake

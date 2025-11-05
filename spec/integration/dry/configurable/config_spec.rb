@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "pathname"
-require "set"
 
 RSpec.describe Dry::Configurable::Config do
   subject(:config) do
