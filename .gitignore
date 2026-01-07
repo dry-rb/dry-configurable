@@ -7,3 +7,4 @@ tmp/
 Gemfile.lock
 spec/examples.txt
 pkg/
+/.rubocop-*

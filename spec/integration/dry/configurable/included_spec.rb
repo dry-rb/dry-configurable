@@ -45,7 +45,7 @@ RSpec.describe Dry::Configurable, ".included" do
       let(:configurable_klass) do
         Class.new do
           include Dry::Configurable
-          def initialize(a, b:) # rubocop:disable Lint/UnusedMethodArgument
+          def initialize(a, b:)
             super()
           end
         end
