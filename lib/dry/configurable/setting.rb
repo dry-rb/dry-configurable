@@ -8,7 +8,7 @@ module Dry
     class Setting
       include Dry::Equalizer(:name, :default, :constructor, :children, :options, inspect: false)
 
-      OPTIONS = %i[default reader constructor mutable cloneable settings config_class].freeze
+      OPTIONS = %i[default reader constructor type mutable cloneable settings config_class].freeze
 
       DEFAULT_CONSTRUCTOR = -> v { v }.freeze
 
@@ -41,7 +41,8 @@ module Dry
       def initialize(
         name,
         default:,
-        constructor: DEFAULT_CONSTRUCTOR,
+        type: DEFAULT_CONSTRUCTOR,
+        constructor: type,
         children: EMPTY_ARRAY,
         **options
       )
