@@ -37,8 +37,8 @@ module Dry
 
         if DATA_RESERVED_NAMES.include?(name.to_sym)
           raise ArgumentError,
-                "#{name.inspect} is not a valid setting name: it conflicts with a Data " \
-                "instance method, which would break Config#to_data"
+            "#{name.inspect} is not a valid setting name: it conflicts with a Data " \
+            "instance method, which would break Config#to_data"
         end
 
         ensure_valid_options(options)
