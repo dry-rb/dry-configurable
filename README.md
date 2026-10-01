@@ -2,7 +2,7 @@
 
 [actions]: https://github.com/dry-rb/dry-configurable/actions
 [chat]: https://discord.gg/naQApPAsZB
-[forum]: https://discourse.hanamirb.org
+[forum]: https://discourse.hanakai.org
 [rubygem]: https://rubygems.org/gems/dry-configurable
 
 # dry-configurable [![Gem Version](https://badge.fury.io/rb/dry-configurable.svg)][rubygem] [![CI Status](https://github.com/dry-rb/dry-configurable/workflows/CI/badge.svg)][actions]
