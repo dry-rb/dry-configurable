@@ -30,6 +30,8 @@ module Dry
       #   Default value for the setting
       # @param [#call] constructor
       #   Transformation given value will go through
+      # @param [#call] type
+      #   An alias for constructor
       # @param [Boolean] reader
       #   Whether a reader accessor must be created
       # @yield

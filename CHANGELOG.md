@@ -9,6 +9,8 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Added
 
+- Add `type:` as an alias for `constructor:` when defining settings.
+
 ### Changed
 
 ### Deprecated
