@@ -231,6 +231,10 @@ module Dry
       end
 
       def method_missing(name, *args)
+        # A reader's method name is the setting name, so it needs none of the string handling that
+        # tells a writer from a reader.
+        return _values.fetch(name) { self[name] } if args.empty? && _settings[name]
+
         setting_name = setting_name_from_method(name)
         setting = _settings[setting_name]
 

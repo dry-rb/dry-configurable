@@ -11,6 +11,8 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Changed
 
+- Speed up reading settings through reader methods (such as `config.name`) by skipping the handling only needed for writer methods. (@parndt)
+
 ### Deprecated
 
 ### Removed

@@ -399,5 +399,36 @@ RSpec.describe Dry::Configurable::Config do
 
       expect { klass.config.method(:hello=) }.to_not raise_error
     end
+
+    it "reads a setting's default, then its assigned value" do
+      klass.setting :hello, default: "world"
+
+      expect(config.hello).to eq "world"
+
+      config.hello = "there"
+
+      expect(config.hello).to eq "there"
+    end
+
+    it "ignores arguments given to a reader" do
+      klass.setting :hello, default: "world"
+
+      expect(config.hello(1)).to eq "world"
+    end
+
+    it "does not treat a writer called without a value as a reader" do
+      klass.setting :hello, default: "world"
+
+      config.public_send(:hello=)
+
+      expect(config.hello).to be_nil
+    end
+
+    it "raises NoMethodError for a method that is not a setting" do
+      klass.setting :hello
+
+      expect { config.goodbye }.to raise_error(NoMethodError)
+      expect { config.goodbye = 1 }.to raise_error(NoMethodError)
+    end
   end
 end
