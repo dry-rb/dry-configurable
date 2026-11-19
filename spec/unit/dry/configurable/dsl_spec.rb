@@ -57,6 +57,14 @@ RSpec.describe Dry::Configurable::DSL do
     expect(setting.constructor.("sqlite")).to eq("jdbc:sqlite")
   end
 
+  it "compiles a setting with a type as an alias for constructor" do
+    setting = dsl.setting(:dsn, default: "sqlite", type: ->(value) { "jdbc:#{value}" })
+
+    expect(setting.name).to be(:dsn)
+    expect(setting.default).to eq("sqlite")
+    expect(setting.constructor.("sqlite")).to eq("jdbc:sqlite")
+  end
+
   it "rejects setting names that conflict with Data instance methods" do
     expect { dsl.setting :hash }.to raise_error(
       ArgumentError,
